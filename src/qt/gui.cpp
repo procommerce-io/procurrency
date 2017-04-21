@@ -94,7 +94,7 @@ GUI::GUI(QWidget *parent):
     setCentralWidget(webView);
 
     //resize(1280, 720);
-	resize(1235, 740);
+	resize(1405, 795);
     setWindowTitle(tr("ProCurrency") + " - " + tr("Enhanced Wallet"));
 #ifndef Q_OS_MAC
     qApp->setWindowIcon(QIcon(":icons/procurrency"));
