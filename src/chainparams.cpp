@@ -50,8 +50,8 @@ int64_t CChainParams::GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64
 {
     int64_t nSubsidy = 5 * COIN;
 	
-	//if(nHeight < (YEARLY_BLOCKCOUNT))
-	if(nHeight < 100)	
+	//if(nHeight < 100)
+	if(nHeight < (YEARLY_BLOCKCOUNT))
     {
         nSubsidy = 15 * COIN;   // 
     }
@@ -168,7 +168,7 @@ public:
         
         nLastPOWBlock = 5000;
         
-        nFirstPosv2Block = 20000; // POSv2 Start
+        nFirstPosv2Block = 920; // POSv2 Start
         nFirstPosv3Block = 30000; // POSv3 Start
 
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20); // PoW starting difficulty = 0.0002441
