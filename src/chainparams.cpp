@@ -184,15 +184,17 @@ public:
 		
 		
 		
-		vSeeds.push_back(CDNSSeedData("seed1",  "67.205.148.149"));
-        vSeeds.push_back(CDNSSeedData("seed2",  "67.205.148.126"));
-        vSeeds.push_back(CDNSSeedData("seed3",  "67.205.140.140"));
-		vSeeds.push_back(CDNSSeedData("seed4",  "162.243.6.128"));
-        vSeeds.push_back(CDNSSeedData("seed5",  "162.243.10.84"));
-        vSeeds.push_back(CDNSSeedData("seed6",  "162.243.50.156"));
-		vSeeds.push_back(CDNSSeedData("seed7",  "162.243.66.199"));
-        vSeeds.push_back(CDNSSeedData("seed8",  "162.243.248.73"));
-        vSeeds.push_back(CDNSSeedData("seed9",  "104.131.131.234"));
+		vSeeds.push_back(CDNSSeedData("seed1",  "185.69.55.38"));
+        vSeeds.push_back(CDNSSeedData("seed2",  "194.135.80.127"));
+        vSeeds.push_back(CDNSSeedData("seed3",  "185.5.53.201"));
+		vSeeds.push_back(CDNSSeedData("seed4",  "185.5.54.65"));
+		vSeeds.push_back(CDNSSeedData("seed5",  "185.69.53.90"));
+		vSeeds.push_back(CDNSSeedData("seed6",  "45.63.51.33"));
+		vSeeds.push_back(CDNSSeedData("seed7",  "45.32.167.248"));
+		vSeeds.push_back(CDNSSeedData("seed8",  "45.76.5.197"));
+		vSeeds.push_back(CDNSSeedData("seed9",  "45.32.176.210"));
+		vSeeds.push_back(CDNSSeedData("seed10",  "45.76.88.24"));
+		vSeeds.push_back(CDNSSeedData("seed11",  "45.76.104.85"));
 		
         
         base58Prefixes[PUBKEY_ADDRESS]      = list_of(55).convert_to_container<std::vector<unsigned char> >(); // ProCurrency address start with "P"
