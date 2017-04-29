@@ -602,7 +602,7 @@ Value rewindchain(const Array& params, bool fHelp)
             uint32_t findPos = sizeof(buffer);
             while (findPos > MESSAGE_START_SIZE)
             {
-                if ((nFind = proc::memrchr(buffer, Params().MessageStart()[0], findPos-MESSAGE_START_SIZE)))
+                if ((nFind = procx::memrchr(buffer, Params().MessageStart()[0], findPos-MESSAGE_START_SIZE)))
                 {
                     if (memcmp(nFind, Params().MessageStart(), MESSAGE_START_SIZE) == 0)
                     {

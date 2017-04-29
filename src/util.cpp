@@ -558,7 +558,7 @@ void ParseParameters(int argc, const char* const argv[])
     }
 }
 
-namespace proc
+namespace procx
 {
 void *memrchr(const void *s, int c, size_t n)
 {

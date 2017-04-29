@@ -362,7 +362,7 @@ inline bool IsSwitchChar(char c)
 #endif
 }
 
-namespace proc
+namespace procx
 {
     void *memrchr(const void *s, int c, size_t n);
     
