@@ -30,10 +30,10 @@ static const int DATABASE_VERSION = 79700;
 // network protocol versioning
 //
 
-static const int PROTOCOL_VERSION = 75500;
+static const int PROTOCOL_VERSION = 75510;
 
 // intial proto version, to be increased after version/verack negotiation
-static const int INIT_PROTO_VERSION = 75500;
+static const int INIT_PROTO_VERSION = 75500; // Bitcoin Init 209
 
 // disconnect from peers older than this proto version
 static const int MIN_PEER_PROTO_VERSION = 75500;

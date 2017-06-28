@@ -22,7 +22,7 @@ BEGIN
             VALUE "FileDescription",    "ProCurrency (OSS GUI client for ProCurrency)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "ProCurrency"
-            VALUE "LegalCopyright",     "2009-2014 The Bitcoin developers, 2012-2014 The NovaCoin & PPCoin developers, 2014 The XCash developers, 2017 The ProCurrency developers"
+            VALUE "LegalCopyright",     "2009-2014 The Bitcoin developers, 2012-2014 The NovaCoin & PPCoin developers, 2017 The ProCurrency developers"
             VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
             VALUE "OriginalFilename",   "ProCurrency.exe"
             VALUE "ProductName",        "ProCurrency"

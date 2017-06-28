@@ -57,8 +57,8 @@ public:
         EXT_SECRET_KEY,
         EXT_KEY_HASH,
         EXT_ACC_HASH,
-        EXT_PUBLIC_KEY_BTC,
-        EXT_SECRET_KEY_BTC,
+        EXT_PUBLIC_KEY_2,
+        EXT_SECRET_KEY_2,
         
         MAX_BASE58_TYPES
     };

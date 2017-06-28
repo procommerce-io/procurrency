@@ -7389,9 +7389,15 @@ int CWallet::ExtKeyCreateAccount(CStoredExtKey *sekAccount, CKeyID &idMaster, CE
     
     CExtKey evExternal, evInternal, evStealth;
     uint32_t nExternal, nInternal, nStealth;
-    if (sekAccount->DeriveNextKey(evExternal, nExternal, false) != 0
+	
+    /*if (sekAccount->DeriveNextKey(evExternal, nExternal, false) != 0
         || sekAccount->DeriveNextKey(evInternal, nInternal, false) != 0
         || sekAccount->DeriveNextKey(evStealth, nStealth, true) != 0)
+	*/
+	if (sekAccount->DeriveNextKey(evExternal, nExternal, true) != 0
+        || sekAccount->DeriveNextKey(evInternal, nInternal, false) != 0
+        || sekAccount->DeriveNextKey(evStealth, nStealth, true) != 0)
+		
     {
         return errorN(1, "Could not derive account chain keys.");
     };

@@ -110,7 +110,7 @@ void TestMnemonic(int nLanguage, const Array &va)
         CExtKey ekTest;
         ekTest.SetMaster(&vSeed[0], vSeed.size());
         
-        eKey58.SetKey(ekTest, CChainParams::EXT_SECRET_KEY_BTC);
+        eKey58.SetKey(ekTest, CChainParams::EXT_SECRET_KEY_2);
         BOOST_CHECK(eKey58.ToString() == sExtKey);
         
         //BOOST_MESSAGE("sExtKey " << sExtKey);

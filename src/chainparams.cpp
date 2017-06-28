@@ -184,7 +184,6 @@ public:
 		
 		
 		
-		vSeeds.push_back(CDNSSeedData("seed1",  "185.69.55.38"));
         vSeeds.push_back(CDNSSeedData("seed2",  "194.135.80.127"));
         vSeeds.push_back(CDNSSeedData("seed3",  "185.5.53.201"));
 		vSeeds.push_back(CDNSSeedData("seed4",  "185.5.54.65"));
@@ -201,12 +200,12 @@ public:
         base58Prefixes[SCRIPT_ADDRESS]      = list_of(119).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[SECRET_KEY]          = list_of(205).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[STEALTH_ADDRESS]     = list_of(125).convert_to_container<std::vector<unsigned char> >(); // s
-        base58Prefixes[EXT_PUBLIC_KEY]      = list_of(0xEE)(0x80)(0x28)(0x6A).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_SECRET_KEY]      = list_of(0xEE)(0x80)(0x31)(0xE8).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_KEY_HASH]        = list_of(108).convert_to_container<std::vector<unsigned char> >();         // k
-        base58Prefixes[EXT_ACC_HASH]        = list_of(84).convert_to_container<std::vector<unsigned char> >();          // a-b
-        base58Prefixes[EXT_PUBLIC_KEY_BTC]  = list_of(0x04)(0x88)(0xB2)(0x1E).convert_to_container<std::vector<unsigned char> >(); // xprv
-        base58Prefixes[EXT_SECRET_KEY_BTC]  = list_of(0x04)(0x88)(0xAD)(0xE4).convert_to_container<std::vector<unsigned char> >(); // xpub
+        base58Prefixes[EXT_PUBLIC_KEY]      = list_of(0x04)(0x88)(0xB2)(0x1E).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_SECRET_KEY]      = list_of(0x04)(0x88)(0xAD)(0xE4).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_KEY_HASH]        = list_of(93).convert_to_container<std::vector<unsigned char> >();         // e
+        base58Prefixes[EXT_ACC_HASH]        = list_of(118).convert_to_container<std::vector<unsigned char> >();          // p
+        base58Prefixes[EXT_PUBLIC_KEY_2]  = list_of(0xE6)(0x76)(0x34)(0x5A).convert_to_container<std::vector<unsigned char> >(); //
+        base58Prefixes[EXT_SECRET_KEY_2]  = list_of(0xE6)(0x76)(0x28)(0x1D).convert_to_container<std::vector<unsigned char> >(); //
 
         //convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
         convertSeeds(vFixedSeeds, pnSeed, ARRAYLEN(pnSeed), nDefaultPort);
@@ -249,21 +248,22 @@ public:
         bnProofOfStakeLimit = CBigNum(~uint256(0) >> 20);
         bnProofOfStakeLimitV2 = CBigNum(~uint256(0) >> 16);
 
-        genesis.nBits  = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce = 0;
+        /*genesis.nBits  = bnProofOfWorkLimit.GetCompact();*/
+		genesis.nBits  = 0x1e0fffff; //504365055 Decimal Number
+        genesis.nNonce = 163555;
         hashGenesisBlock = genesis.GetHash();
         //assert(hashGenesisBlock == uint256("0x0000040154f262df86de1eb539d4bb05ebd5aa8448bdbff066c614e705b5af26"));
         
-        base58Prefixes[PUBKEY_ADDRESS]      = list_of(117).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[PUBKEY_ADDRESS]      = list_of(127).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[SCRIPT_ADDRESS]      = list_of(196).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[SECRET_KEY]          = list_of(202).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[STEALTH_ADDRESS]     = list_of(125).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_PUBLIC_KEY]      = list_of(0xEE)(0x80)(0x28)(0x6A).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_SECRET_KEY]      = list_of(0xEE)(0x80)(0x31)(0xE8).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_KEY_HASH]        = list_of(108).convert_to_container<std::vector<unsigned char> >();         // k
-        base58Prefixes[EXT_ACC_HASH]        = list_of(84).convert_to_container<std::vector<unsigned char> >();          // a-b
-        base58Prefixes[EXT_PUBLIC_KEY_BTC]  = list_of(0x04)(0x88)(0xB2)(0x1E).convert_to_container<std::vector<unsigned char> >(); // xprv
-        base58Prefixes[EXT_SECRET_KEY_BTC]  = list_of(0x04)(0x88)(0xAD)(0xE4).convert_to_container<std::vector<unsigned char> >(); // xpub
+        base58Prefixes[EXT_PUBLIC_KEY]      = list_of(0x04)(0x35)(0x87)(0xCF).convert_to_container<std::vector<unsigned char> >(); //tpub
+        base58Prefixes[EXT_SECRET_KEY]      = list_of(0x04)(0x35)(0x83)(0x94).convert_to_container<std::vector<unsigned char> >(); //tprv
+        base58Prefixes[EXT_KEY_HASH]        = list_of(92).convert_to_container<std::vector<unsigned char> >();         // e
+        base58Prefixes[EXT_ACC_HASH]        = list_of(117).convert_to_container<std::vector<unsigned char> >();          // p
+        base58Prefixes[EXT_PUBLIC_KEY_2]  = list_of(0xE6)(0x76)(0x34)(0x5A).convert_to_container<std::vector<unsigned char> >(); //
+        base58Prefixes[EXT_SECRET_KEY_2]  = list_of(0xE6)(0x76)(0x28)(0x1D).convert_to_container<std::vector<unsigned char> >(); //
         
         //convertSeed6(vFixedSeeds, pnSeed6_test, ARRAYLEN(pnSeed6_test));
         convertSeeds(vFixedSeeds, pnTestnetSeed, ARRAYLEN(pnTestnetSeed), nDefaultPort);

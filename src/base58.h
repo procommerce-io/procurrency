@@ -581,11 +581,11 @@ public:
         switch (type)
         {
             case CChainParams::EXT_SECRET_KEY:
-            case CChainParams::EXT_SECRET_KEY_BTC:
+            case CChainParams::EXT_SECRET_KEY_2:
                 key.EncodeV(vch);
                 break;
             //case CChainParams::EXT_PUBLIC_KEY:
-            //case CChainParams::EXT_PUBLIC_KEY_BTC:
+            //case CChainParams::EXT_PUBLIC_KEY_2:
             default:
                 key.EncodeP(vch);
                 break;
@@ -598,7 +598,7 @@ public:
     {
         CExtKeyPair ret;
         if (vchVersion == Params().Base58Prefix(CChainParams::EXT_SECRET_KEY)
-            || vchVersion == Params().Base58Prefix(CChainParams::EXT_SECRET_KEY_BTC))
+            || vchVersion == Params().Base58Prefix(CChainParams::EXT_SECRET_KEY_2))
         {
             ret.DecodeV(&vchData[0]);
             return ret;
@@ -626,11 +626,11 @@ public:
         if (0 == memcmp(&vchBytes[0], &Params().Base58Prefix(CChainParams::EXT_PUBLIC_KEY)[0], 4))
             type = CChainParams::EXT_PUBLIC_KEY;
         else
-        if (0 == memcmp(&vchBytes[0], &Params().Base58Prefix(CChainParams::EXT_SECRET_KEY_BTC)[0], 4))
-            type = CChainParams::EXT_SECRET_KEY_BTC;
+        if (0 == memcmp(&vchBytes[0], &Params().Base58Prefix(CChainParams::EXT_SECRET_KEY_2)[0], 4))
+            type = CChainParams::EXT_SECRET_KEY_2;
         else
-        if (0 == memcmp(&vchBytes[0], &Params().Base58Prefix(CChainParams::EXT_PUBLIC_KEY_BTC)[0], 4))
-            type = CChainParams::EXT_PUBLIC_KEY_BTC;
+        if (0 == memcmp(&vchBytes[0], &Params().Base58Prefix(CChainParams::EXT_PUBLIC_KEY_2)[0], 4))
+            type = CChainParams::EXT_PUBLIC_KEY_2;
         else
             return 4;
         

@@ -44,10 +44,10 @@ int ExtractBip32InfoV(std::vector<unsigned char> &vchKey, Object &keyInfo, std::
     if (memcmp(&vchKey[0], &Params().Base58Prefix(CChainParams::EXT_SECRET_KEY)[0], 4) == 0)
         keyInfo.push_back(Pair("type", "ProCurrency extended secret key"));
     else
-    if (memcmp(&vchKey[0], &Params().Base58Prefix(CChainParams::EXT_SECRET_KEY_BTC)[0], 4) == 0)
+    if (memcmp(&vchKey[0], &Params().Base58Prefix(CChainParams::EXT_SECRET_KEY_2)[0], 4) == 0)
     {
         keyInfo.push_back(Pair("type", "Bitcoin extended secret key"));
-        typePk = CChainParams::EXT_PUBLIC_KEY_BTC;
+        typePk = CChainParams::EXT_PUBLIC_KEY_2;
     } else
         keyInfo.push_back(Pair("type", "Unknown extended secret key"));
     
@@ -86,7 +86,7 @@ int ExtractBip32InfoP(std::vector<unsigned char> &vchKey, Object &keyInfo, std::
     if (memcmp(&vchKey[0], &Params().Base58Prefix(CChainParams::EXT_SECRET_KEY)[0], 4) == 0)
         keyInfo.push_back(Pair("type", "ProCurrency extended public key"));
     else
-    if (memcmp(&vchKey[0], &Params().Base58Prefix(CChainParams::EXT_SECRET_KEY_BTC)[0], 4) == 0)
+    if (memcmp(&vchKey[0], &Params().Base58Prefix(CChainParams::EXT_SECRET_KEY_2)[0], 4) == 0)
         keyInfo.push_back(Pair("type", "Bitcoin extended public key"));
     else
         keyInfo.push_back(Pair("type", "Unknown extended public key"));
@@ -381,7 +381,7 @@ int KeyInfo(CKeyID &idMaster, CKeyID &idKey, CStoredExtKey &sek, int nShowKeys, 
         && pwalletMain->ExtKeyUnlock(&sek) == 0)
     {
         if (fBip44Root)
-            eKey58.SetKey(sek.kp, CChainParams::EXT_SECRET_KEY_BTC);
+            eKey58.SetKey(sek.kp, CChainParams::EXT_SECRET_KEY_2);
         else
             eKey58.SetKeyV(sek.kp);
         obj.push_back(Pair("evkey", eKey58.ToString()));
@@ -390,7 +390,7 @@ int KeyInfo(CKeyID &idMaster, CKeyID &idKey, CStoredExtKey &sek, int nShowKeys, 
     if (nShowKeys > 0)
     {
         if (fBip44Root)
-            eKey58.SetKey(sek.kp, CChainParams::EXT_PUBLIC_KEY_BTC);
+            eKey58.SetKey(sek.kp, CChainParams::EXT_PUBLIC_KEY_2);
         else
             eKey58.SetKeyP(sek.kp);
         
@@ -676,21 +676,21 @@ Value extkey(const Array &params, bool fHelp)
         const CChainParams &otherNet = TestNet() ? MainNetParams() : TestNetParams();
         
         if (memcmp(&vchOut[0], &Params().Base58Prefix(CChainParams::EXT_SECRET_KEY)[0], 4) == 0
-            || memcmp(&vchOut[0], &Params().Base58Prefix(CChainParams::EXT_SECRET_KEY_BTC)[0], 4) == 0)
+            || memcmp(&vchOut[0], &Params().Base58Prefix(CChainParams::EXT_SECRET_KEY_2)[0], 4) == 0)
         {
             if (ExtKeyPathV(sMode, vchOut, keyInfo, sError) != 0)
                 throw std::runtime_error(strprintf("ExtKeyPathV failed %s.", sError.c_str()));
         } else
         if (memcmp(&vchOut[0], &Params().Base58Prefix(CChainParams::EXT_PUBLIC_KEY)[0], 4) == 0
-            || memcmp(&vchOut[0], &Params().Base58Prefix(CChainParams::EXT_PUBLIC_KEY_BTC)[0], 4) == 0)
+            || memcmp(&vchOut[0], &Params().Base58Prefix(CChainParams::EXT_PUBLIC_KEY_2)[0], 4) == 0)
         {
             if (ExtKeyPathP(sMode, vchOut, keyInfo, sError) != 0)
                 throw std::runtime_error(strprintf("ExtKeyPathP failed %s.", sError.c_str()));
         } else
         if (memcmp(&vchOut[0], &otherNet.Base58Prefix(CChainParams::EXT_SECRET_KEY)[0], 4) == 0
-            || memcmp(&vchOut[0], &otherNet.Base58Prefix(CChainParams::EXT_SECRET_KEY_BTC)[0], 4) == 0
+            || memcmp(&vchOut[0], &otherNet.Base58Prefix(CChainParams::EXT_SECRET_KEY_2)[0], 4) == 0
             || memcmp(&vchOut[0], &otherNet.Base58Prefix(CChainParams::EXT_PUBLIC_KEY)[0], 4) == 0
-            || memcmp(&vchOut[0], &otherNet.Base58Prefix(CChainParams::EXT_PUBLIC_KEY_BTC)[0], 4) == 0)
+            || memcmp(&vchOut[0], &otherNet.Base58Prefix(CChainParams::EXT_PUBLIC_KEY_2)[0], 4) == 0)
         {
             throw std::runtime_error(strprintf("Prefix is for %s-net bip32 key.", otherNet.NetworkIDString().c_str()));
         } else
@@ -874,12 +874,12 @@ Value extkey(const Array &params, bool fHelp)
         {
             if (fBip44)
             {
-                if (!eKey58.IsValid(CChainParams::EXT_SECRET_KEY_BTC))
+                if (!eKey58.IsValid(CChainParams::EXT_SECRET_KEY_2))
                     throw std::runtime_error("Import failed - BIP44 key must begin with Bitcoin secret key prefix.");
             } else
             {
                 if (!eKey58.IsValid(CChainParams::EXT_SECRET_KEY)
-                    && !eKey58.IsValid(CChainParams::EXT_PUBLIC_KEY_BTC))
+                    && !eKey58.IsValid(CChainParams::EXT_PUBLIC_KEY_2))
                     throw std::runtime_error("Import failed - Key must begin with ProCurrency prefix.");
             };
             

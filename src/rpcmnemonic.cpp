@@ -143,7 +143,7 @@ Value mnemonic(const Array &params, bool fHelp)
         
         if (fBip44)
         {
-            eKey58.SetKey(ekMaster, CChainParams::EXT_SECRET_KEY_BTC);
+            eKey58.SetKey(ekMaster, CChainParams::EXT_SECRET_KEY_2);
             result.push_back(Pair("master", eKey58.ToString()));
             
             // m / purpose' / coin_type' / account' / change / address_index
@@ -207,7 +207,7 @@ Value mnemonic(const Array &params, bool fHelp)
         
         if (fBip44)
         {
-            eKey58.SetKey(ekMaster, CChainParams::EXT_SECRET_KEY_BTC);
+            eKey58.SetKey(ekMaster, CChainParams::EXT_SECRET_KEY_2);
             result.push_back(Pair("master", eKey58.ToString()));
             
             // m / purpose' / coin_type' / account' / change / address_index

@@ -156,7 +156,7 @@ tbody tr.selected td:hover {
 
 .pagination.selected,
 .pagination:hover {
-    background:#8a5c5d!important;
+    background:#f9ca72!important;
 }
 
 /* Vertical Menu */
@@ -183,13 +183,13 @@ ul.vmenu li {
 
 ul.vmenu li.selected a {
     background: #152e4b;
-    border: 1px solid #402b2c;
+    border: 1px solid #f9ca72;
     color: #f9ca72;
 }
 
 ul.vmenu li a:hover {
     background: #152e4b;
-    border: 1px solid #503536;
+    border: 1px solid #f9ca72;
     color: #f9ca72;
 }
 

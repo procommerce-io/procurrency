@@ -1542,7 +1542,7 @@ QVariantMap UIBridge::getNewMnemonic(QString password, QString language)
 
         if (fBip44)
         {
-            eKey58.SetKey(ekMaster, CChainParams::EXT_SECRET_KEY_BTC);
+            eKey58.SetKey(ekMaster, CChainParams::EXT_SECRET_KEY_2);
         } else
         {
             eKey58.SetKey(ekMaster, CChainParams::EXT_SECRET_KEY);
@@ -1598,7 +1598,7 @@ QVariantMap UIBridge::importFromMnemonic(QString inMnemonic, QString inPassword,
     if (fBip44)
     {
 
-        eKey58.SetKey(ekMaster, CChainParams::EXT_SECRET_KEY_BTC);
+        eKey58.SetKey(ekMaster, CChainParams::EXT_SECRET_KEY_2);
 
         //result.push_back(Pair("master", eKey58.ToString()));
 
@@ -1711,7 +1711,7 @@ int KeyInfo(CKeyID &idMaster, CKeyID &idKey, CStoredExtKey &sek, int nShowKeys, 
         && pwalletMain->ExtKeyUnlock(&sek) == 0)
     {
         if (fBip44Root)
-            eKey58.SetKey(sek.kp, CChainParams::EXT_SECRET_KEY_BTC);
+            eKey58.SetKey(sek.kp, CChainParams::EXT_SECRET_KEY_2);
         else
             eKey58.SetKeyV(sek.kp);
         obj.insert("evkey", QString::fromStdString(eKey58.ToString()));
@@ -1720,7 +1720,7 @@ int KeyInfo(CKeyID &idMaster, CKeyID &idKey, CStoredExtKey &sek, int nShowKeys, 
     if (nShowKeys > 0)
     {
         if (fBip44Root)
-            eKey58.SetKey(sek.kp, CChainParams::EXT_PUBLIC_KEY_BTC);
+            eKey58.SetKey(sek.kp, CChainParams::EXT_PUBLIC_KEY_2);
         else
             eKey58.SetKeyP(sek.kp);
 
@@ -1906,7 +1906,7 @@ QVariantMap UIBridge::extKeyImport(QString inKey, QString inLabel, bool fBip44, 
     if (eKey58.Set58(sInKey.c_str()) == 0)
     {
         if (!eKey58.IsValid(CChainParams::EXT_SECRET_KEY)
-         && !eKey58.IsValid(CChainParams::EXT_PUBLIC_KEY_BTC))
+         && !eKey58.IsValid(CChainParams::EXT_PUBLIC_KEY_2))
         {
             result.insert("error_msg", "Import failed - Key must begin with ProCurrency prefix.");
             return result;

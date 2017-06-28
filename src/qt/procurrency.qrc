@@ -48,7 +48,7 @@
     <qresource prefix="/images">
         <file alias="about">res/images/about.png</file>
         <file alias="splash">res/images/splash.png</file>
-        <file alias="pro_logo">res/images/pro_logo.png</file>
+        <file alias="proc_logo">res/images/proc_logo.png</file>
         <file alias="default">res/images/avatars/default.png</file>
         <file alias="extkey_new">res/images/extkey_new.png</file>
         <file alias="extkey_open">res/images/extkey_open.png</file>

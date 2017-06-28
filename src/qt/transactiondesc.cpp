@@ -39,7 +39,7 @@ QString TransactionDesc::FormatTxStatus(const CWalletTx& wtx)
 QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
 {
     QString strHTML;
-    QString explorer(fTestNet ? "http://testnet.cryptoguru.tk/" : "http://cryptoguru.tk/"); //testnet explorer needed
+    QString explorer(fTestNet ? "http://procexplorer.com:3000/" : "http://procexplorer.com:3000/"); //testnet explorer needed
 
     LOCK2(cs_main, wallet->cs_wallet);
     strHTML.reserve(4000);
@@ -95,7 +95,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                     {
                         strHTML += "<b>" + tr("From") + ":</b> " + tr("unknown");
                         strHTML += "<br><br>";
-                        strHTML += "<b>" + tr("To") + ":</b> <a href='"+explorer+"/Address/index.php?Currency=PROC&Address=";
+                        strHTML += "<b>" + tr("To") + ":</b> <a href='"+explorer+"/address/";
                         strHTML += GUIUtil::HtmlEscape(CBitcoinAddress(ckidD).ToString())+"' target='_blank'>";
                         strHTML += GUIUtil::HtmlEscape(CBitcoinAddress(ckidD).ToString());
                         if (!wallet->mapAddressBook[ckidD].empty())
@@ -117,7 +117,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                         {
                             strHTML += "<b>" + tr("From") + ":</b> " + tr("unknown");
                             strHTML += "<br><br>";
-                            strHTML += "<b>" + tr("To") + ":</b> <a href='"+explorer+"/Address/index.php?Currency=PROC&Address=";
+                            strHTML += "<b>" + tr("To") + ":</b> <a href='"+explorer+"/address/";
                             strHTML += GUIUtil::HtmlEscape(CBitcoinAddress(address).ToString())+"' target='_blank'>";
                             strHTML += GUIUtil::HtmlEscape(CBitcoinAddress(address).ToString());
                             if (!wallet->mapAddressBook[address].empty())
@@ -144,7 +144,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
         strHTML += "<br><br>";
         // Online transaction
         std::string strAddress = wtx.mapValue["to"];
-        strHTML += "<b>" + tr("To") + ":</b> <a href='"+explorer + "/Address/index.php?Currency=PROC&Address=" + GUIUtil::HtmlEscape(strAddress) + "' target='_blank'>";
+        strHTML += "<b>" + tr("To") + ":</b> <a href='"+explorer + "/address/" + GUIUtil::HtmlEscape(strAddress) + "' target='_blank'>";
         CTxDestination dest = CBitcoinAddress(strAddress).Get();
         if (wallet->mapAddressBook.count(dest) && !wallet->mapAddressBook[dest].empty())
             strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[dest]) + " ";
@@ -203,7 +203,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                     CTxDestination address;
                     if (ExtractDestination(txout.scriptPubKey, address))
                     {
-                        strHTML += "<b>" + tr("To") + ":</b> <a href='"+explorer+"/Address/index.php?Currency=PROC&Address="+GUIUtil::HtmlEscape(CBitcoinAddress(address).ToString())+"' target='_blank'>";
+                        strHTML += "<b>" + tr("To") + ":</b> <a href='"+explorer+"/address/"+GUIUtil::HtmlEscape(CBitcoinAddress(address).ToString())+"' target='_blank'>";
                         if (wallet->mapAddressBook.count(address) && !wallet->mapAddressBook[address].empty())
                             strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[address]) + " ";
                         strHTML += GUIUtil::HtmlEscape(CBitcoinAddress(address).ToString());
@@ -269,7 +269,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
 
     QString txid(wtx.GetHash().ToString().c_str());
 
-    strHTML += "<b>" + tr("Transaction ID") + ":</b> <a href='"+explorer+"/Transaction/index.php?Currency=PROC&Transaction=" + txid + "' target='_blank'>" + txid + "</a><br>";
+    strHTML += "<b>" + tr("Transaction ID") + ":</b> <a href='"+explorer+"/tx/" + txid + "' target='_blank'>" + txid + "</a><br>";
 
     if (wtx.IsCoinBase() || wtx.IsCoinStake())
         strHTML += "<br>" + tr("Generated coins must mature 50 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to \"not accepted\" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.") + "<br><br>";
@@ -331,7 +331,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                     CTxDestination address;
                     if (ExtractDestination(vout.scriptPubKey, address))
                     {
-                        strHTML +="<a href='"+explorer+"/Address/index.php?Currency=PROC&Address="+QString::fromStdString(CBitcoinAddress(address).ToString())+"' target='_blank'>";
+                        strHTML +="<a href='"+explorer+"/address/"+QString::fromStdString(CBitcoinAddress(address).ToString())+"' target='_blank'>";
                         if (wallet->mapAddressBook.count(address) && !wallet->mapAddressBook[address].empty())
                             strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[address]) + " ";
                         strHTML += QString::fromStdString(CBitcoinAddress(address).ToString()) + "</a>";

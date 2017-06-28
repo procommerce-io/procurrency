@@ -1,2 +1,2 @@
-# ProCurrency v1.1
+# ProCurrency Codebase Development
 Procurrency Source Code
