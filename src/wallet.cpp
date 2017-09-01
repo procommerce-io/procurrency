@@ -8147,6 +8147,13 @@ int CWallet::ExtKeyLoadAccountPacks()
         for (it = ekPak.begin(); it != ekPak.end(); ++it)
         {
             sea->mapKeys[it->id] = it->ak;
+            AccKeyMap::iterator lookAheadIt = sea->mapLookAhead.find(it->id);
+            if (lookAheadIt != sea->mapLookAhead.end())
+            {
+                addr.Set(it->id);
+                LogPrintf("Removing duplicate key from LookAhead %s\n", addr.ToString().c_str());
+                sea->mapLookAhead.erase(lookAheadIt);
+            }
         };
     };
     
