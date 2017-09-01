@@ -8055,6 +8055,29 @@ int CWallet::ExtKeyAddAccountToMaps(CKeyID &idAccount, CExtKeyAccount *sea)
             if (itV != sek->mapValue.end())
                 nLookAhead = GetCompressedInt64(itV->second, nLookAhead);
             
+
+            //try to fill possible gaps from missing keys
+            if (fDebug)
+            {
+                LogPrintf("ExtKeyAddAccountToMap(): Filling gaps from keys not saved\n");
+            }
+            CStoredExtKey *pc = sea->GetChain(i);
+            if (pc)
+            {
+                uint32_t ng = pc->nGenerated;
+                if (fDebug)
+                {
+                    LogPrintf("ExtKeyAddAccountToMap(): AddLookAhead from 0 to %d\n",ng);
+                }
+                pc->nGenerated = 0;
+                sea->AddLookAhead(i, ng);
+                pc->nGenerated = ng;
+            }
+            if (fDebug)
+            {
+                LogPrintf("ExtKeyAddAccountToMap(): Done filling gaps\n");
+            }
+
             sea->AddLookAhead(i, (uint32_t)nLookAhead);
         };
         
@@ -8210,6 +8233,13 @@ int CWallet::ExtKeyLoadAccountPacks()
 
 int CWallet::ExtKeyAppendToPack(CWalletDB *pwdb, CExtKeyAccount *sea, const CKeyID &idKey, CEKAKey &ak, bool &fUpdateAcc) const
 {
+    std::vector<CEKAKeyPack> keys;
+    keys.push_back(CEKAKeyPack(idKey,ak));
+    return ExtKeyAppendToPack(pwdb,sea,keys,fUpdateAcc);
+}
+
+int CWallet::ExtKeyAppendToPack(CWalletDB *pwdb, CExtKeyAccount *sea, const std::vector<CEKAKeyPack>& keys, bool &fUpdateAcc) const
+{
     // - must call WriteExtAccount after
     
     
@@ -8223,10 +8253,12 @@ int CWallet::ExtKeyAppendToPack(CWalletDB *pwdb, CExtKeyAccount *sea, const CKey
             LogPrintf("Account %s, starting new keypack %u.\n", idAccount.ToString(), sea->nPack);
     };
     
-    try { ekPak.push_back(CEKAKeyPack(idKey, ak)); } catch (std::exception& e)
-    {
-        return errorN(1, "%s push_back failed.", __func__, sea->nPack);
-    };
+    for (int i=0;i<keys.size();i++) {
+        try { ekPak.push_back( keys[i] ); } catch (std::exception& e)
+        {
+            return errorN(1, "%s push_back failed.", __func__, sea->nPack);
+        };
+    }
     
     if (!pwdb->WriteExtKeyPack(idAccount, sea->nPack, ekPak))
     {
@@ -8275,6 +8307,7 @@ int CWallet::ExtKeyAppendToPack(CWalletDB *pwdb, CExtKeyAccount *sea, const CKey
     return 0;
 };
 
+
 int CWallet::ExtKeySaveKey(CWalletDB *pwdb, CExtKeyAccount *sea, const CKeyID &keyId, CEKAKey &ak) const
 {
     if (fDebug)
@@ -8284,11 +8317,13 @@ int CWallet::ExtKeySaveKey(CWalletDB *pwdb, CExtKeyAccount *sea, const CKeyID &k
         AssertLockHeld(cs_wallet);
     };
     
-    if (!sea->SaveKey(keyId, ak))
+    std::vector<CEKAKeyPack> ekPak;
+
+    if (!sea->SaveKey(keyId, ak,ekPak))
         return errorN(1, "%s SaveKey failed.", __func__);
     
     bool fUpdateAcc;
-    if (0 != ExtKeyAppendToPack(pwdb, sea, keyId, ak, fUpdateAcc))
+    if (0 != ExtKeyAppendToPack(pwdb, sea, ekPak, fUpdateAcc))
         return errorN(1, "%s ExtKeyAppendToPack failed.", __func__);
     
     CStoredExtKey *pc = sea->GetChain(ak.nParent);

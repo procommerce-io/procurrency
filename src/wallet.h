@@ -497,6 +497,7 @@ public:
     
     
     int ExtKeyAppendToPack(CWalletDB *pwdb, CExtKeyAccount *sea, const CKeyID &idKey, CEKAKey &ak, bool &fUpdateAcc) const;
+    int ExtKeyAppendToPack(CWalletDB *pwdb, CExtKeyAccount *sea, const std::vector<CEKAKeyPack>& keys, bool &fUpdateAcc) const;
     int ExtKeyAppendToPack(CWalletDB *pwdb, CExtKeyAccount *sea, const CKeyID &idKey, CEKASCKey &asck, bool &fUpdateAcc) const;
     
     

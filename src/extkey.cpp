@@ -514,9 +514,15 @@ bool CExtKeyAccount::GetPubKey(const CEKASCKey &asck, CPubKey &pkOut) const
     
     
     return (0 == ExpandStealthChildPubKey(&miSk->second, asck.sShared, pkOut));
-};
+}
 
 bool CExtKeyAccount::SaveKey(const CKeyID &id, CEKAKey &keyIn)
+{
+    std::vector<CEKAKeyPack> ekPak;
+    return SaveKey(id,keyIn,ekPak);
+}
+
+bool CExtKeyAccount::SaveKey(const CKeyID &id, CEKAKey &keyIn, std::vector<CEKAKeyPack> &ekPak)
 {
     // TODO: rename? this is taking a key from lookahead and saving it
     LOCK(cs_account);
@@ -551,6 +557,9 @@ bool CExtKeyAccount::SaveKey(const CKeyID &id, CEKAKey &keyIn)
                     }
 
                     mapKeys[it->first] = it->second;
+
+                    ekPak.push_back( CEKAKeyPack(it->first,it->second) );
+
                     mapLookAhead.erase(it++);
                 } else {
                     ++it;
@@ -562,6 +571,7 @@ bool CExtKeyAccount::SaveKey(const CKeyID &id, CEKAKey &keyIn)
 
     
     mapKeys[id] = keyIn;
+    ekPak.push_back( CEKAKeyPack(id,keyIn) );
     
 
     if (pc != NULL)
