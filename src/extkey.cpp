@@ -514,9 +514,15 @@ bool CExtKeyAccount::GetPubKey(const CEKASCKey &asck, CPubKey &pkOut) const
     
     
     return (0 == ExpandStealthChildPubKey(&miSk->second, asck.sShared, pkOut));
-};
+}
 
 bool CExtKeyAccount::SaveKey(const CKeyID &id, CEKAKey &keyIn)
+{
+    std::vector<CEKAKeyPack> ekPak;
+    return SaveKey(id,keyIn,ekPak);
+}
+
+bool CExtKeyAccount::SaveKey(const CKeyID &id, CEKAKey &keyIn, std::vector<CEKAKeyPack> &ekPak)
 {
     // TODO: rename? this is taking a key from lookahead and saving it
     LOCK(cs_account);
@@ -529,18 +535,53 @@ bool CExtKeyAccount::SaveKey(const CKeyID &id, CEKAKey &keyIn)
         CBitcoinAddress addr(id);
         LogPrintf("Warning: SaveKey %s key not found in look ahead %s.\n", GetIDString58().c_str(), addr.ToString().c_str());
     };
+
+    CStoredExtKey *pc;
+    pc = GetChain(keyIn.nParent);
+
+    if (pc!=NULL) {
+        if (keyIn.nKey > pc->nGenerated) {
+            //fill gaps
+
+            AccKeyMap::iterator it = mapLookAhead.begin();
+            while ( it!=mapLookAhead.end())
+            {
+
+                if (it->second.nKey < keyIn.nKey &&
+                    it->second.nParent == keyIn.nParent &&
+                    mapKeys.find(it->first) == mapKeys.end())
+                {
+                    if (fDebug) {
+                        CBitcoinAddress addr(it->first);
+                        LogPrintf("Saved key for gap %s.\n", addr.ToString().c_str());
+                    }
+
+                    mapKeys[it->first] = it->second;
+
+                    ekPak.push_back( CEKAKeyPack(it->first,it->second) );
+
+                    mapLookAhead.erase(it++);
+                } else {
+                    ++it;
+                }
+            }
+            pc->nGenerated = keyIn.nKey;
+        }
+    }
+
     
     mapKeys[id] = keyIn;
+    ekPak.push_back( CEKAKeyPack(id,keyIn) );
     
-    CStoredExtKey *pc;
-    if ((pc = GetChain(keyIn.nParent)) != NULL)
+
+    if (pc != NULL)
     {
         if (keyIn.nKey == pc->nGenerated) // TODO: gaps?
             pc->nGenerated++;
         
         if (pc->nFlags & EAF_ACTIVE
             && pc->nFlags & EAF_RECEIVE_ON)
-            AddLookAhead(keyIn.nParent, 1);
+            AddLookAhead(keyIn.nParent, N_DEFAULT_LOOKAHEAD);
     };
     
     if (fDebug)

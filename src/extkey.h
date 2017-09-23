@@ -392,6 +392,7 @@ public:
     bool GetPubKey(const CEKASCKey &asck, CPubKey &pkOut) const;
     
     bool SaveKey(const CKeyID &id, CEKAKey &keyIn);
+    bool SaveKey(const CKeyID &id, CEKAKey &keyIn, std::vector<CEKAKeyPack>& ekPak);
     bool SaveKey(const CKeyID &id, CEKASCKey &keyIn);
     
     bool IsLocked(const CEKAStealthKey &aks);
