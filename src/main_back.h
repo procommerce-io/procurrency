@@ -49,9 +49,6 @@ static const unsigned int MAX_MULTI_BLOCK_THIN_ELEMENTS = 128;
 //static const int64_t MAX_MONEY = std::numeric_limits<int64_t>::max();
 static const int64_t MAX_MONEY = 75000000000 * COIN;
 
-/* REMOVE MBLK */
-static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
-
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC

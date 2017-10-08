@@ -4509,10 +4509,8 @@ static void ProcessGetData(CNode* pfrom)
                     exit(1);
                 };
 
-              if (inv.type == MSG_BLOCK)
-              {
-				if(pindexBest->nHeight <= MBLK_REMOVE_FORK_BLOCK)
-				{	
+                if (inv.type == MSG_BLOCK)
+                {
                     if (pfrom->nVersion >= MIN_MBLK_VERSION)
                     {
                         uint32_t nBlockBytes = ::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION);
@@ -4527,22 +4525,19 @@ static void ProcessGetData(CNode* pfrom)
 
                         vMultiBlock.push_back(block);
                         nMultiBlockBytes += nBlockBytes;
-					} 
-				}else
+                    } else
                     {
                         pfrom->PushMessage("block", block);
                     }
-              }else
-				{
+                } else
+                {
                     // MSG_FILTERED_BLOCK)
                     LOCK(pfrom->cs_filter);
                     if (pfrom->pfilter)
                     {
                         CMerkleBlock merkleBlock(block, pBlockIndex, *(pfrom->pfilter));
                         typedef std::pair<unsigned int, uint256> PairType;
-						
-					  if(pindexBest->nHeight <= MBLK_REMOVE_FORK_BLOCK)
-					  {	  
+
                         if (pfrom->nVersion >= MIN_MBLK_VERSION)
                         {
                             uint32_t nBlockBytes = ::GetSerializeSize(merkleBlock, SER_NETWORK, PROTOCOL_VERSION);
@@ -4570,8 +4565,7 @@ static void ProcessGetData(CNode* pfrom)
                             vMultiBlockThin.push_back(mbElem);
                             nMultiBlockBytes += nBlockBytes;
 
-                        } 
-					  }else
+                        } else
                         {
                             pfrom->PushMessage("merkleblock", merkleBlock);
 
@@ -4640,8 +4634,6 @@ static void ProcessGetData(CNode* pfrom)
 
         // -- break here to give chance to process other messages
         //    ProcessGetData will be called again in ProcessMessages
-	  if(pindexBest->nHeight <= MBLK_REMOVE_FORK_BLOCK)
-      {		  
         if (pfrom->nVersion >= MIN_MBLK_VERSION)
         {
             if (vMultiBlock.size() >= MAX_MULTI_BLOCK_ELEMENTS)
@@ -4656,8 +4648,7 @@ static void ProcessGetData(CNode* pfrom)
                 vMultiBlockThin.clear();
                 break;
             };
-        } 
-	  }else
+        } else
         {
             if (inv.type == MSG_BLOCK || inv.type == MSG_FILTERED_BLOCK)
                 break;
@@ -5576,8 +5567,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             pfrom->Misbehaving(tx.nDoS);
 
     } else
-  if(pindexBest->nHeight <= MBLK_REMOVE_FORK_BLOCK)
-  {	  
     if (strCommand == "mblk" && !fImporting && !fReindexing)  // Ignore blocks received while importing
     {
         // multiblock
@@ -5663,8 +5652,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             };
         } // cs_main
     }
-  }else 
-	if (strCommand == "block" && !fImporting && !fReindexing) // Ignore blocks received while importing
+	else if (strCommand == "block" && !fImporting && !fReindexing) // Ignore blocks received while importing
     {
         if (nNodeMode != NT_FULL)
         {
