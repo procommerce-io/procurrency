@@ -4,7 +4,7 @@
     </qresource>
     <qresource prefix="/icons">
         <file alias="procurrency">res/icons/proc-256.png</file>
-        <file alias="procurrency_testnet">res/icons/proc-256.png</file>
+        <file alias="procurrency_testnet">res/icons/proc-testnet.png</file>
         <file alias="toolbar">res/icons/proc-16.png</file>
         <file alias="toolbar_testnet">res/icons/proc-16.png</file>
         <file alias="address-book">res/icons/address-book.png</file>
@@ -44,6 +44,7 @@
         <file alias="tradeat_bittrex">res/icons/tradeat_bittrex.png</file>
 		<file alias="proc_bg">res/icons/proc_bg.png</file>
 		<file alias="sideMenu_bg">res/icons/sideMenu_bg.png</file>
+		<file alias="qtlogo">res/icons/qtlogo.png</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="about">res/images/about.png</file>

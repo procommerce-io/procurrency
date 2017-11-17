@@ -5,11 +5,12 @@
 #ifndef BITCOIN_INIT_H
 #define BITCOIN_INIT_H
 
-#ifndef OTP_ENABLED
-    #include "wallet.h"
-#else
-    #include "wallet_otp.h"
-#endif
+
+#include "wallet.h"
+
+namespace boost {
+    class thread_group;
+} // namespace boost
 
 extern CWallet* pwalletMain;
 void StartShutdown();

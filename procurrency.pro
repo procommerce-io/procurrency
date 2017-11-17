@@ -2,10 +2,11 @@ TEMPLATE = app
 TARGET = ProCurrency-qt
 VERSION = 1.3.0.0
 INCLUDEPATH += src src/json src/qt
+QT += core gui network
+DEFINES += ENABLE_WALLET
 DEFINES += BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
 CONFIG += no_include_pwd
 CONFIG += thread
-QT += core gui network
 QT += webkit printsupport
 
 #CONFIG += otp_enabled

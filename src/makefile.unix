@@ -6,6 +6,7 @@ QT_DIR = /usr/include/qt5
 QT_CORE = ${QT_DIR}/QtCore
 
 USE_UPNP:=1
+USE_WALLET:=1
 
 LINK:=$(CXX)
 ARCH:=$(system lscpu | head -n 1 | awk '{print $2}')
@@ -120,21 +121,16 @@ OBJS= \
     obj/key.o \
     obj/eckey.o \
     obj/extkey.o \
-    obj/db.o \
     obj/init.o \
     obj/procd.o \
     obj/keystore.o \
-    obj/miner.o \
     obj/main.o \
     obj/net.o \
     obj/protocol.o \
     obj/rpcprotocol.o \
     obj/rpcserver.o \
     obj/rpcclient.o \
-    obj/rpcdump.o \
     obj/rpcnet.o \
-    obj/rpcmining.o \
-    obj/rpcwallet.o \
     obj/rpcblockchain.o \
     obj/rpcrawtransaction.o \
     obj/rpcsmessage.o \
@@ -144,8 +140,6 @@ OBJS= \
     obj/sync.o \
     obj/util.o \
     obj/hash.o \
-    obj/wallet.o \
-    obj/walletdb.o \
     obj/noui.o \
     obj/kernel.o \
     obj/pbkdf2.o \
@@ -161,6 +155,18 @@ OBJS= \
     obj/chainparams.o \
     obj/state.o \
     obj/bloom.o
+
+ifeq (${USE_WALLET}, 1)
+    DEFS += -DENABLE_WALLET
+    OBJS += \
+        obj/db.o \
+        obj/miner.o \
+        obj/rpcdump.o \
+        obj/rpcmining.o \
+        obj/rpcwallet.o \
+        obj/wallet.o \
+        obj/walletdb.o
+endif
 
 
 all: procd

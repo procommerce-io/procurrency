@@ -628,6 +628,16 @@ var overviewPage = {
                      fun: function () {
                         $("#navitems [href=#options]").click();
                      }
+                 },
+				 
+				 {
+                     name: 'Show AutoBackups',
+                     fa: 'fa-save vred fa-fw font-20px',
+                     fun: function () {
+                        //$("#navitems [href=#showBackups]").click();
+						//bridge.userAction(['showBackups']);
+						$('#showBackups').click();
+                     }
                  }];
 
         $('#settings').contextMenu(menu, {onOpen:function(data,e){openContextMenu(data.menu);}, onClose:function(data,e){data.menu.isOpen = 0;}, triggerOn: 'click', displayAround: 'trigger', position: 'bottom', mouseClick: 'left', sizeStyle: 'content'});
@@ -648,7 +658,8 @@ var overviewPage = {
                  },
                  {
                      name: 'About&nbsp;Qt...',
-                     fa: 'fa-question vred fa-fw font-20px',
+					 img: 'qrc:///icons/qtlogo',
+                     //fa: 'fa-question vred fa-fw font-20px',
                      fun: function () {
                         bridge.userAction(['aboutQtClicked']);
                      }

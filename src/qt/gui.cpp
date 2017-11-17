@@ -86,7 +86,7 @@ GUI::GUI(QWidget *parent):
     webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 
     webView->page()->action(QWebPage::Reload )->setVisible(false);
-    webView->page()->action(QWebPage::Back   )->setVisible(false);
+    webView->page()->action(QWebPage::Back   )->setVisible(true);
     webView->page()->action(QWebPage::Forward)->setVisible(false);
 
     connect(webView, SIGNAL(linkClicked(const QUrl&)), this, SLOT(urlClicked(const QUrl&)));
@@ -117,8 +117,10 @@ GUI::GUI(QWidget *parent):
     createTrayIcon();
 
     rpcConsole = new RPCConsole(this);
-
     connect(openRPCConsoleAction, SIGNAL(triggered()), rpcConsole, SLOT(show()));
+	
+	// clicking on automatic backups shows details
+    connect(showBackupsAction, SIGNAL(triggered()), rpcConsole, SLOT(showBackups()));
     
     // prevents an oben debug window from becoming stuck/unusable on client shutdown
     connect(quitAction, SIGNAL(triggered()), rpcConsole, SLOT(hide()));
@@ -149,7 +151,6 @@ GUI::~GUI()
 {
     if(trayIcon) // Hide tray icon, as deleting will let it linger until quit (on Ubuntu)
         trayIcon->hide();
-
     delete webView;
 #ifdef Q_OS_MAC
     delete appMenuBar;
@@ -213,6 +214,9 @@ void GUI::createActions()
     //exportAction->setToolTip(tr("Export the data in the current tab to a file"));
     openRPCConsoleAction = new QAction(QIcon(":/icons/debugwindow"), tr("&Debug window"), this);
     openRPCConsoleAction->setToolTip(tr("Open debugging and diagnostic console"));
+	
+	showBackupsAction = new QAction(QIcon(":/icons/filesave"), tr("Show Auto&Backups"), this);
+    showBackupsAction->setToolTip(tr("Open Auto Backups Folder"));
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), SLOT(aboutClicked()));
@@ -251,6 +255,7 @@ void GUI::createMenuBar()
     settings->addAction(lockWalletAction);
     settings->addSeparator();
     settings->addAction(optionsAction);
+	settings->addAction(showBackupsAction);
 
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
     help->addAction(openRPCConsoleAction);
@@ -378,6 +383,7 @@ void GUI::createTrayIcon()
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(optionsAction);
     trayIconMenu->addAction(openRPCConsoleAction);
+	trayIconMenu->addAction(showBackupsAction);
 #ifndef Q_OS_MAC // This is built-in on Mac
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(quitAction);
