@@ -1026,6 +1026,8 @@ QVariantMap UIBridge::userAction(QVariantMap action)
         window->aboutClicked();
     if(key == "aboutQtClicked")
         window->aboutQtAction->trigger();
+	if(key == "showBackups")
+        window->showBackupsAction->trigger();
     if(key == "debugClicked")
         window->rpcConsole->show();
     if(key == "clearRecipients")

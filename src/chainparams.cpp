@@ -44,7 +44,7 @@ int64_t CChainParams::GetProofOfWorkReward(int nHeight, int64_t nFees) const
     return nSubsidy + nFees;
 }
 
-static const int YEARLY_BLOCKCOUNT =  525600; // 1440 * 365
+static const int YEARLY_BLOCKCOUNT =  367920; //90s (1008 * 365)
 // miner's coin stake reward based on coin age spent (coin-days)
 int64_t CChainParams::GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64_t nFees) const
 {
@@ -194,6 +194,12 @@ public:
 		vSeeds.push_back(CDNSSeedData("seed9",  "45.32.176.210"));
 		vSeeds.push_back(CDNSSeedData("seed10",  "45.76.88.24"));
 		vSeeds.push_back(CDNSSeedData("seed11",  "45.76.104.85"));
+		//
+		vSeeds.push_back(CDNSSeedData("seed11",  "71.213.148.206"));
+		vSeeds.push_back(CDNSSeedData("seed11",  "67.197.66.122"));
+		vSeeds.push_back(CDNSSeedData("seed11",  "75.70.40.167"));
+		vSeeds.push_back(CDNSSeedData("seed11",  "66.222.148.57"));
+		vSeeds.push_back(CDNSSeedData("seed11",  "47.157.52.95"));
 		
         
         base58Prefixes[PUBKEY_ADDRESS]      = list_of(55).convert_to_container<std::vector<unsigned char> >(); // ProCurrency address start with "P"

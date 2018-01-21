@@ -832,9 +832,11 @@ bool AppInit2(boost::thread_group& threadGroup)
         addrProxy = CService(mapArgs["-proxy"], 9050);
         if (!addrProxy.IsValid())
             return InitError(strprintf(_("Invalid -proxy address: '%s'"), mapArgs["-proxy"]));
-        
-        SetProxy(NET_IPV4, addrProxy);
-        SetProxy(NET_IPV6, addrProxy);
+		
+        if (!IsLimited(NET_IPV4))
+			SetProxy(NET_IPV4, addrProxy);
+		if (!IsLimited(NET_IPV6))
+			SetProxy(NET_IPV6, addrProxy);
         SetNameProxy(addrProxy);
         fProxy = true;
     }
@@ -875,8 +877,7 @@ bool AppInit2(boost::thread_group& threadGroup)
                     return InitError(strprintf(_("Cannot resolve -bind address: '%s'"), strBind.c_str()));
                 fBound |= Bind(addrBind);
             };
-        } else
-        {
+        } else {
             struct in_addr inaddr_any;
             inaddr_any.s_addr = INADDR_ANY;
             if (!IsLimited(NET_IPV6))
@@ -899,15 +900,17 @@ bool AppInit2(boost::thread_group& threadGroup)
         };
     };
 
-    if (mapArgs.count("-reservebalance")) // ppcoin: reserve balance amount
+#ifdef ENABLE_WALLET	
+    if (mapArgs.count("-reservebalance")) // procurrency: reserve balance amount
     {
         if (!ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
         {
             InitError(_("Invalid amount for -reservebalance=<amount>"));
             return false;
-        };
-    };
-    
+        }
+    }
+#endif
+   
     BOOST_FOREACH(std::string strDest, mapMultiArgs["-seednode"])
         AddOneShot(strDest);
 

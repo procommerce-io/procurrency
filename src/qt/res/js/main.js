@@ -395,7 +395,7 @@ var unit = {
 
             case 3:
                 this.name    = "sPROC",
-                this.display = "Shi-ProCurrencys";
+                this.display = "Shi-PROC";
                 break;
 
             default:
@@ -635,8 +635,8 @@ var overviewPage = {
                      fa: 'fa-save vred fa-fw font-20px',
                      fun: function () {
                         //$("#navitems [href=#showBackups]").click();
-						//bridge.userAction(['showBackups']);
-						$('#showBackups').click();
+						bridge.userAction(['showBackups']);
+						//$('#showBackups').click();
                      }
                  }];
 
@@ -2223,6 +2223,7 @@ function editorCommand(text, endText) {
         editor.focus();
 };
 
+/*
 var blockExplorerPage = 
 {
     blockHeader: {},
@@ -2411,7 +2412,8 @@ var blockExplorerPage =
                 })
             }).find(".editable")
     }
-}
+} 
+*/
 
 var keyManagementPage = {
     init: function() {

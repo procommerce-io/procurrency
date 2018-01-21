@@ -48,13 +48,12 @@ static const unsigned int MAX_MULTI_BLOCK_THIN_ELEMENTS = 128;
 /** No amount larger than this (in satoshi) is valid */
 //static const int64_t MAX_MONEY = std::numeric_limits<int64_t>::max();
 static const int64_t MAX_MONEY = 75000000000 * COIN;
-
-/* REMOVE MBLK */
-static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
-
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
+
+/* REMOVE MBLK */
+static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
 
 inline int64_t FutureDrift(int64_t nTime, int nHeight) { return Params().IsProtocolV1(nHeight) ? nTime + 10 * 60 : nTime + 15; }
 
@@ -169,6 +168,24 @@ bool GetWalletFile(CWallet* pwallet, std::string &strWalletFileOut);
 
 /** Get statistics from node state */
 bool GetNodeStateStats(NodeId nodeid, CNodeStateStats &stats);
+
+/** (try to) add transaction to memory pool **/ //new code
+bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
+                        bool* pfMissingInputs);
+
+bool AcceptableInputs(CTxMemPool& pool, const CTransaction &txo, bool fLimitFree,
+                        bool* pfMissingInputs);
+
+
+bool FindTransactionsByDestination(const CTxDestination &dest, std::vector<uint256> &vtxhash);
+
+int GetInputAge(CTxIn& vin);
+/** Abort with a message */
+bool AbortNode(const std::string &msg, const std::string &userMessage="");
+
+/** Increase a node's misbehavior score. */   //new code
+void Misbehaving(NodeId nodeid, int howmuch);
+
 
 /** Position on disk for a particular transaction. */
 class CDiskTxPos

@@ -1874,7 +1874,8 @@ label.recipient {
 /* Icons styling */
 
 .staking {
-    color: rgb(18, 121, 59);
+    /* color: rgb(18, 121, 59); */
+	color: rgb(249, 202, 101);
 }
 .not-staking {
     opacity: 0.3;

@@ -5,8 +5,9 @@
 QT_DIR = /usr/include/qt5
 QT_CORE = ${QT_DIR}/QtCore
 
-USE_UPNP:=1
+USE_UPNP:=0
 USE_WALLET:=1
+USE_IPV6:=1
 
 LINK:=$(CXX)
 ARCH:=$(system lscpu | head -n 1 | awk '{print $2}')
@@ -48,6 +49,10 @@ endif
 ifneq (${USE_UPNP}, -)
     LIBS += -l miniupnpc
     DEFS += -DUSE_UPNP=$(USE_UPNP)
+endif
+
+ifneq (${USE_IPV6}, -)
+	DEFS += -DUSE_IPV6=$(USE_IPV6)
 endif
 
 LIBS+= \
