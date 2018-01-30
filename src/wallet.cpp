@@ -5775,8 +5775,7 @@ bool CWallet::InitBloomFilter()
     return true;
 };
 
-
-// NovaCoin: get current stake weight posv1
+// NovaCoin: get current stake weight
 bool CWallet::GetStakeWeightV1(int nHeight, const CKeyStore& keystore, uint64_t& nMinWeight, uint64_t& nMaxWeight, uint64_t& nWeight)
 {
     // Choose coins to use
@@ -5843,7 +5842,6 @@ bool CWallet::GetStakeWeightV1(int nHeight, const CKeyStore& keystore, uint64_t&
 
     return true;
 }
-
 
 // NovaCoin: get current stake weight posv2
 uint64_t CWallet::GetStakeWeight() const
@@ -6019,8 +6017,8 @@ bool CWallet::CreateCoinStake(unsigned int nBits, int64_t nSearchInterval, int64
                 vwtxPrev.push_back(pcoin.first);
                 txNew.vout.push_back(CTxOut(0, scriptPubKeyOut));
 
-                //if (GetWeight(nHeight, nBlockTime, (int64_t)txNew.nTime) < nStakeSplitAge)
-                    //txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake //del
+                if (GetWeight(nHeight, nBlockTime, (int64_t)txNew.nTime) < nStakeSplitAge)
+                    txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
 
                 if (fDebugPoS)
                     LogPrintf("CreateCoinStake : added kernel type=%d\n", whichType);
@@ -6043,7 +6041,6 @@ bool CWallet::CreateCoinStake(unsigned int nBits, int64_t nSearchInterval, int64
         if (txNew.vout.size() == 2 && ((pcoin.first->vout[pcoin.second].scriptPubKey == scriptPubKeyKernel || pcoin.first->vout[pcoin.second].scriptPubKey == txNew.vout[1].scriptPubKey))
             && pcoin.first->GetHash() != txNew.vin[0].prevout.hash)
         {
-			//int64_t nTimeWeight = GetWeight((int64_t)pcoin.first->nTime, (int64_t)txNew.nTime); //del
             int64_t nTimeWeight = GetWeight(nHeight, (int64_t)pcoin.first->nTime, (int64_t)txNew.nTime);
 
             // Stop adding more inputs if already too many inputs

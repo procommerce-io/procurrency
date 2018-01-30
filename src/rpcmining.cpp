@@ -79,7 +79,7 @@ Value getstakesubsidy(const Array& params, bool fHelp)
     if (!tx.GetCoinAge(txdb, pindexBest, nCoinAge))
         throw JSONRPCError(RPC_MISC_ERROR, "GetCoinAge failed");
 
-    //return (uint64_t)Params().GetProofOfStakeReward(pindexBest, nCoinAge, 0);//del
+    //return (uint64_t)Params().GetProofOfStakeReward(pindexBest, nCoinAge, 0);
 	return (uint64_t)Params().GetProofOfStakeReward(pindexBest->nHeight, nCoinAge, 0);
 }
 
@@ -92,12 +92,10 @@ Value getmininginfo(const Array& params, bool fHelp)
 
     uint64_t nMinWeight = 0, nMaxWeight = 0, nWeight = 0;
 
-    if (Params().IsProtocolV2(nBestHeight))
-		uint64_t nWeight = pwalletMain->GetStakeWeight();
-        //pwalletMain->GetStakeWeightV1(nBestHeight, *pwalletMain, nMinWeight, nMaxWeight, nWeight); //del
+    if (Params().IsProtocolV1(nBestHeight))
+        pwalletMain->GetStakeWeightV1(nBestHeight, *pwalletMain, nMinWeight, nMaxWeight, nWeight);
     else
-		pwalletMain->GetStakeWeightV1(nBestHeight, *pwalletMain, nMinWeight, nMaxWeight, nWeight);
-        //uint64_t nWeight = pwalletMain->GetStakeWeight(); //del
+        nWeight = pwalletMain->GetStakeWeight();
 
     Object obj, diff, weight;
     obj.push_back(Pair("blocks",                (int)nBestHeight));
@@ -141,12 +139,10 @@ Value getstakinginfo(const Array& params, bool fHelp)
 
     uint64_t nMinWeight = 0, nMaxWeight = 0, nWeight = 0;
 
-    if (Params().IsProtocolV2(nBestHeight))
-		uint64_t nWeight = pwalletMain->GetStakeWeight();
-        //pwalletMain->GetStakeWeightV1(nBestHeight, *pwalletMain, nMinWeight, nMaxWeight, nWeight);//del
+    if (Params().IsProtocolV1(nBestHeight))
+        pwalletMain->GetStakeWeightV1(nBestHeight, *pwalletMain, nMinWeight, nMaxWeight, nWeight);
     else
-		pwalletMain->GetStakeWeightV1(nBestHeight, *pwalletMain, nMinWeight, nMaxWeight, nWeight);
-        //uint64_t nWeight = pwalletMain->GetStakeWeight(); //del
+        nWeight = pwalletMain->GetStakeWeight();
 
     uint64_t nNetworkWeight = GetPoSKernelPS();
     bool staking = nLastCoinStakeSearchInterval && nWeight;

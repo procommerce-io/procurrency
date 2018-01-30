@@ -15,12 +15,10 @@ int64_t GetWeight(int nHeight, int64_t nIntervalBeginning, int64_t nIntervalEnd)
     // Kernel hash weight starts from 0 at the min age
     // this change increases active coins participating the hash and helps
     // to secure the network when proof-of-stake difficulty is low
-    if (Params().IsProtocolV2(nHeight))
-		return nIntervalEnd - nIntervalBeginning - nStakeMinAge;
-        //return min(nIntervalEnd - nIntervalBeginning - nStakeMinAge, (int64_t)nStakeMaxAge); //del
+    if (Params().IsProtocolV1(nHeight))
+        return min(nIntervalEnd - nIntervalBeginning - nStakeMinAge, (int64_t)nStakeMaxAge);
     else
-		return min(nIntervalEnd - nIntervalBeginning - nStakeMinAge, (int64_t)nStakeMaxAge);
-        //return nIntervalEnd - nIntervalBeginning - nStakeMinAge; //del
+        return nIntervalEnd - nIntervalBeginning - nStakeMinAge;
 }
 
 // Get the last stake modifier and its generation time from a given block
@@ -728,10 +726,8 @@ static inline bool CheckStakeKernelHashV2(CStakeModifier* pStakeMod, unsigned in
 bool CheckStakeKernelHash(int nPrevHeight, CStakeModifier* pStakeMod, unsigned int nBits, const CBlock& blockFrom, unsigned int nTxPrevOffset, const CTransaction& txPrev, const COutPoint& prevout, unsigned int nTimeTx, uint256& hashProofOfStake, uint256& targetProofOfStake, bool fPrintProofOfStake)
 {
     if (Params().IsProtocolV1(nPrevHeight+1))
-		//return CheckStakeKernelHashV2(pStakeMod, nBits, blockFrom.GetBlockTime(), txPrev, prevout, nTimeTx, hashProofOfStake, targetProofOfStake, fPrintProofOfStake); //del
         return CheckStakeKernelHashV1(nPrevHeight+1, nBits, blockFrom, nTxPrevOffset, txPrev, prevout, nTimeTx, hashProofOfStake, targetProofOfStake, fPrintProofOfStake);
     else
-		//return CheckStakeKernelHashV1(nPrevHeight+1, nBits, blockFrom, nTxPrevOffset, txPrev, prevout, nTimeTx, hashProofOfStake, targetProofOfStake, fPrintProofOfStake); //del
         return CheckStakeKernelHashV2(pStakeMod, nBits, blockFrom.GetBlockTime(), txPrev, prevout, nTimeTx, hashProofOfStake, targetProofOfStake, fPrintProofOfStake);
 }
 
@@ -784,12 +780,10 @@ bool CheckProofOfStake(CBlockIndex* pindexPrev, const CTransaction& tx, unsigned
 // Check whether the coinstake timestamp meets protocol
 bool CheckCoinStakeTimestamp(int nHeight, int64_t nTimeBlock, int64_t nTimeTx)
 {
-    if (Params().IsProtocolV2(nHeight))
-		return (nTimeBlock == nTimeTx) && ((nTimeTx & STAKE_TIMESTAMP_MASK) == 0);
-        //return (nTimeBlock == nTimeTx); //del
+    if (Params().IsProtocolV1(nHeight))
+        return (nTimeBlock == nTimeTx);
     else
-		return (nTimeBlock == nTimeTx);
-        //return (nTimeBlock == nTimeTx) && ((nTimeTx & STAKE_TIMESTAMP_MASK) == 0); //del
+        return (nTimeBlock == nTimeTx) && ((nTimeTx & STAKE_TIMESTAMP_MASK) == 0);
 }
 
 bool CheckKernel(CBlockIndex* pindexPrev, unsigned int nBits, int64_t nTime, const COutPoint& prevout, int64_t* pBlockTime)

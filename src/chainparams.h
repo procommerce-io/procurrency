@@ -71,7 +71,6 @@ public:
     const bool IsProtocolV1(int nHeight) const { return nHeight < nFirstPosv2Block; }
     const bool IsProtocolV2(int nHeight) const { return nHeight > nFirstPosv2Block; }
     const bool IsProtocolV3(int nHeight) const { return nHeight > nFirstPosv3Block; }
-	//const bool IsProtocolV4(int nHeight) const { return nHeight > nFirstPosv4Block; } // ProtocolV4
 
     const CBigNum& ProofOfWorkLimit() const { return bnProofOfWorkLimit; }
     const CBigNum& ProofOfStakeLimit(int nHeight) const { return IsProtocolV2(nHeight) ? bnProofOfStakeLimitV2 : bnProofOfStakeLimit; }

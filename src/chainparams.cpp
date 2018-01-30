@@ -170,7 +170,6 @@ public:
         
         nFirstPosv2Block = 920; // POSv2 Start
         nFirstPosv3Block = 30000; // POSv3 Start
-		//nFirstPosv4Block = 400000 // POSv4 start
 
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20); // PoW starting difficulty = 0.0002441
         bnProofOfStakeLimit = CBigNum(~uint256(0) >> 20); // PoS starting difficulty = 0.0002441

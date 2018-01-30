@@ -52,18 +52,12 @@ inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MO
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 
-/** REMOVE MBLK **/
+/* REMOVE MBLK */
 static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
 
-inline int64_t FutureDriftV1(int64_t nTime) { return nTime + 10 * 60; } // ProtocolV1
-inline int64_t FutureDriftV2(int64_t nTime) { return nTime + 15; } // ProtocolV2/V3
-/**inline int64_t FutureDriftV4(int64_t nTime, int nHeight) { return nTime + 20 * 60; }**/ // ProtocolV4
+inline int64_t FutureDrift(int64_t nTime, int nHeight) { return Params().IsProtocolV1(nHeight) ? nTime + 10 * 60 : nTime + 15; }
 
-//inline int64_t FutureDrift(int64_t nTime, int nHeight) { return Params().IsProtocolV1(nHeight) ? nTime + 10 * 60 : nTime + 15; } //del
-inline int64_t FutureDrift(int64_t nTime, int nHeight) { return Params().IsProtocolV2(nHeight) ? FutureDriftV2(nTime) : FutureDriftV1(nTime); }
-
-inline unsigned int GetTargetSpacing(int nHeight) { return Params().IsProtocolV2(nHeight) ? 60 : 69; }
-//inline unsigned int GetTargetSpacing2(int nHeight) { return Params().IsProtocolV2(nHeight) ? 69 : 120; } // New Block Time
+inline unsigned int GetTargetSpacing(int nHeight) { return Params().IsProtocolV1(nHeight) ? 60 : 69; }
 
 extern CScript COINBASE_FLAGS;
 extern CCriticalSection cs_main;
@@ -1283,12 +1277,10 @@ public:
 
     int64_t GetPastTimeLimit() const
     {
-        if (Params().IsProtocolV2(nHeight))
-			return GetBlockTime();
-            //return GetMedianTimePast(); //del
+        if (Params().IsProtocolV1(nHeight))
+            return GetMedianTimePast();
         else
-			return GetMedianTimePast();
-            //return GetBlockTime();  //del   
+            return GetBlockTime();     
     }
 
     enum { nMedianTimeSpan=11 };
@@ -1494,12 +1486,10 @@ public:
 
     int64_t GetPastTimeLimit() const
     {
-        if (Params().IsProtocolV2(nHeight))
-			return GetBlockTime();
-            //return GetMedianTimePast(); //del
+        if (Params().IsProtocolV1(nHeight))
+            return GetMedianTimePast();
         else
-			return GetMedianTimePast();
-            //return GetBlockTime();  //del   
+            return GetBlockTime();
     }
 
     enum { nMedianTimeSpan=11 };
