@@ -134,7 +134,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake, int64_t* pFees)
 
     int nHeight = pindexPrev->nHeight+1; // height of new block
     
-    if (Params().IsProtocolV1(nHeight)) // generate old version until protocolV2
+    if (Params().IsProtocolV2(nHeight)) // generate old version until protocolV2
         pblock->nVersion = 6;
     
 

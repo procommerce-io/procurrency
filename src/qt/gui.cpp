@@ -952,11 +952,16 @@ void GUI::updateWeight()
     if (!lockWallet)
         return;
 
-    if (Params().IsProtocolV1(nBestHeight)) {
-        uint64_t nMinWeight = 0, nMaxWeight = 0;
+    /**if (Params().IsProtocolV2(nBestHeight)) {
+		nWeight = pwalletMain->GetStakeWeight();
+        //uint64_t nMinWeight = 0, nMaxWeight = 0; //del
+        //pwalletMain->GetStakeWeightV1(nBestHeight, *pwalletMain, nMinWeight, nMaxWeight, nWeight); //del
+   } else
+		uint64_t nMinWeight = 0, nMaxWeight = 0;
         pwalletMain->GetStakeWeightV1(nBestHeight, *pwalletMain, nMinWeight, nMaxWeight, nWeight);
-    } else
-        nWeight = pwalletMain->GetStakeWeight();
+        //nWeight = pwalletMain->GetStakeWeight(); //del **/
+		
+	nWeight = pwalletMain->GetStakeWeight();	
 }
 
 void GUI::updateStakingIcon()
