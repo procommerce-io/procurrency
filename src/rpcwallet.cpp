@@ -232,38 +232,28 @@ Value getnewpubkey(const Array& params, bool fHelp)
 
 Value getnewaddress(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() > 2)
+    if (fHelp || params.size() > 1)
         throw std::runtime_error(
-            "getnewaddress [account] [normal]\n"
-            "Returns a new ProCurrency stealth address for receiving payments.  "
-        "If normal is specified, a normal address will be provided. "
+            "getnewaddress [account]\n"
+            "Returns a new ProCurrency address for receiving payments.  "
             "If [account] is specified, it is added to the address book "
             "so payments received with the address will be credited to [account].");
 
     // Parse the account first so we don't generate a key if there's an error
-    if(params.size() > 1)
-    {
-        std::string strAccount;
-        if (params.size() > 0)
-            strAccount = AccountFromValue(params[0]);
+    std::string strAccount;
+    if (params.size() > 0)
+        strAccount = AccountFromValue(params[0]);
 
-        if (!pwalletMain->IsLocked())
-            pwalletMain->TopUpKeyPool();
 
-        // Generate a new key that is added to wallet
-        CPubKey newKey;
-        if (0 != pwalletMain->NewKeyFromAccount(newKey))
-            throw std::runtime_error("NewKeyFromAccount failed.");
-        CKeyID keyID = newKey.GetID();
+    // Generate a new key that is added to wallet
+    CPubKey newKey;
+    if (0 != pwalletMain->NewKeyFromAccount(newKey))
+        throw std::runtime_error("NewKeyFromAccount failed.");
+    CKeyID keyID = newKey.GetID();
 
-        pwalletMain->SetAddressBookName(keyID, strAccount, NULL, true, true);
+    pwalletMain->SetAddressBookName(keyID, strAccount, NULL, true, true);
 
-        return CBitcoinAddress(keyID).ToString();
-    }
-    else
-    {
-        return getnewstealthaddress(params, fHelp);
-    }
+    return CBitcoinAddress(keyID).ToString();
 }
 
 
