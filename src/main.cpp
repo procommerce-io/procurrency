@@ -2559,7 +2559,7 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
                 return DoS(100, error("ConnectInputs() : %s, txv %d nTxFee < 0", GetHash().ToString().substr(0,10).c_str(), nVersion));
 
             // enforce transaction fees for every block
-            if (nTxFee < GetMinFee()) //&& !Params().IsProtocolV1(nBestHeight+1))//del
+            if (nTxFee < GetMinFee() && !Params().IsProtocolV1(nBestHeight+1))
                 return fBlock? DoS(100, error("ConnectInputs() : %s, txv %d not paying required fee=%s, paid=%s", GetHash().ToString().substr(0,10).c_str(), nVersion, FormatMoney(GetMinFee()).c_str(), FormatMoney(nTxFee).c_str())) : false;
 
             nFees += nTxFee;
@@ -3882,15 +3882,15 @@ bool CBlock::SignBlock(CWallet& wallet, int64_t nFees)
 
     CKey key;
     CTransaction txCoinStake;
-    if (!Params().IsProtocolV2(nBestHeight+1))
+    if (!Params().IsProtocolV1(nBestHeight+1))
         txCoinStake.nTime &= ~STAKE_TIMESTAMP_MASK;
     
     int64_t nSearchTime = txCoinStake.nTime; // search to current time
 
     if (nSearchTime > nLastCoinStakeSearchTime)
     {
-        /**int64_t nSearchInterval = Params().IsProtocolV1(nBestHeight+1) ? nSearchTime - nLastCoinStakeSearchTime : 1;**/ //del
-		int64_t nSearchInterval = Params().IsProtocolV2(nBestHeight+1) ? 1 : nSearchTime - nLastCoinStakeSearchTime;
+        int64_t nSearchInterval = Params().IsProtocolV1(nBestHeight+1) ? nSearchTime - nLastCoinStakeSearchTime : 1;
+		//int64_t nSearchInterval = Params().IsProtocolV2(nBestHeight+1) ? 1 : nSearchTime - nLastCoinStakeSearchTime; //del
         if (wallet.CreateCoinStake(nBits, nSearchInterval, nFees, txCoinStake, key))
         {
             if (txCoinStake.nTime >= pindexBest->GetPastTimeLimit()+1)

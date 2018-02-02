@@ -60,10 +60,10 @@ inline int64_t FutureDriftV2(int64_t nTime) { return nTime + 15; } // ProtocolV2
 /**inline int64_t FutureDriftV4(int64_t nTime, int nHeight) { return nTime + 20 * 60; }**/ // ProtocolV4
 
 //inline int64_t FutureDrift(int64_t nTime, int nHeight) { return Params().IsProtocolV1(nHeight) ? nTime + 10 * 60 : nTime + 15; } //del
-inline int64_t FutureDrift(int64_t nTime, int nHeight) { return Params().IsProtocolV2(nHeight) ? FutureDriftV2(nTime) : FutureDriftV1(nTime); }
+inline int64_t FutureDrift(int64_t nTime, int nHeight) { return Params().IsProtocolV1(nHeight) ? FutureDriftV1(nTime) : FutureDriftV2(nTime); }
 
-inline unsigned int GetTargetSpacing(int nHeight) { return Params().IsProtocolV2(nHeight) ? 60 : 69; }
-//inline unsigned int GetTargetSpacing2(int nHeight) { return Params().IsProtocolV2(nHeight) ? 69 : 120; } // New Block Time
+inline unsigned int GetTargetSpacing(int nHeight) { return Params().IsProtocolV1(nHeight) ? 60 : 69; }
+//inline unsigned int GetTargetSpacing2(int nHeight) { return Params().IsProtocolV4(nHeight-80000) ? 120 : 69; } // New Block Time
 
 extern CScript COINBASE_FLAGS;
 extern CCriticalSection cs_main;
@@ -1283,12 +1283,10 @@ public:
 
     int64_t GetPastTimeLimit() const
     {
-        if (Params().IsProtocolV2(nHeight))
-			return GetBlockTime();
-            //return GetMedianTimePast(); //del
+        if (Params().IsProtocolV1(nHeight))
+            return GetMedianTimePast();
         else
-			return GetMedianTimePast();
-            //return GetBlockTime();  //del   
+            return GetBlockTime();
     }
 
     enum { nMedianTimeSpan=11 };
@@ -1494,12 +1492,10 @@ public:
 
     int64_t GetPastTimeLimit() const
     {
-        if (Params().IsProtocolV2(nHeight))
-			return GetBlockTime();
-            //return GetMedianTimePast(); //del
+        if (Params().IsProtocolV1(nHeight))
+            return GetMedianTimePast();
         else
-			return GetMedianTimePast();
-            //return GetBlockTime();  //del   
+            return GetBlockTime();
     }
 
     enum { nMedianTimeSpan=11 };

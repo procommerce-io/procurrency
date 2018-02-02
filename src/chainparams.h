@@ -75,6 +75,8 @@ public:
 
     const CBigNum& ProofOfWorkLimit() const { return bnProofOfWorkLimit; }
     const CBigNum& ProofOfStakeLimit(int nHeight) const { return IsProtocolV2(nHeight) ? bnProofOfStakeLimitV2 : bnProofOfStakeLimit; }
+	// ProtocolV4
+	/**const CBigNum& ProofOfStakeLimit(int nHeight) const { return IsProtocolV4(nHeight) ? bnProofOfStakeLimit : bnProofOfStakeLimitV4; }**/
     
     
     virtual const CBlock& GenesisBlock() const = 0;
@@ -114,6 +116,7 @@ protected:
     CBigNum bnProofOfWorkLimit;
     CBigNum bnProofOfStakeLimit;
     CBigNum bnProofOfStakeLimitV2;
+	/**CBigNum bnProofOfStakeLimitV4;**/ //ProtocolV4
     
     std::string strDataDir;
     std::vector<CDNSSeedData> vSeeds;

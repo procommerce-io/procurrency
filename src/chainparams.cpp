@@ -175,6 +175,7 @@ public:
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20); // PoW starting difficulty = 0.0002441
         bnProofOfStakeLimit = CBigNum(~uint256(0) >> 20); // PoS starting difficulty = 0.0002441
         bnProofOfStakeLimitV2 = CBigNum(~uint256(0) >> 34);
+		/**bnProofOfStakeLimitV4 = CBigNum(~uint256(0) >> 40);**/ // ProtocolV4
         
         genesis.nBits    = bnProofOfWorkLimit.GetCompact();
         genesis.nNonce   = 163555;
