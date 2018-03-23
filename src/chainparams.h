@@ -8,11 +8,7 @@
 
 #include "bignum.h"
 #include "uint256.h"
-#ifndef OTP_ENABLED
-    #include "util.h"
-#else
-    #include "util_otp.h"
-#endif
+#include "util.h"
 
 #include <vector>
 
@@ -71,12 +67,12 @@ public:
     const bool IsProtocolV1(int nHeight) const { return nHeight < nFirstPosv2Block; }
     const bool IsProtocolV2(int nHeight) const { return nHeight > nFirstPosv2Block; }
     const bool IsProtocolV3(int nHeight) const { return nHeight > nFirstPosv3Block; }
-	//const bool IsProtocolV4(int nHeight) const { return nHeight > nFirstPosv4Block; } // ProtocolV4
+	const bool IsProtocolV4(int nHeight) const { return nHeight > nFirstPosv4Block; } // ProtocolV4
 
     const CBigNum& ProofOfWorkLimit() const { return bnProofOfWorkLimit; }
     const CBigNum& ProofOfStakeLimit(int nHeight) const { return IsProtocolV2(nHeight) ? bnProofOfStakeLimitV2 : bnProofOfStakeLimit; }
 	// ProtocolV4
-	/**const CBigNum& ProofOfStakeLimit(int nHeight) const { return IsProtocolV4(nHeight) ? bnProofOfStakeLimit : bnProofOfStakeLimitV4; }**/
+	const CBigNum& ProofOfStakeLimitV4(int nHeight) const { return IsProtocolV4(nHeight) ? bnProofOfStakeLimitV4 : bnProofOfStakeLimitV3; }
     
     
     virtual const CBlock& GenesisBlock() const = 0;
@@ -113,10 +109,12 @@ protected:
     
     int nFirstPosv2Block;
     int nFirstPosv3Block;
+	int nFirstPosv4Block; //ProtocolV4
     CBigNum bnProofOfWorkLimit;
     CBigNum bnProofOfStakeLimit;
     CBigNum bnProofOfStakeLimitV2;
-	/**CBigNum bnProofOfStakeLimitV4;**/ //ProtocolV4
+	CBigNum bnProofOfStakeLimitV3;
+	CBigNum bnProofOfStakeLimitV4; //ProtocolV4
     
     std::string strDataDir;
     std::vector<CDNSSeedData> vSeeds;

@@ -4,23 +4,18 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "wallet.h"
+
 #include "txdb.h"
-#ifndef OTP_ENABLED
-    #include "wallet.h"
-    #include "walletdb.h" // for BackupWallet
-    #include "bloom.h"
-    #include "crypter.h"
-#else
-    #include "wallet_otp.h"
-    #include "walletdb_otp.h" // for BackupWallet
-    #include "bloom.h"
-    #include "crypter_otp.h"
-#endif
+#include "walletdb.h" // for BackupWallet
+#include "bloom.h"
+#include "crypter.h"
 #include "ui_interface.h"
 #include "base58.h"
 #include "kernel.h"
 #include "coincontrol.h"
 #include "pbkdf2.h"
+
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
@@ -6043,7 +6038,6 @@ bool CWallet::CreateCoinStake(unsigned int nBits, int64_t nSearchInterval, int64
         if (txNew.vout.size() == 2 && ((pcoin.first->vout[pcoin.second].scriptPubKey == scriptPubKeyKernel || pcoin.first->vout[pcoin.second].scriptPubKey == txNew.vout[1].scriptPubKey))
             && pcoin.first->GetHash() != txNew.vin[0].prevout.hash)
         {
-			//int64_t nTimeWeight = GetWeight((int64_t)pcoin.first->nTime, (int64_t)txNew.nTime); //del
             int64_t nTimeWeight = GetWeight(nHeight, (int64_t)pcoin.first->nTime, (int64_t)txNew.nTime);
 
             // Stop adding more inputs if already too many inputs
@@ -6082,7 +6076,6 @@ bool CWallet::CreateCoinStake(unsigned int nBits, int64_t nSearchInterval, int64
         if (!txNew.GetCoinAge(txdb, pindexPrev, nCoinAge))
             return error("CreateCoinStake : failed to calculate coin age");
 
-        //int64_t nReward = Params().GetProofOfStakeReward(pindexPrev, nCoinAge, nFees);
 		int64_t nReward = Params().GetProofOfStakeReward(pindexPrev->nHeight, nCoinAge, nFees);
         if (nReward <= 0)
             return false;
