@@ -1914,9 +1914,8 @@ const CBlockThinIndex* GetLastBlockThinIndex(const CBlockThinIndex* pindex, bool
 
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake)
 {
-	CBigNum bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit(pindexLast->nHeight) : Params().ProofOfWorkLimit();
-	
-	CBigNum bnTargetLimitV4 = fProofOfStake ? Params().ProofOfStakeLimitV4(pindexLast->nHeight) : Params().ProofOfWorkLimit();
+    CBigNum bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit(pindexLast->nHeight) : Params().ProofOfWorkLimit();
+    
 
     if (pindexLast == NULL)
         return bnTargetLimit.GetCompact(); // genesis block
@@ -1929,50 +1928,32 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
         return bnTargetLimit.GetCompact(); // second block
     
     //int64_t nTargetSpacing = GetTargetSpacing(pindexLast->nHeight);
-	int64_t nTargetSpacing = 0; //
-	
-	if(pindexLast->nHeight < NEW_TARGET_SPACING_FORK_BLOCK){
-		nTargetSpacing = 90; //90s
-	}else{
-		nTargetSpacing = 120; //120s
-	}
+	int64_t nTargetSpacing = 90; //90s
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
     if (nActualSpacing < 0)
-		nActualSpacing = nTargetSpacing;
+        nActualSpacing = nTargetSpacing;
 
-	if (Params().IsProtocolV3(pindexLast->nHeight)) {
+    if (Params().IsProtocolV3(pindexLast->nHeight)) {
         if (nActualSpacing > nTargetSpacing * 10)
             nActualSpacing = nTargetSpacing * 10;
-	}
-    if (Params().IsProtocolV4(pindexLast->nHeight)) {
-        if (nActualSpacing > nTargetSpacing * 20)
-            nActualSpacing = nTargetSpacing * 20;
-	}
+    }
     // ppcoin: target change every block
     // ppcoin: retarget with exponential moving toward target spacing
     CBigNum bnNew;
     bnNew.SetCompact(pindexPrev->nBits);
-	
-	int64_t nInterval = nTargetTimespan / nTargetSpacing;
+    int64_t nInterval = nTargetTimespan / nTargetSpacing;
     bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
-	bnNew /= ((nInterval + 1) * nTargetSpacing);
-	
-	if (Params().IsProtocolV4(pindexLast->nHeight)) {	
-		if (bnNew <= 0 || bnNew > bnTargetLimitV4)
-			bnNew = bnTargetLimitV4;
-	}else{
-		if (bnNew <= 0 || bnNew > bnTargetLimit)
-			bnNew = bnTargetLimit;
-	}
+    bnNew /= ((nInterval + 1) * nTargetSpacing);
+
+    if (bnNew <= 0 || bnNew > bnTargetLimit)
+        bnNew = bnTargetLimit;
 
     return bnNew.GetCompact();
 }
 
 unsigned int GetNextTargetRequiredThin(const CBlockThinIndex* pindexLast, bool fProofOfStake)
 {
-	CBigNum bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit(pindexLast->nHeight) : Params().ProofOfWorkLimit();
-	
-	CBigNum bnTargetLimitV4 = fProofOfStake ? Params().ProofOfStakeLimitV4(pindexLast->nHeight) : Params().ProofOfWorkLimit();
+    CBigNum bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit(pindexLast->nHeight) : Params().ProofOfWorkLimit();
 
     if (pindexLast == NULL)
         return bnTargetLimit.GetCompact(); // genesis block
@@ -1988,37 +1969,21 @@ unsigned int GetNextTargetRequiredThin(const CBlockThinIndex* pindexLast, bool f
         return bnTargetLimit.GetCompact(); // second block
     
     //int64_t nTargetSpacing = GetTargetSpacing(pindexLast->nHeight);
-	int64_t nTargetSpacing = 0; //Initiation
-	if(pindexLast->nHeight < NEW_TARGET_SPACING_FORK_BLOCK){
-		nTargetSpacing = 90; //90s
-	}else{
-		nTargetSpacing = 120; //120s
-	}
+	int64_t nTargetSpacing = 90; //90s
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
     if (nActualSpacing < 0)
-		nActualSpacing = nTargetSpacing;
+        nActualSpacing = nTargetSpacing;
 
-
-    if (Params().IsProtocolV4(pindexLast->nHeight)) {
-        if (nActualSpacing > nTargetSpacing * 20)
-            nActualSpacing = nTargetSpacing * 20;
-	}
     // ppcoin: target change every block
     // ppcoin: retarget with exponential moving toward target spacing
     CBigNum bnNew;
     bnNew.SetCompact(pindexPrev->nBits);
-	
-	int64_t nInterval = nTargetTimespan / nTargetSpacing;
+    int64_t nInterval = nTargetTimespan / nTargetSpacing;
     bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
-	bnNew /= ((nInterval + 1) * nTargetSpacing);
-	
-	if (Params().IsProtocolV4(pindexLast->nHeight)) {	
-		if (bnNew <= 0 || bnNew > bnTargetLimitV4)
-			bnNew = bnTargetLimitV4;
-	}else{
-		if (bnNew <= 0 || bnNew > bnTargetLimit)
-			bnNew = bnTargetLimit;
-	}
+    bnNew /= ((nInterval + 1) * nTargetSpacing);
+
+    if (bnNew <= 0 || bnNew > bnTargetLimit)
+        bnNew = bnTargetLimit;
 
     return bnNew.GetCompact();
 }
@@ -3589,18 +3554,18 @@ bool CBlock::AcceptBlock()
     // Check coinbase timestamp
     if (GetBlockTime() > FutureDrift((int64_t)vtx[0].nTime, nHeight))
         return DoS(50, error("AcceptBlock() : coinbase timestamp is too early"));
-	
-	//if (Params().IsProtocolV4(nHeight) // ProtocolV4 //del
-          //{
-			// Check coinbase timestamp | ProtocolV4  
-            if ((Params().IsProtocolV4(nHeight)) && (GetBlockTime() > FutureDriftV4((int64_t)vtx[0].nTime, nHeight)))
+	/**
+	if(IsProtocolV4(nHeight)) // ProtocolV4
+          {
+            if (GetBlockTime() > FutureDriftV4((int64_t)vtx[0].nTime, nHeight))
                 return DoS(50, error("AcceptBlock() : coinbase timestamp is too early"));
-          //}
-    //else
-          //{
-            //if (GetBlockTime() > FutureDrift((int64_t)vtx[0].nTime, nHeight)) //del
-                //return DoS(50, error("AcceptBlock() : coinbase timestamp is too early"));
-          //}
+          }
+    else
+          {
+            if (GetBlockTime() > FutureDrift((int64_t)vtx[0].nTime, nHeight))
+                return DoS(50, error("AcceptBlock() : coinbase timestamp is too early"));
+          }
+	**/
 		  
     // Check coinstake timestamp
     if (IsProofOfStake() && !CheckCoinStakeTimestamp(nHeight, GetBlockTime(), (int64_t)vtx[1].nTime))
@@ -3613,9 +3578,6 @@ bool CBlock::AcceptBlock()
 
     // Check timestamp against prev
     if (GetBlockTime() <= pindexPrev->GetPastTimeLimit() || FutureDrift(GetBlockTime(), nHeight) < pindexPrev->GetBlockTime())
-        return error("AcceptBlock() : block's timestamp is too early");
-	// Check timestamp against prev | ProtocolV4
-    if ((Params().IsProtocolV4(nHeight)) && (GetBlockTime() <= pindexPrev->GetPastTimeLimit() || FutureDriftV4(GetBlockTime(), nHeight) < pindexPrev->GetBlockTime()))
         return error("AcceptBlock() : block's timestamp is too early");
 
     // Check that all transactions are finalized
@@ -3920,22 +3882,15 @@ bool CBlock::SignBlock(CWallet& wallet, int64_t nFees)
 
     CKey key;
     CTransaction txCoinStake;
-    if ((!Params().IsProtocolV1(nBestHeight+1)) || (!Params().IsProtocolV4(nBestHeight+1)))
+    if (!Params().IsProtocolV1(nBestHeight+1))
         txCoinStake.nTime &= ~STAKE_TIMESTAMP_MASK;
     
     int64_t nSearchTime = txCoinStake.nTime; // search to current time
-	int64_t nSearchInterval = 0;
 
     if (nSearchTime > nLastCoinStakeSearchTime)
     {
-		//int64_t nSearchInterval = Params().IsProtocolV1(nBestHeight+1) ? nSearchTime - nLastCoinStakeSearchTime : 1; //del
-		//int64_t nSearchInterval = 0;
-		if (Params().IsProtocolV4(nBestHeight+1)) {
-			nSearchInterval = Params().IsProtocolV4(nBestHeight+1) ? 1 : nSearchTime - nLastCoinStakeSearchTime;
-		}else{
-			nSearchInterval = Params().IsProtocolV1(nBestHeight+1) ? nSearchTime - nLastCoinStakeSearchTime : 1;
-		}
-		
+        int64_t nSearchInterval = Params().IsProtocolV1(nBestHeight+1) ? nSearchTime - nLastCoinStakeSearchTime : 1;
+		//int64_t nSearchInterval = Params().IsProtocolV2(nBestHeight+1) ? 1 : nSearchTime - nLastCoinStakeSearchTime; //del
         if (wallet.CreateCoinStake(nBits, nSearchInterval, nFees, txCoinStake, key))
         {
             if (txCoinStake.nTime >= pindexBest->GetPastTimeLimit()+1)

@@ -14,11 +14,20 @@
 #include "addresstablemodel.h"
 #include "bitcoinunits.h"
 #include "guiconstants.h"
-#include "askpassphrasedialog.h"
+#ifndef OTP_ENABLED
+    #include "askpassphrasedialog.h"
+#else
+    #include "askpassphrasedialog_otp.h"
+#endif
 #include "notificator.h"
 #include "guiutil.h"
-#include "wallet.h"
-#include "util.h"
+#ifndef OTP_ENABLED
+    #include "wallet.h"
+    #include "util.h"
+#else
+    #include "wallet_otp.h"
+    #include "util_otp.h"
+#endif
 #include "init.h"
 
 #ifdef Q_OS_MAC
@@ -87,7 +96,6 @@ GUI::GUI(QWidget *parent):
     //resize(1280, 720);
 	resize(1405, 795);
     setWindowTitle(tr("ProCurrency") + " - " + tr("Enhanced Wallet"));
-	//setWindowTitle(tr("ProCurrency") + " - " + tr("Canyon Wallet")); //v2.0.0
 #ifndef Q_OS_MAC
     qApp->setWindowIcon(QIcon(":icons/procurrency"));
     setWindowIcon(QIcon(":icons/procurrency"));
@@ -967,12 +975,7 @@ void GUI::updateStakingIcon()
     {
         uint64_t nWeight = this->nWeight;
 
-		unsigned nEstimateTime = 0;
-		if (Params().IsProtocolV4(nBestHeight))
-			nEstimateTime = GetTargetSpacingV4(nBestHeight) * nNetworkWeight / nWeight;
-		else
-			nEstimateTime = GetTargetSpacing(nBestHeight) * nNetworkWeight / nWeight;
-		
+        unsigned nEstimateTime = GetTargetSpacing(nBestHeight) * nNetworkWeight / nWeight;
         QString text;
 
         text = (nEstimateTime < 60)           ? tr("%n second(s)", "", nEstimateTime) : \
