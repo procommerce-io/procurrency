@@ -54,16 +54,19 @@ static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20
 
 /** REMOVE MBLK **/
 static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
+/** New Blocktime Correction **/
+static const signed int NEW_TARGET_SPACING_FORK_BLOCK = 390000;
+/** MN Enforcement **/
+//static const signed int MN_ENFORCEMENT_FORK_BLOCK = xxxxxxxxx;
 
 inline int64_t FutureDriftV1(int64_t nTime) { return nTime + 10 * 60; } // ProtocolV1
 inline int64_t FutureDriftV2(int64_t nTime) { return nTime + 15; } // ProtocolV2/V3
-/**inline int64_t FutureDriftV4(int64_t nTime, int nHeight) { return nTime + 20 * 60; }**/ // ProtocolV4
+inline int64_t FutureDriftV4(int64_t nTime, int nHeight) { return nTime + 20 * 60; } // ProtocolV4
 
-//inline int64_t FutureDrift(int64_t nTime, int nHeight) { return Params().IsProtocolV1(nHeight) ? nTime + 10 * 60 : nTime + 15; } //del
 inline int64_t FutureDrift(int64_t nTime, int nHeight) { return Params().IsProtocolV1(nHeight) ? FutureDriftV1(nTime) : FutureDriftV2(nTime); }
 
 inline unsigned int GetTargetSpacing(int nHeight) { return Params().IsProtocolV1(nHeight) ? 60 : 69; }
-//inline unsigned int GetTargetSpacing2(int nHeight) { return Params().IsProtocolV4(nHeight-80000) ? 120 : 69; } // New Block Time
+inline unsigned int GetTargetSpacingV4(int nHeight) { return Params().IsProtocolV4(nHeight) ? 120 : 60; } // ProtocolV4
 
 extern CScript COINBASE_FLAGS;
 extern CCriticalSection cs_main;

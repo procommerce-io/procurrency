@@ -7,11 +7,7 @@
 
 #include "chainparams.h"
 #include "main.h"
-#ifndef OTP_ENABLED
-    #include "util.h"
-#else
-    #include "util_otp.h"
-#endif
+#include "util.h"
 
 #include <boost/assign/list_of.hpp>
 
@@ -45,6 +41,8 @@ int64_t CChainParams::GetProofOfWorkReward(int nHeight, int64_t nFees) const
 }
 
 static const int YEARLY_BLOCKCOUNT =  367920; //90s (1008 * 365)
+//static const int NEW_YEARLY_BLOCKCOUNT =  262800; //120s (720 * 365)
+static const int YEARLY_BLOCKCOUNT_2 =  525600; //120s (720 * 365 * 2)
 // miner's coin stake reward based on coin age spent (coin-days)
 int64_t CChainParams::GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64_t nFees) const
 {
@@ -55,7 +53,7 @@ int64_t CChainParams::GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64
     {
         nSubsidy = 15 * COIN;   // 
     }
-	else if(nHeight < (YEARLY_BLOCKCOUNT * 2))
+	else if(nHeight < (YEARLY_BLOCKCOUNT_2))
 	{		
         nSubsidy = 10 * COIN;
     }
@@ -162,20 +160,21 @@ public:
         
         vAlertPubKey = ParseHex("");
         
-        nDefaultPort = 35950;
-        nRPCPort = 35960;
+        nDefaultPort = 35950; //45950
+        nRPCPort = 35960;     //45960
         nBIP44ID = 0x80000023;
         
         nLastPOWBlock = 5000;
         
         nFirstPosv2Block = 920; // POSv2 Start
         nFirstPosv3Block = 30000; // POSv3 Start
-		//nFirstPosv4Block = 400000 // POSv4 start
+		nFirstPosv4Block = 440000; // POSv4 start
 
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20); // PoW starting difficulty = 0.0002441
         bnProofOfStakeLimit = CBigNum(~uint256(0) >> 20); // PoS starting difficulty = 0.0002441
         bnProofOfStakeLimitV2 = CBigNum(~uint256(0) >> 34);
-		/**bnProofOfStakeLimitV4 = CBigNum(~uint256(0) >> 40);**/ // ProtocolV4
+		bnProofOfStakeLimitV3 = CBigNum(~uint256(0) >> 34);
+		bnProofOfStakeLimitV4 = CBigNum(~uint256(0) >> 40); // ProtocolV4
         
         genesis.nBits    = bnProofOfWorkLimit.GetCompact();
         genesis.nNonce   = 163555;
@@ -186,22 +185,27 @@ public:
 		
 		
 		
-        vSeeds.push_back(CDNSSeedData("seed2",  "194.135.80.127"));
-        vSeeds.push_back(CDNSSeedData("seed3",  "185.5.53.201"));
-		vSeeds.push_back(CDNSSeedData("seed4",  "185.5.54.65"));
-		vSeeds.push_back(CDNSSeedData("seed5",  "185.69.53.90"));
-		vSeeds.push_back(CDNSSeedData("seed6",  "45.63.51.33"));
-		vSeeds.push_back(CDNSSeedData("seed7",  "45.32.167.248"));
-		vSeeds.push_back(CDNSSeedData("seed8",  "45.76.5.197"));
-		vSeeds.push_back(CDNSSeedData("seed9",  "45.32.176.210"));
-		vSeeds.push_back(CDNSSeedData("seed10",  "45.76.88.24"));
-		vSeeds.push_back(CDNSSeedData("seed11",  "45.76.104.85"));
+        vSeeds.push_back(CDNSSeedData("seed1",  "185.5.53.201"));
+		vSeeds.push_back(CDNSSeedData("seed2",  "185.5.54.65"));
+		vSeeds.push_back(CDNSSeedData("seed3",  "185.69.53.90"));
+		vSeeds.push_back(CDNSSeedData("seed4",  "45.63.51.33"));
+		vSeeds.push_back(CDNSSeedData("seed5",  "45.32.167.248"));
+		vSeeds.push_back(CDNSSeedData("seed6",  "45.76.5.197"));
+		vSeeds.push_back(CDNSSeedData("seed7",  "45.32.176.210"));
+		vSeeds.push_back(CDNSSeedData("seed8",  "45.76.88.24"));
+		vSeeds.push_back(CDNSSeedData("seed9",  "45.76.104.85"));
+		
+		vSeeds.push_back(CDNSSeedData("seed10",  "45.76.75.49"));
+		vSeeds.push_back(CDNSSeedData("seed11",  "195.181.241.20"));
+		//vSeeds.push_back(CDNSSeedData("seed12",  "94.176.232.135")); //del
 		//
-		vSeeds.push_back(CDNSSeedData("seed11",  "71.213.148.206"));
-		vSeeds.push_back(CDNSSeedData("seed11",  "67.197.66.122"));
-		vSeeds.push_back(CDNSSeedData("seed11",  "75.70.40.167"));
-		vSeeds.push_back(CDNSSeedData("seed11",  "66.222.148.57"));
-		vSeeds.push_back(CDNSSeedData("seed11",  "47.157.52.95"));
+		/*
+		vSeeds.push_back(CDNSSeedData("seed13",  "71.213.148.206"));
+		vSeeds.push_back(CDNSSeedData("seed14",  "67.197.66.122"));
+		vSeeds.push_back(CDNSSeedData("seed15",  "75.70.40.167"));
+		vSeeds.push_back(CDNSSeedData("seed16",  "66.222.148.57"));
+		vSeeds.push_back(CDNSSeedData("seed17",  "47.157.52.95"));
+		*/
 		
         
         base58Prefixes[PUBKEY_ADDRESS]      = list_of(55).convert_to_container<std::vector<unsigned char> >(); // ProCurrency address start with "P"
