@@ -40,9 +40,8 @@ int64_t CChainParams::GetProofOfWorkReward(int nHeight, int64_t nFees) const
     return nSubsidy + nFees;
 }
 
-static const int YEARLY_BLOCKCOUNT =  367920; //90s (1008 * 365)
-//static const int NEW_YEARLY_BLOCKCOUNT =  262800; //120s (720 * 365)
-static const int YEARLY_BLOCKCOUNT_2 =  525600; //120s (720 * 365 * 2)
+static const int YEARLY_BLOCKCOUNT =  525600; // 1440 * 365
+static const int YEARLY_BLOCKCOUNT_2 =  788400; //120s (1440 * 365) + (720 * 365)
 // miner's coin stake reward based on coin age spent (coin-days)
 int64_t CChainParams::GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64_t nFees) const
 {
@@ -197,6 +196,7 @@ public:
 		
 		vSeeds.push_back(CDNSSeedData("seed10",  "45.76.75.49"));
 		vSeeds.push_back(CDNSSeedData("seed11",  "195.181.241.20"));
+		vSeeds.push_back(CDNSSeedData("seed11",  "94.176.234.18"));
 		//vSeeds.push_back(CDNSSeedData("seed12",  "94.176.232.135")); //del
 		//
 		/*
