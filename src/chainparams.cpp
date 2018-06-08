@@ -159,8 +159,8 @@ public:
         
         vAlertPubKey = ParseHex("");
         
-        nDefaultPort = 35950; //45950
-        nRPCPort = 35960;     //45960
+        nDefaultPort = 45950; //45950 / 35950
+        nRPCPort = 45960;     //45960 / 35960
         nBIP44ID = 0x80000023;
         
         nLastPOWBlock = 5000;
@@ -196,7 +196,8 @@ public:
 		
 		vSeeds.push_back(CDNSSeedData("seed10",  "45.76.75.49"));
 		vSeeds.push_back(CDNSSeedData("seed11",  "195.181.241.20"));
-		vSeeds.push_back(CDNSSeedData("seed11",  "94.176.234.18"));
+		vSeeds.push_back(CDNSSeedData("seed12",  "94.176.234.18"));
+		vSeeds.push_back(CDNSSeedData("seed13",  "172.114.134.215"));
 		//vSeeds.push_back(CDNSSeedData("seed12",  "94.176.232.135")); //del
 		//
 		/*
@@ -247,8 +248,8 @@ public:
         
         vAlertPubKey = ParseHex("04e20146b21f90537b95bfac738d1a7f8dc4c1dde0970c967c6d1a8afde077c07eb2fc8082bc4a79a7c97c369ecb9c76b414d1cdae93b8b8a8aa16400bff9d9e76");
         
-        nDefaultPort = 35951;
-        nRPCPort = 35961;
+        nDefaultPort = 45951; //45951 / 35951
+        nRPCPort = 45961; //45961 / 35961
         nBIP44ID = 0x80000001;
 
         nLastPOWBlock = 1000;

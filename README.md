@@ -12,6 +12,6 @@
 <tr><td>Max Coin Supply</td><td>75B PROC</td></tr>
 <tr><td>Premine</td><td>15B PROC</td></tr>
 
-<tr><td>RPC Port</td><td> 35960</td></tr>
-<tr><td>P2P Port</td><td> 35950</td></tr>
+<tr><td>RPC Port</td><td> <s>35960</s> now 45960</td></tr>
+<tr><td>P2P Port</td><td> <s>35950</s> now 45950</td></tr>
 </table>
