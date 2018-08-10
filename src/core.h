@@ -1,23 +1,21 @@
-// Copyright (c) 2014 The ShadowCoin developers
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Copyright (c) 2009-2013 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
-// file license.txt or http://www.opensource.org/licenses/mit-license.php.
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+#ifndef BITCOIN_CORE_H
+#define BITCOIN_CORE_H
 
-#ifndef PROC_CORE_H
-#define PROC_CORE_H
+#include "uint256.h"
+#include "serialize.h"
+#include "script.h"
 
-#include <stdlib.h>
+#include "util.h"
+#include "ringsig.h"
+
 #include <stdio.h>
 #include <vector>
 #include <inttypes.h>
-
-#ifndef OTP_ENABLED
-    #include "util.h"
-#else
-    #include "util_otp.h"
-#endif
-#include "serialize.h"
-#include "script.h"
-#include "ringsig.h"
+#include <stdlib.h>
 
 enum GetMinFee_mode
 {
@@ -27,6 +25,7 @@ enum GetMinFee_mode
     GMF_ANON,
 };
 
+class CScript;
 class CTransaction;
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
@@ -57,15 +56,9 @@ public:
         return !(a == b);
     }
 
-    std::string ToString() const
-    {
-        return strprintf("COutPoint(%s, %u)", hash.ToString().substr(0,10).c_str(), n);
-    }
+    std::string ToString() const;
+    std::string ToStringShort() const;
 
-    void print() const
-    {
-        LogPrintf("%s\n", ToString().c_str());
-    }
 };
 
 /** An inpoint - a combination of a transaction and an index n into its vin */
@@ -81,8 +74,6 @@ public:
     bool IsNull() const { return (ptx == NULL && n == (unsigned int) -1); }
 };
 
-
-
 /** An input of a transaction.  It contains the location of the previous
  * transaction's output that it claims and a signature that matches the
  * output's public key.
@@ -92,6 +83,7 @@ class CTxIn
 public:
     COutPoint prevout;
     CScript scriptSig;
+    CScript prevPubKey;
     unsigned int nSequence;
 
     CTxIn()
@@ -99,19 +91,9 @@ public:
         nSequence = std::numeric_limits<unsigned int>::max();
     }
 
-    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), unsigned int nSequenceIn=std::numeric_limits<unsigned int>::max())
-    {
-        prevout = prevoutIn;
-        scriptSig = scriptSigIn;
-        nSequence = nSequenceIn;
-    }
+    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), unsigned int nSequenceIn=std::numeric_limits<unsigned int>::max());
 
-    CTxIn(uint256 hashPrevTx, unsigned int nOut, CScript scriptSigIn=CScript(), unsigned int nSequenceIn=std::numeric_limits<unsigned int>::max())
-    {
-        prevout = COutPoint(hashPrevTx, nOut);
-        scriptSig = scriptSigIn;
-        nSequence = nSequenceIn;
-    }
+    explicit CTxIn(uint256 hashPrevTx, unsigned int nOut, CScript scriptSigIn=CScript(), unsigned int nSequenceIn=std::numeric_limits<unsigned int>::max());
 
     IMPLEMENT_SERIALIZE
     (
@@ -124,14 +106,13 @@ public:
     {
         return (nSequence == std::numeric_limits<unsigned int>::max());
     }
-    
-    bool IsAnonInput() const
+	
+	bool IsAnonInput() const
     {
         return (scriptSig.size() >= MIN_ANON_IN_SIZE
             && scriptSig[0] == OP_RETURN
             && scriptSig[1] == OP_ANON_MARKER);
     }
-
 
     friend bool operator==(const CTxIn& a, const CTxIn& b)
     {
@@ -145,32 +126,9 @@ public:
         return !(a == b);
     }
 
-    std::string ToStringShort() const
-    {
-        return strprintf(" %s %d", prevout.hash.ToString().c_str(), prevout.n);
-    }
-
-    std::string ToString() const
-    {
-        std::string str;
-        str += "CTxIn(";
-        str += prevout.ToString();
-        if (prevout.IsNull())
-            str += strprintf(", coinbase %s", HexStr(scriptSig).c_str());
-        else
-            str += strprintf(", scriptSig=%s", scriptSig.ToString().substr(0,24).c_str());
-        if (nSequence != std::numeric_limits<unsigned int>::max())
-            str += strprintf(", nSequence=%u", nSequence);
-        str += ")";
-        return str;
-    }
-
-    void print() const
-    {
-        LogPrintf("%s\n", ToString().c_str());
-    }
-    
-    void ExtractKeyImage(ec_point& kiOut) const
+    std::string ToString() const;
+	
+	void ExtractKeyImage(ec_point& kiOut) const
     {
         kiOut.resize(EC_COMPRESSED_SIZE);
         memcpy(&kiOut[0], prevout.hash.begin(), 32);
@@ -181,7 +139,6 @@ public:
     {
         return (prevout.n >> 16) & 0xFFFF;
     };
-    
 };
 
 
@@ -194,6 +151,7 @@ class CTxOut
 {
 public:
     int64_t nValue;
+    int nRounds;
     CScript scriptPubKey;
 
     CTxOut()
@@ -201,11 +159,7 @@ public:
         SetNull();
     }
 
-    CTxOut(int64_t nValueIn, CScript scriptPubKeyIn)
-    {
-        nValue = nValueIn;
-        scriptPubKey = scriptPubKeyIn;
-    }
+    CTxOut(int64_t nValueIn, CScript scriptPubKeyIn);
 
     IMPLEMENT_SERIALIZE
     (
@@ -216,10 +170,11 @@ public:
     void SetNull()
     {
         nValue = -1;
+        nRounds = -10; // an initial value, should be no way to get this by calculations
         scriptPubKey.clear();
     }
 
-    bool IsNull()
+    bool IsNull() const
     {
         return (nValue == -1);
     }
@@ -234,23 +189,33 @@ public:
     {
         return (nValue == 0 && scriptPubKey.empty());
     }
-
-    bool IsAnonOutput() const
+	
+	bool IsAnonOutput() const
     {
         return (scriptPubKey.size() >= MIN_ANON_OUT_SIZE
             && scriptPubKey[0] == OP_RETURN
             && scriptPubKey[1] == OP_ANON_MARKER);
     }
 
+    uint256 GetHash() const;
 
-    uint256 GetHash() const
+    bool IsDust(int64_t MIN_RELAY_TX_FEE) const
     {
-        return SerializeHash(*this);
+        // "Dust" is defined in terms of CTransaction::nMinRelayTxFee,
+        // which has units satoshis-per-kilobyte.
+        // If you'd pay more than 1/3 in fees
+        // to spend something, then we consider it dust.
+        // A typical txout is 34 bytes big, and will
+        // need a CTxIn of at least 148 bytes to spend,
+        // so dust is a txout less than 546 satoshis
+        // with default nMinRelayTxFee.
+        return ((nValue*1000)/(3*((int)GetSerializeSize(SER_DISK,0)+148)) < MIN_RELAY_TX_FEE);
     }
 
     friend bool operator==(const CTxOut& a, const CTxOut& b)
     {
         return (a.nValue       == b.nValue &&
+                a.nRounds      == b.nRounds &&
                 a.scriptPubKey == b.scriptPubKey);
     }
 
@@ -258,8 +223,8 @@ public:
     {
         return !(a == b);
     }
-
-    friend bool operator<(const CTxOut& a, const CTxOut& b)
+	//////////////-
+	friend bool operator<(const CTxOut& a, const CTxOut& b)
     {
         return (a.nValue < b.nValue);
     }
@@ -268,19 +233,11 @@ public:
     {
         return strprintf(" out %s %s", FormatMoney(nValue).c_str(), scriptPubKey.ToString(true).c_str());
     }
+	/////////////-
 
-    std::string ToString() const
-    {
-        if (IsEmpty()) return "CTxOut(empty)";
-        return strprintf("CTxOut(nValue=%s, scriptPubKey=%s)", FormatMoney(nValue).c_str(), scriptPubKey.ToString().c_str());
-    }
-
-    void print() const
-    {
-        LogPrintf("%s\n", ToString().c_str());
-    }
-    
-    CPubKey ExtractAnonPk() const
+    std::string ToString() const;
+	
+	CPubKey ExtractAnonPk() const
     {
         // always use IsAnonOutput to check length
         return CPubKey(&scriptPubKey[2+1], EC_COMPRESSED_SIZE);
@@ -314,6 +271,7 @@ public:
         READWRITE(nValue);
     )
 };
+
 
 class CAnonOutput
 {
@@ -443,5 +401,4 @@ public:
     int64_t nTime;
 };
 
-#endif  // PROC_CORE_H
-
+#endif

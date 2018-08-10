@@ -100,6 +100,8 @@ bool ShutdownRequested()
     return fRequestShutdown;
 }
 
+static boost::scoped_ptr<ECCVerifyHandle> globalVerifyHandle;
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // Shutdown
@@ -161,6 +163,9 @@ bool Finalise()
     
     fs::remove(GetPidFile());
     return true;
+	
+	globalVerifyHandle.reset();
+    ECC_Stop();
 }
 
 void Shutdown()
@@ -580,6 +585,11 @@ bool AppInit2(boost::thread_group& threadGroup)
 
 
     // ********************************************************* Step 4: application initialization: dir lock, daemonize, pidfile, debug log
+	
+	// Initialize elliptic curve code
+    ECC_Start();
+    globalVerifyHandle.reset(new ECCVerifyHandle());
+	
     // Sanity check
     if (!InitSanityCheck())
         return InitError(_("Initialization sanity check failed. ProCurrency is shutting down."));

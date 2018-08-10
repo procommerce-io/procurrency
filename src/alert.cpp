@@ -2,21 +2,25 @@
 // Alert system
 //
 
+#include "alert.h"
+
+#include "chainparams.h"
+#include "pubkey.h"
+#include "net.h"
+#include "ui_interface.h"
+#include "util.h"
+
+#include <stdint.h>
 #include <algorithm>
+#include <map>
+
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/foreach.hpp>
-#include <map>
 
-#include "alert.h"
-#include "chainparams.h"
-#include "key.h"
-#include "net.h"
-#include "sync.h"
-#include "ui_interface.h"
+using namespace std;
 
-
-std::map<uint256, CAlert> mapAlerts;
+map<uint256, CAlert> mapAlerts;
 CCriticalSection cs_mapAlerts;
 
 void CUnsignedAlert::SetNull()
@@ -65,18 +69,13 @@ std::string CUnsignedAlert::ToString() const
         nExpiration,
         nID,
         nCancel,
-        strSetCancel.c_str(),
+        strSetCancel,
         nMinVer,
         nMaxVer,
-        strSetSubVer.c_str(),
+        strSetSubVer,
         nPriority,
-        strComment.c_str(),
-        strStatusBar.c_str());
-}
-
-void CUnsignedAlert::print() const
-{
-    LogPrintf("%s", ToString().c_str());
+        strComment,
+        strStatusBar);
 }
 
 void CAlert::SetNull()
@@ -125,6 +124,9 @@ bool CAlert::RelayTo(CNode* pnode) const
 {
     if (!IsInEffect())
         return false;
+    // don't relay to nodes which haven't sent their version message
+    if (pnode->nVersion == 0)
+        return false;
     // returns true if wasn't already contained in the set
     if (pnode->setKnown.insert(GetHash()).second)
     {
@@ -156,7 +158,7 @@ CAlert CAlert::getAlertByHash(const uint256 &hash)
     CAlert retval;
     {
         LOCK(cs_mapAlerts);
-        std::map<uint256, CAlert>::iterator mi = mapAlerts.find(hash);
+        map<uint256, CAlert>::iterator mi = mapAlerts.find(hash);
         if(mi != mapAlerts.end())
             retval = mi->second;
     }
@@ -195,24 +197,23 @@ bool CAlert::ProcessAlert(bool fThread)
     {
         LOCK(cs_mapAlerts);
         // Cancel previous alerts
-        for (std::map<uint256, CAlert>::iterator mi = mapAlerts.begin(); mi != mapAlerts.end();)
+        for (map<uint256, CAlert>::iterator mi = mapAlerts.begin(); mi != mapAlerts.end();)
         {
             const CAlert& alert = (*mi).second;
             if (Cancels(alert))
             {
-                LogPrintf("cancelling alert %d\n", alert.nID);
+                LogPrint("alert", "cancelling alert %d\n", alert.nID);
                 uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
                 mapAlerts.erase(mi++);
-            } else
-            if (!alert.IsInEffect())
-            {
-                LogPrintf("expiring alert %d\n", alert.nID);
-                uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
-                mapAlerts.erase(mi++);
-            } else
-            {
-                mi++;
             }
+            else if (!alert.IsInEffect())
+            {
+                LogPrint("alert", "expiring alert %d\n", alert.nID);
+                uiInterface.NotifyAlertChanged((*mi).first, CT_DELETED);
+                mapAlerts.erase(mi++);
+            }
+            else
+                mi++;
         }
 
         // Check if this alert has been cancelled
@@ -221,13 +222,13 @@ bool CAlert::ProcessAlert(bool fThread)
             const CAlert& alert = item.second;
             if (alert.Cancels(*this))
             {
-                LogPrintf("alert already cancelled by %d\n", alert.nID);
+                LogPrint("alert", "alert already cancelled by %d\n", alert.nID);
                 return false;
             }
         }
 
         // Add to mapAlerts
-        mapAlerts.insert(std::make_pair(GetHash(), *this));
+        mapAlerts.insert(make_pair(GetHash(), *this));
         // Notify UI and -alertnotify if it applies to me
         if(AppliesToMe())
         {
@@ -239,15 +240,7 @@ bool CAlert::ProcessAlert(bool fThread)
                 // be safe we first strip anything not in safeChars, then add single quotes around
                 // the whole string before passing it to the shell:
                 std::string singleQuote("'");
-                // safeChars chosen to allow simple messages/URLs/email addresses, but avoid anything
-                // even possibly remotely dangerous like & or >
-                std::string safeChars("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890 .,;_/:?@");
-                std::string safeStatus;
-                for (std::string::size_type i = 0; i < strStatusBar.size(); i++)
-                {
-                    if (safeChars.find(strStatusBar[i]) != std::string::npos)
-                        safeStatus.push_back(strStatusBar[i]);
-                }
+                std::string safeStatus = SanitizeString(strStatusBar);
                 safeStatus = singleQuote+safeStatus+singleQuote;
                 boost::replace_all(strCmd, "%s", safeStatus);
 
@@ -259,6 +252,6 @@ bool CAlert::ProcessAlert(bool fThread)
         }
     }
 
-    LogPrintf("accepted alert %d, AppliesToMe()=%d\n", nID, AppliesToMe());
+    LogPrint("alert", "accepted alert %d, AppliesToMe()=%d\n", nID, AppliesToMe());
     return true;
 }
