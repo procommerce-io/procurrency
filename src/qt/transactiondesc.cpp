@@ -39,7 +39,7 @@ QString TransactionDesc::FormatTxStatus(const CWalletTx& wtx)
 QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
 {
     QString strHTML;
-    QString explorer(fTestNet ? "http://procexplorer.com:3000/" : "http://procexplorer.com:3000/"); //testnet explorer needed
+    QString explorer(fTestNet ? "https://procsight.com/" : "https://procsight.com/"); //testnet explorer needed
 
     LOCK2(cs_main, wallet->cs_wallet);
     strHTML.reserve(4000);
