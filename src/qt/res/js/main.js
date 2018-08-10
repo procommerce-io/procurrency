@@ -1395,7 +1395,8 @@ function addressBookInit() {
 }
 
 
-var Name = 'Me';
+//var Name = 'Me';
+var Name = 'Proc: ';
 var initialAddress = true;
 
 function appendAddresses(addresses) {
