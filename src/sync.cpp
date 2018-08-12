@@ -3,12 +3,12 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "sync.h"
-
-#ifndef OTP_ENABLED
-    #include "util.h"
-#else
-    #include "util_otp.h"
-#endif
+#include "util.h"
+//#ifndef OTP_ENABLED
+    //#include "util.h"
+//#else
+    //#include "util_otp.h"
+//#endif
 #include "state.h"
 
 #include <stdio.h>

@@ -15,7 +15,7 @@
 
 using namespace boost::chrono;
 
-// test_shadow --log_level=all  --run_test=ringsig_tests
+// test_procurrency --log_level=all  --run_test=ringsig_tests
 
 clock_t totalGenerate;
 clock_t totalVerify;

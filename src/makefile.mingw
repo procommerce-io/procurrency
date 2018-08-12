@@ -5,27 +5,32 @@
 USE_UPNP:=0
 USE_WALLET:=1
 
+BOOST_SUFFIX?=-mgw49-mt-s-1_57
+
 INCLUDEPATHS= \
- -I"C:\Develop\deps\boost_1_59_0" \
- -I"C:\Develop\deps\db-4.8.30.NC\build_unix" \
- -I"C:\Develop\deps\openssl-1.0.2d\include" \
+ -I"C:\deps\boost_1_57_0" \
+ -I"C:\deps\db-4.8.30.NC\build_unix" \
+ -I"C:\deps\openssl-1.0.1m\include" \
  -I"$(abspath obj)"
 
 TESTDEFS = -DTEST_DATA_DIR=$(abspath test/data)
 
 LIBPATHS= \
- -L"C:\Develop\deps\boost_1_59_0\bin.v2\libs" \
- -L"C:\Develop\deps\db-4.8.30.NC\build_unix" \
- -L"C:\Develop\deps\openssl-1.0.2d\lib" \
+ -L"C:\deps\boost_1_57_0\bin.v2\libs" \
+ -L"C:\deps\db-4.8.30.NC\build_unix" \
+ -L"C:\deps\openssl-1.0.1m\lib" \
 
 LIBS= \
- -l boost_system-mgw49-mt-s-1_59 \
- -l boost_filesystem-mgw49-mt-s-1_59 \
- -l boost_program_options-mgw49-mt-s-1_59 \
- -l boost_thread-mgw49-mt-s-1_59 \
- -l boost_chrono-mgw49-mt-s-1_59 \
+ -l leveldb \
+ -l memenv \
+ -l boost_system$(BOOST_SUFFIX) \
+ -l boost_filesystem$(BOOST_SUFFIX) \
+ -l boost_program_options$(BOOST_SUFFIX) \
+ -l boost_thread$(BOOST_SUFFIX) \
+ -l boost_chrono$(BOOST_SUFFIX) \
  -l db_cxx \
  -l ssl \
+ -l secp256k1 \
  -l crypto \
  -l z
 
@@ -78,29 +83,27 @@ HEADERS = $(wildcard *.h)
 
 OBJS= \
     obj/alert.o \
+	obj/allocators.o \
     obj/version.o \
     obj/checkpoints.o \
     obj/netbase.o \
     obj/addrman.o \
+	obj/base58.o \
     obj/crypter.o \
     obj/key.o \
+	obj/pubkey.o \
     obj/eckey.o \
     obj/extkey.o \
-    obj/db.o \
     obj/init.o \
     obj/procd.o \
     obj/keystore.o \
-    obj/miner.o \
     obj/main.o \
     obj/net.o \
     obj/protocol.o \
     obj/rpcprotocol.o \
     obj/rpcserver.o \
     obj/rpcclient.o \
-    obj/rpcdump.o \
     obj/rpcnet.o \
-    obj/rpcmining.o \
-    obj/rpcwallet.o \
     obj/rpcblockchain.o \
     obj/rpcrawtransaction.o \
     obj/rpcsmessage.o \
@@ -110,8 +113,6 @@ OBJS= \
     obj/sync.o \
     obj/util.o \
     obj/hash.o \
-    obj/wallet.o \
-    obj/walletdb.o \
     obj/noui.o \
     obj/kernel.o \
     obj/pbkdf2.o \
@@ -126,7 +127,26 @@ OBJS= \
     obj/txmempool.o \
     obj/chainparams.o \
     obj/state.o \
-    obj/bloom.o 
+	obj/crypto/hmac_sha256.o \
+    obj/crypto/hmac_sha512.o \
+    obj/crypto/ripemd160.o \
+    obj/crypto/sha1.o \
+    obj/crypto/sha256.o \
+    obj/crypto/sha512.o \
+	obj/support/cleanse.o \
+    obj/bloom.o
+
+ifeq (${USE_WALLET}, 1)
+    DEFS += -DENABLE_WALLET
+    OBJS += \
+        obj/db.o \
+        obj/miner.o \
+        obj/rpcdump.o \
+        obj/rpcmining.o \
+        obj/rpcwallet.o \
+        obj/wallet.o \
+        obj/walletdb.o
+endif
 
 all: procd.exe
 

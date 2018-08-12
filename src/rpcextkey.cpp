@@ -5,11 +5,12 @@
 #include "init.h"
 #include "main.h"
 #include "rpcserver.h"
-#ifndef OTP_ENABLED
-    #include "wallet.h"
-#else
-    #include "wallet_otp.h"
-#endif
+#include "wallet.h"
+//#ifndef OTP_ENABLED
+    //#include "wallet.h"
+//#else
+    //#include "wallet_otp.h"
+//#endif
 #include "key.h"
 #include "extkey.h"
 #include "chainparams.h"

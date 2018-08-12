@@ -3,13 +3,15 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef OTP_ENABLED
+#include "wallet.h"
+#include "walletdb.h" // for BackupWallet
+/*#ifndef OTP_ENABLED
     #include "wallet.h"
-    #include "walletdb.h" // for BackupWallet
+    #include "walletdb.h" // for BackupWallet	//del
 #else
     #include "wallet_otp.h"
     #include "walletdb_otp.h" // for BackupWallet
-#endif
+#endif*/
 #include "rpcserver.h"
 #include "init.h"
 #include "base58.h"

@@ -20,7 +20,7 @@ struct TestingSetup {
     TestingSetup() {
         //fPrintToDebugLog = false; // don't want to write to debug.log file
         
-        pathTemp = GetTempPath() / strprintf("test_shadow_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
+        pathTemp = GetTempPath() / strprintf("test_procurrency_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
         //printf("pathTemp %s\n", pathTemp.string().c_str());
         boost::filesystem::create_directories(pathTemp);
         mapArgs["-datadir"] = pathTemp.string();

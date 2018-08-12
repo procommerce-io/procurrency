@@ -696,7 +696,7 @@ void ThreadSecureMsg()
             } // cs_vNodes
 
             if(fDebugSmsg)
-                LogPrintf("shadow-smsg thread: ignoring - looked peer %d, status on search %u\n", nPeerId, fExists);
+                LogPrintf("procurrency-smsg thread: ignoring - looked peer %d, status on search %u\n", nPeerId, fExists);
         };
 
         MilliSleep(SMSG_THREAD_DELAY * 1000); //  // check every SMSG_THREAD_DELAY seconds

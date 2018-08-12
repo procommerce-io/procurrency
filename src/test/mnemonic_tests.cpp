@@ -59,7 +59,7 @@ Object read_json_object(const std::string &filename)
     return v.get_obj();
 };
 
-// test_shadow --log_level=all  --run_test=mnemonic_tests
+// test_procurrency --log_level=all  --run_test=mnemonic_tests
 
 void TestMnemonic(int nLanguage, const Array &va)
 {

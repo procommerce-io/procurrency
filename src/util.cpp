@@ -12,6 +12,12 @@
 #include "version.h"
 #include "ui_interface.h"
 
+#include <algorithm>
+
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+#include <boost/algorithm/string/case_conv.hpp> // for to_lower()
+#include <boost/algorithm/string/predicate.hpp> // for startswith() and endswith()
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -33,6 +39,7 @@ namespace boost {
 #include <boost/thread.hpp>
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
+#include <openssl/err.h>
 #include <stdarg.h>
 
 #ifdef WIN32
@@ -79,7 +86,7 @@ void locking_callback(int mode, int i, const char* file, int line)
     }
 }
 
-LockedPageManager LockedPageManager::instance;
+//LockedPageManager LockedPageManager::instance;  //del
 
 // Init
 class CInit
@@ -114,10 +121,14 @@ public:
 }
 instance_of_cinit;
 
-
-
-
-
+bool GetRandBytes(unsigned char *buf, int num)
+{
+    if (RAND_bytes(buf, num) == 0) {
+        LogPrint("rand", "%s : OpenSSL RAND_bytes() failed with error: %s\n", __func__, ERR_error_string(ERR_get_error(), NULL));
+        return false;
+    }
+    return true;
+}
 
 void RandAddSeed()
 {

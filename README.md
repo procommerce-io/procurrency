@@ -15,3 +15,18 @@
 <tr><td>RPC Port</td><td> <s>35960</s> now 45960</td></tr>
 <tr><td>P2P Port</td><td> <s>35950</s> now 45950</td></tr>
 </table>
+
+### NOTE:
+ProCurrency need secp256k1 with Module Recovery Enabled
+
+libsecp256k1 Build steps
+=========================
+libsecp256k1 is built using autotools:
+
+    $ ./autogen.sh
+    $ ./configure --enable-module-recovery
+    $ make
+    $ ./tests
+	
+	To Build ProCurrency-qt for Linux
+    $ sudo make install

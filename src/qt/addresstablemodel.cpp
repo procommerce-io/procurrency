@@ -1,12 +1,12 @@
 #include "addresstablemodel.h"
 #include "guiutil.h"
 #include "walletmodel.h"
-
-#ifndef OTP_ENABLED
-    #include "wallet.h"
-#else
-    #include "wallet_otp.h"
-#endif
+#include "wallet.h"
+//#ifndef OTP_ENABLED
+    //#include "wallet.h" //del
+//#else
+    //#include "wallet_otp.h"
+//#endif
 
 #include "base58.h"
 #include "stealth.h"

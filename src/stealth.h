@@ -9,16 +9,16 @@
 #include <stdio.h> 
 #include <vector>
 #include <inttypes.h>
-
-#ifndef OTP_ENABLED
-    #include "util.h"
-#else
-    #include "util_otp.h"
-#endif
+#include "util.h"
+//#ifndef OTP_ENABLED
+    //#include "util.h"		//del
+//#else
+    //#include "util_otp.h"
+//#endif
 #include "serialize.h"
 #include "key.h"
 #include "hash.h"
-#include "types.h"
+#include "proc-types.h"
 
 const uint32_t MAX_STEALTH_NARRATION_SIZE = 48;
 

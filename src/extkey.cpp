@@ -4,17 +4,21 @@
 
 #include "extkey.h"
 
-#ifndef OTP_ENABLED
+#include "util.h"
+#include "base58.h"
+#include "state.h"
+#include "wallet.h"
+/*#ifndef OTP_ENABLED
     #include "util.h"
     #include "base58.h"
 	#include "state.h"
-    #include "wallet.h"
+    #include "wallet.h"     //del
 #else
     #include "util_otp.h"
     #include "base58.h"
 	#include "state.h"
     #include "wallet_otp.h"
-#endif
+#endif*/
 #include "init.h" // for pwalletMain
 
 #include "wordlists/english.h"

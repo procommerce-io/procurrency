@@ -7,11 +7,12 @@
 
 #include "key.h"
 #include "hash.h"
-#ifndef OTP_ENABLED
-    #include "crypter.h"
-#else
-    #include "crypter_otp.h"
-#endif
+#include "crypter.h"
+//#ifndef OTP_ENABLED
+    //#include "crypter.h"  //del
+//#else
+    //#include "crypter_otp.h"
+//#endif
 #include "stealth.h"
 
 #include "state.h"
