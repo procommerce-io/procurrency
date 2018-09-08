@@ -313,11 +313,12 @@ article {
     margin-top: 10px;
 }
 
-.user-info .user-name {
+.user-info .user-name,
+.user-info .balance {	
     text-transform: uppercase;
     font-family: "Open Sans", sans-serif;
     font-size: 14px;
-    float: left;
+    /*float: left;*/
 }
 
 .user-info .user-menu {
