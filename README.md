@@ -19,14 +19,13 @@
 ### NOTE:
 ProCurrency need secp256k1 with Module Recovery Enabled
 
-libsecp256k1 Build steps
-=========================
+### libsecp256k1 Build steps
+
 libsecp256k1 is built using autotools:
 
     $ ./autogen.sh
     $ ./configure --enable-module-recovery
     $ make
-    $ ./tests
 	
-	To Build ProCurrency-qt for Linux
+	To Build or Run ProCurrency-qt for Linux
     $ sudo make install
