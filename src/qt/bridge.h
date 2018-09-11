@@ -57,9 +57,6 @@ public:
 #ifdef TRADING_BITTREX
     Q_INVOKABLE void openBittrex();
 #endif
-#ifdef BITTORRENT_ENABLED
-    Q_INVOKABLE void openBittorrent();
-#endif
 
     Q_INVOKABLE void openCoinControl();
 

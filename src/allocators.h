@@ -35,7 +35,7 @@ public:
         page_mask = ~(page_size - 1);
     }
 
-    /*~LockedPageManagerBase()
+    /*~LockedPageManagerBase() //fix "GetLockedPageCount() == 0" ERROR
     {
         assert(this->GetLockedPageCount() == 0);
     }*/
