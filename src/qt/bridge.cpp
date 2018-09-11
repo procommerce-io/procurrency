@@ -679,12 +679,6 @@ void UIBridge::openBittrex()
 }
 #endif
 
-#ifdef BITTORRENT_ENABLED
-void UIBridge::openBittorrent()
-{
-}
-#endif
-
 void UIBridge::openCoinControl()
 {
     if (!window || !window->walletModel)

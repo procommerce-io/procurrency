@@ -313,11 +313,12 @@ article {
     margin-top: 10px;
 }
 
-.user-info .user-name {
+.user-info .user-name,
+.user-info .balance {	
     text-transform: uppercase;
     font-family: "Open Sans", sans-serif;
     font-size: 14px;
-    float: left;
+    /*float: left;*/
 }
 
 .user-info .user-menu {
@@ -596,11 +597,12 @@ article {
 #navpanel [href='#receive']:before,
 #navpanel [href='#transactions']:before,
 #navpanel [href='#addressbook']:before,
-#navpanel [href='#messages']:before,
+/*#navpanel [href='#messages']:before,*/
 #navpanel [href='#blockdata']:before,
-#navpanel [href='#torrent']:before,
-#navpanel [href='#bittrex']:before,
-#navpanel [href='#news']:before {
+#navpanel [href='#chaindata']:before
+/*#navpanel [href='#bittrex']:before,
+#navpanel [href='#news']:before*/ 
+{
     height: 20px;
     width: 20px;
     display: inline-block;
@@ -619,11 +621,12 @@ article {
 #navpanel .selected [href='#receive']:before,
 #navpanel .selected [href='#transactions']:before,
 #navpanel .selected [href='#addressbook']:before,
-#navpanel .selected [href='#messages']:before,
+/*#navpanel .selected [href='#messages']:before,*/
 #navpanel .selected [href='#blockdata']:before,
-#navpanel .selected [href='#torrent']:before,
-#navpanel .selected [href='#bittrex']:before,
-#navpanel .selected [href='#news']:before {
+#navpanel .selected [href='#chaindata']:before
+/*#navpanel .selected [href='#bittrex']:before,  //del
+#navpanel .selected [href='#news']:before*/ 
+{
     background: #f9ca72;
 }
 
@@ -647,25 +650,25 @@ article {
     -webkit-mask-position-y: -185px;
 }
 
-#navpanel [href='#messages']:before {
+/*#navpanel [href='#messages']:before { //del
     -webkit-mask-position-y: -231px;
-}
+}*/
 
 #navpanel [href='#blockdata']:before {
-    -webkit-mask-position-y: -319px;
+    -webkit-mask-position-y: -221px; /*-319px;*/
 }
 
-#navpanel [href='#torrent']:before {
+#navpanel [href='#chaindata']:before {
     -webkit-mask-position-y: -274px;
 }
 
-#navpanel [href='#bittrex']:before {
+/*#navpanel [href='#bittrex']:before {   //del
     -webkit-mask-position-y: -185px;
 }
 
-#navpanel [href='#news']:before {
+#navpanel [href='#news']:before {       //del
     -webkit-mask-position-y: -364px;
-}
+}*/
 
 
 /* End - Navigation panel items */

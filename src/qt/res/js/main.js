@@ -132,8 +132,11 @@ $(function() {
     receivePageInit();
     transactionPageInit();
     addressBookInit();
-    chatInit();
+    //chatInit();
+	//chainDataPage.init();
+    blockExplorerPage.init();
     keyManagementPage.init();
+	
     // Tooltip
     $('[data-title]').on('mouseenter', tooltip);
 
@@ -283,6 +286,7 @@ function connectSignals() {
 
     overviewPage.clientInfo();
     optionsPage.update();
+	//chainDataPage.updateAnonOutputs();
 }
 
 function triggerElement(el, trigger) {
@@ -395,7 +399,7 @@ var unit = {
 
             case 3:
                 this.name    = "sPROC",
-                this.display = "Shi-PROC";
+                this.display = "PROCtoshi";
                 break;
 
             default:
@@ -1018,6 +1022,8 @@ function changeTxnType()
 
 function suggestRingSize()
 {
+	//chainDataPage.updateAnonOutputs();
+	
     var minsize = bridge.info.options.MinRingSize||3,
         maxsize = bridge.info.options.MaxRingSize||50;
 
@@ -1396,7 +1402,7 @@ function addressBookInit() {
 
 
 //var Name = 'Me';
-var Name = 'Proc: ';
+var Name = 'ProC:';
 var initialAddress = true;
 
 function appendAddresses(addresses) {
@@ -1422,6 +1428,7 @@ function appendAddresses(addresses) {
 
             if(initialAddress) {
                 $("#message-from-address").prepend("<option title='Anonymous' value='anon' selected>Anonymous</option>");
+				
                 $(".user-name")   .text(Name);
                 $(".user-address").text(address.address);
                 initialAddress = false;
@@ -2224,9 +2231,51 @@ function editorCommand(text, endText) {
         editor.focus();
 };
 
-/*
+var chainDataPage = {
+    anonOutputs: {},
+    init: function() {
+        $("#show-own-outputs,#show-all-outputs").on("click", function(e) {
+            $(e.target).hide().siblings('a').show();
+        });
+
+        $("#show-own-outputs").on("click", function() {
+            $("#chaindata .footable tbody tr>td:first-child+td").each(function() {
+                if($(this).text()==0)
+                    $(this).parents("tr").hide();
+            });
+        });
+
+        $("#show-all-outputs").on("click", function() {
+            $("#chaindata .footable tbody tr:hidden").show();
+        });
+    },
+    updateAnonOutputs: function() {
+        chainDataPage.anonOutputs = bridge.listAnonOutputs();
+        var tbody = $('#chaindata .footable tbody');
+        tbody.html('');
+
+        for (value in chainDataPage.anonOutputs) {
+            var anonOutput = chainDataPage.anonOutputs[value];
+
+            tbody.append('<tr>\
+                    <td data-value='+value+'>'+anonOutput.value_s+'</td>\
+                    <td>' +  anonOutput.owned_outputs
+                          + (anonOutput.owned_outputs == anonOutput.owned_mature
+                            ? ''
+                            : ' (<b>' + anonOutput.owned_mature + '</b>)') + '</td>\
+                    <td>'+anonOutput.system_outputs + ' (' + anonOutput.system_mature + ')</td>\
+                    <td>'+anonOutput.system_spends  +'</td>\
+                    <td>'+anonOutput.least_depth    +'</td>\
+                </tr>');
+        }
+
+        $('#chaindata .footable').trigger('footable_initialize');
+    }
+}
+
 var blockExplorerPage = 
 {
+	init: function() {},
     blockHeader: {},
     findBlock: function(searchID) {
 
@@ -2414,7 +2463,6 @@ var blockExplorerPage =
             }).find(".editable")
     }
 } 
-*/
 
 var keyManagementPage = {
     init: function() {
