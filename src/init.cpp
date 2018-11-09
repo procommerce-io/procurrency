@@ -1086,13 +1086,36 @@ bool AppInit2(boost::thread_group& threadGroup)
 #endif // !ENABLE_WALLET	
     // ********************************************************* Step 9: import blocks
 
-    std::vector<boost::filesystem::path> vImportFiles;
     if (mapArgs.count("-loadblock"))
     {
+        uiInterface.InitMessage(_("Importing blockchain data file."));
+
         BOOST_FOREACH(std::string strFile, mapMultiArgs["-loadblock"])
-            vImportFiles.push_back(strFile);
+        {
+            FILE* file = fopen(strFile.c_str(), "rb");
+            if (file)
+                LoadExternalBlockFile(0, file);
+            else
+                LogPrintf("Error: -loadblock '%s' - file not found.\n", strFile.c_str());
+        };
+        LogPrintf("Terminating: loadblock completed.\n");
+        Finalise();
+        exit(0);
     };
-	threadGroup.create_thread(boost::bind(&ThreadImport, vImportFiles));
+
+    fs::path pathBootstrap = GetDataDir() / "bootstrap.dat";
+    if (fs::exists(pathBootstrap))
+    {
+        uiInterface.InitMessage(_("Importing bootstrap blockchain data file."));
+
+        FILE* file = fopen(pathBootstrap.string().c_str(), "rb");
+        if (file)
+        {
+            fs::path pathBootstrapOld = GetDataDir() / "bootstrap.dat.old";
+            LoadExternalBlockFile(0, file);
+            RenameOver(pathBootstrap, pathBootstrapOld);
+        };
+    };
     
     if (mapArgs.count("-reindex"))
     {
@@ -1141,14 +1164,35 @@ bool AppInit2(boost::thread_group& threadGroup)
         return false;
 
     RandAddSeedPerfmon();
+	
+	/* // TO DO: RebuildAddressIndex
+	// reindex addresses found in blockchain
+    if(GetBoolArg("-reindexaddr", false))
+    {
+        uiInterface.InitMessage(_("Rebuilding address index..."));
+        CBlockIndex *pblockAddrIndex = pindexBest;
+		CTxDB txdbAddr("rw");
+		while(pblockAddrIndex)
+		{
+			uiInterface.InitMessage(strprintf("Rebuilding address index, block %i", pblockAddrIndex->nHeight));
+			bool ReadFromDisk(const CBlockIndex* pindex, bool fReadTransactions=true);
+			CBlock pblockAddr;
+			if(pblockAddr.ReadFromDisk(pblockAddrIndex, true))
+				pblockAddr.RebuildAddressIndex(txdbAddr);
+			pblockAddrIndex = pblockAddrIndex->pprev;
+		}
+    }
+	*/
 
     //// debug print
     LogPrintf("mapBlockIndex.size() = %u\n",            mapBlockIndex.size());
     LogPrintf("mapBlockThinIndex.size() = %u\n",        mapBlockThinIndex.size());
     LogPrintf("nBestHeight = %d\n",                     nBestHeight);
-    LogPrintf("setKeyPool.size() = %u\n",               pwalletMain->setKeyPool.size());
-    LogPrintf("mapWallet.size() = %u\n",                pwalletMain->mapWallet.size());
-    LogPrintf("mapAddressBook.size() = %u\n",           pwalletMain->mapAddressBook.size());
+#ifdef ENABLE_WALLET
+    LogPrintf("setKeyPool.size() = %u\n",      pwalletMain ? pwalletMain->setKeyPool.size() : 0);
+    LogPrintf("mapWallet.size() = %u\n",       pwalletMain ? pwalletMain->mapWallet.size() : 0);
+    LogPrintf("mapAddressBook.size() = %u\n",  pwalletMain ? pwalletMain->mapAddressBook.size() : 0);
+#endif
 
     StartNode(threadGroup);
     
