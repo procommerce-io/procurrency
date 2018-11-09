@@ -48,6 +48,10 @@ static const int MIN_THIN_VERSION = 75499;
 // only request blocks from all versions AFTER this one
 static const int MIN_MBLK_VERSION = 70002;
 
+// only request blocks from nodes outside this range of versions
+static const int NOBLKS_VERSION_START = 0;
+static const int NOBLKS_VERSION_END = 75000;
+
 // BIP 0031, pong message, is enabled for all versions AFTER this one
 static const int BIP0031_VERSION = 70000;
 

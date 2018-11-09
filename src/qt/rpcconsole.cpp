@@ -404,6 +404,7 @@ void RPCConsole::setNumConnections(int count)
 void RPCConsole::setNumBlocks(int count, int countOfPeers)
 {
     ui->numberOfBlocks->setText(QString::number(count));
+	ui->totalBlocks->setText(QString::number(countOfPeers)); //Estimated total blocks
     QDateTime lastBlockDate;
     if (nNodeMode == NT_FULL)
         lastBlockDate = clientModel->getLastBlockDate();

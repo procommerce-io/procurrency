@@ -38,7 +38,8 @@ static const unsigned int MAX_BLOCK_SIGOPS = MAX_BLOCK_SIZE/50;
 static const unsigned int MAX_ORPHAN_TRANSACTIONS = MAX_BLOCK_SIZE/100;
 /** Default for -maxorphanblocksmib, maximum number of memory to keep orphan blocks */
 static const unsigned int DEFAULT_MAX_ORPHAN_BLOCKS = 50;
-static const unsigned int MAX_INV_SZ = 50000;
+/** The maximum number of entries in an 'inv' protocol message */ //del
+//static const unsigned int MAX_INV_SZ = 50000; //del
 static const unsigned int MAX_GETHEADERS_SZ = 2000;
 
 static const unsigned int MAX_MULTI_BLOCK_SIZE = 5120000;    // 5MiB, most likely to hit MAX_MULTI_BLOCK_ELEMNTS first

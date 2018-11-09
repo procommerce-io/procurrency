@@ -2,12 +2,12 @@ TEMPLATE = app
 TARGET = ProCurrency-qt
 VERSION = 1.3.0.0
 INCLUDEPATH += src src/json src/qt
-QT += core gui network
+QT += network printsupport
 DEFINES += ENABLE_WALLET
 DEFINES += BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
 CONFIG += no_include_pwd
 CONFIG += thread
-QT += webkit printsupport
+CONFIG += openssl
 
 #CONFIG += otp_enabled
 #CONFIG += trading_enabled
@@ -19,6 +19,7 @@ android:ios{
 }
 
 greaterThan(QT_MAJOR_VERSION, 4) {
+    QT += widgets webkitwidgets
     DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
 }
 
@@ -74,24 +75,21 @@ android {
     OBJECTS_DIR = build-android
     MOC_DIR = build-android
     UI_DIR = build-android
-} else {
-
-    QT += widgets webkitwidgets
 }
-    RESOURCES += \ 
-		src/qt/procurrency.qrc
+
+RESOURCES += \ 
+	src/qt/procurrency.qrc
 
 macx {
     message(Building with for Mac OSX)
 
     QMAKE_TARGET_BUNDLE_PREFIX = proc
+	BOOST_LIB_SUFFIX=-mt
+    BOOST_INCLUDE_PATH=/usr/local/Cellar/boost/1.61.0_1/include
+    BOOST_LIB_PATH=/usr/local/Cellar/boost/1.61.0_1/lib
 
     OPENSSL_INCLUDE_PATH=/usr/local/opt/openssl/include
     OPENSSL_LIB_PATH=/usr/local/opt/openssl/lib
-
-    BOOST_LIB_SUFFIX=-mt
-    BOOST_INCLUDE_PATH=/usr/local/Cellar/boost/1.61.0_1/include
-    BOOST_LIB_PATH=/usr/local/Cellar/boost/1.61.0_1/lib
 
     BDB_INCLUDE_PATH=/usr/local/Cellar/berkeley-db/6.1.26/include
     BDB_LIB_PATH=/usr/local/Cellar/berkeley-db/6.1.26/lib
@@ -102,24 +100,9 @@ macx {
     QRENCODE_INCLUDE_PATH=/usr/local/Cellar/qrencode/3.4.4/include
     QRENCODE_LIB_PATH=/usr/local/Cellar/qrencode/3.4.4/lib
 
-#   DEFINES += IS_ARCH_64 #unsure if needed?
     QMAKE_CXXFLAGS += -arch x86_64 -stdlib=libc++
     QMAKE_CFLAGS += -arch x86_64
     QMAKE_LFLAGS += -arch x86_64 -stdlib=libc++
-}
-
-build_mxe32 {
-    message(Building with build_mxe32)
-    LIBS += -L~/Development/mxe/usr/i686-w64-mingw32.shared/lib
-    INCLUDEPATH += ~/Development/mxe/usr/i686-w64-mingw32.shared/include
-    INCLUDEPATH += ~/Development/mxe/usr/i686-w64-mingw32.shared/include/openssl
-}
-
-build_mxe64 {
-    message(Building with build_mxe64)
-    LIBS += -L~/Development/mxe/usr/x86_64-w64-mingw32.shared/lib
-    INCLUDEPATH += ~/Development/mxe/usr/x86_64-w64-mingw32.shared/include
-    INCLUDEPATH += ~/Development/mxe/usr/x86_64-w64-mingw32.shared/include/openssl
 }
 
 # use: qmake "RELEASE=1"
@@ -137,17 +120,27 @@ contains(RELEASE, 1) {
     }
 }
 
+build_win32 {
+
+    #USE_BUILD_INFO = 1
+    DEFINES += HAVE_BUILD_INFO
+}
+
+!win32 {
 # for extra security against potential buffer overflows: enable GCCs Stack Smashing Protection
 QMAKE_CXXFLAGS *= -fstack-protector-all --param ssp-buffer-size=1
 QMAKE_LFLAGS *= -fstack-protector-all --param ssp-buffer-size=1
 # We need to exclude this for Windows cross compile with MinGW 4.2.x, as it will result in a non-working executable!
 # This can be enabled for Windows, when we switch to MinGW >= 4.4.x.
-
+}
+# for extra security (see: https://wiki.debian.org/Hardening): this flag is GCC compiler-specific
+QMAKE_CXXFLAGS *= -D_FORTIFY_SOURCE=2
 # for extra security on Windows: enable ASLR and DEP via GCC linker flags
 win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
+# on Windows: enable GCC large address aware linker flag
 win32:QMAKE_LFLAGS *= -Wl,--large-address-aware
+# i686-w64-mingw32
 #win32:QMAKE_LFLAGS += -static-libgcc -static-libstdc++
-lessThan(QT_MAJOR_VERSION, 5): win32: QMAKE_LFLAGS *= -static
 
 # use: qmake "USE_QRCODE=1"
 # libqrencode (http://fukuchi.org/works/qrencode/index.en.html) must be installed for support
@@ -362,6 +355,7 @@ HEADERS += \
     src/qt/messagemodel.h \
     src/qt/gui.h \
 	src/pubkey.h \
+	src/limitedmap.h \
 	src/support/cleanse.h \
 	src/crypto/common.h \
     src/crypto/hmac_sha256.h \
@@ -597,9 +591,12 @@ LIBS += -lssl -lcrypto -lz -ldb_cxx$$BDB_LIB_SUFFIX
 windows:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
 
 # Secp256k1
-INCLUDEPATH += $$SECP256K1_INCLUDE_PATH
-LIBS += $$join(SECP256K1_LIB_PATH,,-L,)
-LIBS += -lsecp256k1 -lgmp
+!windows: {
+    LIBS += -lgmp
+} else {
+    INCLUDEPATH += $$SECP256K1_INCLUDE_PATH
+    LIBS += $$join(SECP256K1_LIB_PATH,,-L,) -lsecp256k1
+}
 
 LIBS += -lboost_system$$BOOST_LIB_SUFFIX -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX
 windows:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX

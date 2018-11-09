@@ -6225,379 +6225,403 @@ bool ProcessMessages(CNode* pfrom)
     return fOk;
 }
 
-
+//
 bool SendMessages(CNode* pto, std::vector<CNode*> &vNodesCopy, bool fSendTrickle)
 {
-    // Don't send anything until we get their version message
-    if (pto->nVersion == 0)
-        return true;
+	TRY_LOCK(cs_main, lockMain);
+	if (lockMain) {
+		// Don't send anything until we get their version message
+		if (pto->nVersion == 0)
+			return true;
 
-    //
-    // Message: ping
-    //
-    bool pingSend = false;
-    if (pto->fPingQueued)
-    {
-        // RPC ping request by user
-        pingSend = true;
-    }
+		//
+		// Message: ping
+		//
+		bool pingSend = false;
+		if (pto->fPingQueued)
+		{
+			// RPC ping request by user
+			pingSend = true;
+		}
 
-    if (pto->nPingNonceSent == 0 && pto->nPingUsecStart + PING_INTERVAL * 1000000 < GetTimeMicros())
-    {
-        // Ping automatically sent as a latency probe & keepalive.
-        pingSend = true;
-    }
+		if (pto->nPingNonceSent == 0 && pto->nPingUsecStart + PING_INTERVAL * 1000000 < GetTimeMicros())
+		{
+			// Ping automatically sent as a latency probe & keepalive.
+			pingSend = true;
+		}
 
-    if (pingSend)
-    {
-        uint64_t nonce = 0;
-        while (nonce == 0)
-            RAND_bytes((unsigned char*)&nonce, sizeof(nonce));
+		if (pingSend)
+		{
+			uint64_t nonce = 0;
+			while (nonce == 0)
+				RAND_bytes((unsigned char*)&nonce, sizeof(nonce));
 
-        pto->fPingQueued = false;
-        pto->nPingUsecStart = GetTimeMicros();
+			pto->fPingQueued = false;
+			pto->nPingUsecStart = GetTimeMicros();
+			if (pto->nVersion > BIP0031_VERSION) {
+				pto->nPingNonceSent = nonce;
+				pto->PushMessage("ping", nonce, nBestHeight);
+			} else {
+				  // Peer is too old to support ping command with nonce, pong will never arrive.
+                pto->nPingNonceSent = 0;
+                pto->PushMessage("ping");
+            }
+			/*
+			// Resend wallet transactions that haven't gotten in a block yet
+			// Except during reindex, importing and IBD, when old wallet
+			// transactions become unconfirmed and spams other nodes.
+			if (!fReindexing && !IsInitialBlockDownload())
+			{
+				ResendWalletTransactions();
+			}
+			*/
 
-        pto->nPingNonceSent = nonce;
-        pto->PushMessage("ping", nonce, nBestHeight);
+		}
+
+		TRY_LOCK(cs_main, lockMain); // Acquire cs_main for IsInitialBlockDownload() and CNodeState()
+		if (!lockMain)
+			return true;
+	
+		// Start block sync
+        if (pto->fStartSync && !fImporting && !fReindexing) {
+            pto->fStartSync = false;
+            //PushGetBlocks(pto, pindexBest, uint256(0)); //commneted for now check pto->PushGetBlocks
+        }
 
         // Resend wallet transactions that haven't gotten in a block yet
         // Except during reindex, importing and IBD, when old wallet
         // transactions become unconfirmed and spams other nodes.
-        if (!fReindexing && !IsInitialBlockDownload())
+        if (!fReindexing && !fImporting && !IsInitialBlockDownload())
         {
             ResendWalletTransactions();
         }
 
-    }
+		// Address refresh broadcast
+		static int64_t nLastRebroadcast;
+		if (!IsInitialBlockDownload() && (GetTime() - nLastRebroadcast > 24 * 60 * 60))
+		{
+			BOOST_FOREACH(CNode* pnode, vNodesCopy)
+			{
+				// Periodically clear setAddrKnown to allow refresh broadcasts
+				if (nLastRebroadcast)
+					pnode->setAddrKnown.clear();
 
-    TRY_LOCK(cs_main, lockMain); // Acquire cs_main for IsInitialBlockDownload() and CNodeState()
-    if (!lockMain)
-        return true;
+				// Rebroadcast our address
+				if (!fNoListen)
+				{
+					CAddress addr = GetLocalAddress(&pnode->addr);
+					if (addr.IsRoutable())
+						pnode->PushAddress(addr);
+				};
+			};
+			nLastRebroadcast = GetTime();
+		};
 
-    // Address refresh broadcast
-    static int64_t nLastRebroadcast;
-    if (!IsInitialBlockDownload() && (GetTime() - nLastRebroadcast > 24 * 60 * 60))
-    {
-        BOOST_FOREACH(CNode* pnode, vNodesCopy)
-        {
-            // Periodically clear setAddrKnown to allow refresh broadcasts
-            if (nLastRebroadcast)
-                pnode->setAddrKnown.clear();
-
-            // Rebroadcast our address
-            if (!fNoListen)
-            {
-                CAddress addr = GetLocalAddress(&pnode->addr);
-                if (addr.IsRoutable())
-                    pnode->PushAddress(addr);
-            };
-        };
-        nLastRebroadcast = GetTime();
-    };
-
-    //
-    // Message: addr
-    //
-    if (fSendTrickle)
-    {
-        vector<CAddress> vAddr;
-        vAddr.reserve(pto->vAddrToSend.size());
-        BOOST_FOREACH(const CAddress& addr, pto->vAddrToSend)
-        {
-            // returns true if wasn't already contained in the set
-            if (pto->setAddrKnown.insert(addr).second)
-            {
-                vAddr.push_back(addr);
-                // receiver rejects addr messages larger than 1000
-                if (vAddr.size() >= 1000)
-                {
-                    pto->PushMessage("addr", vAddr);
-                    vAddr.clear();
-                };
-            };
-        };
-        pto->vAddrToSend.clear();
-        if (!vAddr.empty())
-            pto->PushMessage("addr", vAddr);
-    };
+		//
+		// Message: addr
+		//
+		if (fSendTrickle)
+		{
+			vector<CAddress> vAddr;
+			vAddr.reserve(pto->vAddrToSend.size());
+			BOOST_FOREACH(const CAddress& addr, pto->vAddrToSend)
+			{
+				// returns true if wasn't already contained in the set
+				if (pto->setAddrKnown.insert(addr).second)
+				{
+					vAddr.push_back(addr);
+					// receiver rejects addr messages larger than 1000
+					if (vAddr.size() >= 1000)
+					{
+						pto->PushMessage("addr", vAddr);
+						vAddr.clear();
+					};
+				};
+			};
+			pto->vAddrToSend.clear();
+			if (!vAddr.empty())
+				pto->PushMessage("addr", vAddr);
+		};
 
 
-    //
-    // Message: inventory
-    //
-    std::vector<CInv> vInv;
-    std::vector<CInv> vInvWait;
+		//
+		// Message: inventory
+		//
+		std::vector<CInv> vInv;
+		std::vector<CInv> vInvWait;
 
-    {
-        LOCK2(pwalletMain->cs_wallet, pto->cs_inventory);
-        vInv.reserve(pto->vInventoryToSend.size());
-        vInvWait.reserve(pto->vInventoryToSend.size());
-        BOOST_FOREACH(const CInv& inv, pto->vInventoryToSend)
-        {
-            if (pto->setInventoryKnown.count(inv))
-                continue;
+		{
+			LOCK2(pwalletMain->cs_wallet, pto->cs_inventory);
+			vInv.reserve(pto->vInventoryToSend.size());
+			vInvWait.reserve(pto->vInventoryToSend.size());
+			BOOST_FOREACH(const CInv& inv, pto->vInventoryToSend)
+			{
+				if (pto->setInventoryKnown.count(inv))
+					continue;
 
-            // trickle out tx inv to protect privacy
-            if (inv.type == MSG_TX && !fSendTrickle)
-            {
-                // 1/4 of tx invs blast to all immediately
-                static uint256 hashSalt;
-                if (hashSalt == 0)
-                    hashSalt = GetRandHash();
-                uint256 hashRand = inv.hash ^ hashSalt;
-                hashRand = Hash(BEGIN(hashRand), END(hashRand));
-                bool fTrickleWait = ((hashRand & 3) != 0);
+				// trickle out tx inv to protect privacy
+				if (inv.type == MSG_TX && !fSendTrickle)
+				{
+					// 1/4 of tx invs blast to all immediately
+					static uint256 hashSalt;
+					if (hashSalt == 0)
+						hashSalt = GetRandHash();
+					uint256 hashRand = inv.hash ^ hashSalt;
+					hashRand = Hash(BEGIN(hashRand), END(hashRand));
+					bool fTrickleWait = ((hashRand & 3) != 0);
 
-                // always trickle our own transactions
-                if (!fTrickleWait)
-                {
-                    CWalletTx wtx;
-                    if (GetTransaction(inv.hash, wtx))
-                        if (wtx.fFromMe)
-                            fTrickleWait = true;
-                };
+					// always trickle our own transactions
+					if (!fTrickleWait)
+					{
+						CWalletTx wtx;
+						if (GetTransaction(inv.hash, wtx))
+							if (wtx.fFromMe)
+								fTrickleWait = true;
+					};
 
-                if (fTrickleWait)
-                {
-                    vInvWait.push_back(inv);
-                    continue;
-                };
-            };
+					if (fTrickleWait)
+					{
+						vInvWait.push_back(inv);
+						continue;
+					};
+				};
 
-            // returns true if wasn't already contained in the set
-            if (pto->setInventoryKnown.insert(inv).second)
-            {
-                vInv.push_back(inv);
-                if (vInv.size() >= 1000)
-                {
-                    pto->PushMessage("inv", vInv);
-                    vInv.clear();
-                }
-            }
-        }
-        pto->vInventoryToSend = vInvWait;
-    }
-    if (!vInv.empty())
-        pto->PushMessage("inv", vInv);
+				// returns true if wasn't already contained in the set
+				if (pto->setInventoryKnown.insert(inv).second)
+				{
+					vInv.push_back(inv);
+					if (vInv.size() >= 1000)
+					{
+						pto->PushMessage("inv", vInv);
+						vInv.clear();
+					}
+				}
+			}
+			pto->vInventoryToSend = vInvWait;
+		}
+		if (!vInv.empty())
+			pto->PushMessage("inv", vInv);
 
-    int64_t nTimeNow = GetTime();
-    std::vector<CInv> vGetFilteredBlocks;
+		int64_t nTimeNow = GetTime();
+		std::vector<CInv> vGetFilteredBlocks;
 
-    if (nNodeState == NS_GET_FILTERED_BLOCKS
-        && pto->nTypeInd == NT_FULL)
-    {
-        uint256 hash;
-        CInv inv(MSG_FILTERED_BLOCK, hash);
+		if (nNodeState == NS_GET_FILTERED_BLOCKS
+			&& pto->nTypeInd == NT_FULL)
+		{
+			uint256 hash;
+			CInv inv(MSG_FILTERED_BLOCK, hash);
 
-        if (nHeightFilteredNeeded < 1)
-            nHeightFilteredNeeded = 1;
+			if (nHeightFilteredNeeded < 1)
+				nHeightFilteredNeeded = 1;
 
-        if (nHeightFilteredNeeded <= nBestHeight
-            && vPendingFilteredChunks.size() < 4)
-        {
-            if (!fThinFullIndex
-                && pindexRear
-                && nHeightFilteredNeeded < pindexRear->nHeight)
-            {
-                if (fDebug)
-                    LogPrintf("Finding block height %d from db.\n", nHeightFilteredNeeded);
+			if (nHeightFilteredNeeded <= nBestHeight
+				&& vPendingFilteredChunks.size() < 4)
+			{
+				if (!fThinFullIndex
+					&& pindexRear
+					&& nHeightFilteredNeeded < pindexRear->nHeight)
+				{
+					if (fDebug)
+						LogPrintf("Finding block height %d from db.\n", nHeightFilteredNeeded);
 
-                CDiskBlockThinIndex diskindex;
-                uint256 hashPrev;
+					CDiskBlockThinIndex diskindex;
+					uint256 hashPrev;
 
-                if (pindexRear->phashBlock)
-                    hashPrev = *pindexRear->phashBlock;
-                else
-                    hashPrev = pindexRear->GetBlockHash();
+					if (pindexRear->phashBlock)
+						hashPrev = *pindexRear->phashBlock;
+					else
+						hashPrev = pindexRear->GetBlockHash();
 
-                // -- find closest checkpoint
-                Checkpoints::MapCheckpoints& checkpoints = (fTestNet ? Checkpoints::mapCheckpointsTestnet : Checkpoints::mapCheckpoints);
-                Checkpoints::MapCheckpoints::reverse_iterator rit;
+					// -- find closest checkpoint
+					Checkpoints::MapCheckpoints& checkpoints = (fTestNet ? Checkpoints::mapCheckpointsTestnet : Checkpoints::mapCheckpoints);
+					Checkpoints::MapCheckpoints::reverse_iterator rit;
 
-                for (rit = checkpoints.rbegin(); rit != checkpoints.rend(); ++rit)
-                {
-                    if (rit->first < nHeightFilteredNeeded)
-                        break;
-                    hashPrev = rit->second;
-                };
+					for (rit = checkpoints.rbegin(); rit != checkpoints.rend(); ++rit)
+					{
+						if (rit->first < nHeightFilteredNeeded)
+							break;
+						hashPrev = rit->second;
+					};
 
-                if (fDebug
-                    && pindexRear->phashBlock
-                    && *pindexRear->phashBlock != hashPrev)
-                {
-                    LogPrintf("Starting from checkpoint %s.\n", hashPrev.ToString().c_str());
-                }
+					if (fDebug
+						&& pindexRear->phashBlock
+						&& *pindexRear->phashBlock != hashPrev)
+					{
+						LogPrintf("Starting from checkpoint %s.\n", hashPrev.ToString().c_str());
+					}
 
-                CTxDB txdb("r");
-                while (hashPrev != 0)
-                {
-                    if (!txdb.ReadBlockThinIndex(hashPrev, diskindex))
-                    {
-                        LogPrintf("NS_GET_FILTERED_BLOCKS Read header %s failed.\n", hashPrev.ToString().c_str());
-                        break;
-                    };
+					CTxDB txdb("r");
+					while (hashPrev != 0)
+					{
+						if (!txdb.ReadBlockThinIndex(hashPrev, diskindex))
+						{
+							LogPrintf("NS_GET_FILTERED_BLOCKS Read header %s failed.\n", hashPrev.ToString().c_str());
+							break;
+						};
 
-                    if (diskindex.nHeight <= nHeightFilteredNeeded)
-                    {
-                        if (fDebug)
-                            LogPrintf("Found block height %d, %s - reading forwards.\n", nHeightFilteredNeeded, hashPrev.ToString().c_str());
+						if (diskindex.nHeight <= nHeightFilteredNeeded)
+						{
+							if (fDebug)
+								LogPrintf("Found block height %d, %s - reading forwards.\n", nHeightFilteredNeeded, hashPrev.ToString().c_str());
 
-                        inv.hash = hashPrev;
-                        vGetFilteredBlocks.push_back(inv);
-                        nHeightFilteredNeeded++;
+							inv.hash = hashPrev;
+							vGetFilteredBlocks.push_back(inv);
+							nHeightFilteredNeeded++;
 
-                        uint256 hashNext = diskindex.hashNext;
-                        // -- TODO: cache backwards to avoid reading twice, and detect when in index window
+							uint256 hashNext = diskindex.hashNext;
+							// -- TODO: cache backwards to avoid reading twice, and detect when in index window
 
-                        for (uint32_t i = 0; i < 127; ++i) // choose a low number to spread the load over more peers
-                        {
-                            if (hashNext == 0)
-                                break;
+							for (uint32_t i = 0; i < 127; ++i) // choose a low number to spread the load over more peers
+							{
+								if (hashNext == 0)
+									break;
 
-                            inv.hash = hashNext;
-                            vGetFilteredBlocks.push_back(inv);
-                            nHeightFilteredNeeded++;
+								inv.hash = hashNext;
+								vGetFilteredBlocks.push_back(inv);
+								nHeightFilteredNeeded++;
 
-                            if (!txdb.ReadBlockThinIndex(hashNext, diskindex))
-                            {
-                                LogPrintf("NS_GET_FILTERED_BLOCKS (inner) Read header %s failed.\n", hashNext.ToString().c_str());
-                                break;
-                            };
-                            hashNext = diskindex.hashNext;
-                        };
-                        break;
-                    };
+								if (!txdb.ReadBlockThinIndex(hashNext, diskindex))
+								{
+									LogPrintf("NS_GET_FILTERED_BLOCKS (inner) Read header %s failed.\n", hashNext.ToString().c_str());
+									break;
+								};
+								hashNext = diskindex.hashNext;
+							};
+							break;
+						};
 
-                    hashPrev = diskindex.hashPrev;
-                };
+						hashPrev = diskindex.hashPrev;
+					};
 
-            } else
-            {
-                CBlockThinIndex* pblockindex = FindBlockThinByHeight(nHeightFilteredNeeded);
+				} else
+				{
+					CBlockThinIndex* pblockindex = FindBlockThinByHeight(nHeightFilteredNeeded);
 
-                if (!pblockindex)
-                {
-                    LogPrintf("Warning: FindBlockThinByHeight() %d failed.\n", nHeightFilteredNeeded);
-                } else
-                {
-                    for (uint32_t i = 0; i < 128; ++i) // choose a low number to spread the load over more peers
-                    {
-                        if (pblockindex->phashBlock)
-                            inv.hash = *pblockindex->phashBlock;
-                        else
-                            inv.hash = pblockindex->GetBlockHash();
+					if (!pblockindex)
+					{
+						LogPrintf("Warning: FindBlockThinByHeight() %d failed.\n", nHeightFilteredNeeded);
+					} else
+					{
+						for (uint32_t i = 0; i < 128; ++i) // choose a low number to spread the load over more peers
+						{
+							if (pblockindex->phashBlock)
+								inv.hash = *pblockindex->phashBlock;
+							else
+								inv.hash = pblockindex->GetBlockHash();
 
-                        vGetFilteredBlocks.push_back(inv);
-                        nHeightFilteredNeeded++;
+							vGetFilteredBlocks.push_back(inv);
+							nHeightFilteredNeeded++;
 
-                        if (!pblockindex->pnext)
-                            break;
-                        pblockindex = pblockindex->pnext;
-                    };
-                };
-            };
+							if (!pblockindex->pnext)
+								break;
+							pblockindex = pblockindex->pnext;
+						};
+					};
+				};
 
-        } else
-        if (vPendingFilteredChunks.size() > 0)
-        {
-            std::vector<CPendingFilteredChunk>::iterator it;
-            for (it = vPendingFilteredChunks.begin(); it < vPendingFilteredChunks.end(); ++it)
-            {
-                // -- delay, request again
-                if (nTimeNow - it->nTime > 60 * 5)
-                {
-                    if (fDebugNet)
-                        LogPrintf("Timeout: Re-requesting chunk, starting from %s\n", it->startHash.ToString().c_str());
+			} else
+			if (vPendingFilteredChunks.size() > 0)
+			{
+				std::vector<CPendingFilteredChunk>::iterator it;
+				for (it = vPendingFilteredChunks.begin(); it < vPendingFilteredChunks.end(); ++it)
+				{
+					// -- delay, request again
+					if (nTimeNow - it->nTime > 60 * 5)
+					{
+						if (fDebugNet)
+							LogPrintf("Timeout: Re-requesting chunk, starting from %s\n", it->startHash.ToString().c_str());
 
-                    std::map<uint256, CBlockThinIndex*>::iterator mi = mapBlockThinIndex.find(it->startHash);
+						std::map<uint256, CBlockThinIndex*>::iterator mi = mapBlockThinIndex.find(it->startHash);
 
-                    if (mi != mapBlockThinIndex.end())
-                    {
-                        CBlockThinIndex *pblockindex = mi->second;
+						if (mi != mapBlockThinIndex.end())
+						{
+							CBlockThinIndex *pblockindex = mi->second;
 
-                        for (uint32_t i = 0; i < 512; ++i) // choose a low number to spread the load over more peers
-                        {
-                            if (pblockindex->phashBlock)
-                                inv.hash = *pblockindex->phashBlock;
-                            else
-                                inv.hash = pblockindex->GetBlockHash();
+							for (uint32_t i = 0; i < 512; ++i) // choose a low number to spread the load over more peers
+							{
+								if (pblockindex->phashBlock)
+									inv.hash = *pblockindex->phashBlock;
+								else
+									inv.hash = pblockindex->GetBlockHash();
 
-                            vGetFilteredBlocks.push_back(inv);
-                            nHeightFilteredNeeded++;
+								vGetFilteredBlocks.push_back(inv);
+								nHeightFilteredNeeded++;
 
-                            if (!pblockindex->pnext
-                                || inv.hash == it->endHash)
-                                break;
-                            pblockindex = pblockindex->pnext;
-                        };
-                    } else
-                    {
-                        LogPrintf("Error: Can't find hash %s, to re-request filtered blocks.\n", it->startHash.ToString().c_str());
-                    };
+								if (!pblockindex->pnext
+									|| inv.hash == it->endHash)
+									break;
+								pblockindex = pblockindex->pnext;
+							};
+						} else
+						{
+							LogPrintf("Error: Can't find hash %s, to re-request filtered blocks.\n", it->startHash.ToString().c_str());
+						};
 
-                    vPendingFilteredChunks.erase(it);
-                    break; // give other peers a chance
-                };
-            };
-        };
-    };
+						vPendingFilteredChunks.erase(it);
+						break; // give other peers a chance
+					};
+				};
+			};
+		};
 
-    if (!vGetFilteredBlocks.empty())
-    {
-        if (fDebugNet)
-            LogPrintf("Requesting filtered chunk from peer %s, starting from %s\n", pto->addr.ToString().c_str(), vGetFilteredBlocks[0].hash.ToString().c_str());
+		if (!vGetFilteredBlocks.empty())
+		{
+			if (fDebugNet)
+				LogPrintf("Requesting filtered chunk from peer %s, starting from %s\n", pto->addr.ToString().c_str(), vGetFilteredBlocks[0].hash.ToString().c_str());
 
-        vPendingFilteredChunks.push_back(CPendingFilteredChunk(vGetFilteredBlocks[0].hash, vGetFilteredBlocks[vGetFilteredBlocks.size()-1].hash, GetTime()));
-        pto->PushMessage("getdata", vGetFilteredBlocks);
-    };
-
-
-    //
-    // Message: getdata
-    //
-    std::vector<CInv> vGetData;
-    int64_t nNow = GetTime() * 1000000;
-    CTxDB txdb("r");
-
-    while (!pto->mapAskFor.empty() && (*pto->mapAskFor.begin()).first <= nNow)
-    {
-        const CInv& inv = (*pto->mapAskFor.begin()).second;
-
-        if ((nNodeMode == NT_FULL && !AlreadyHave(txdb, inv))
-          ||(nNodeMode == NT_THIN && !AlreadyHaveThin(txdb, inv)))
-        {
-            LogPrint("net", "sending getdata: %s\n", inv.ToString());
-
-            vGetData.push_back(inv);
-            if (vGetData.size() >= 1000)
-            {
-                pto->PushMessage("getdata", vGetData);
-                vGetData.clear();
-            }
-            mapAlreadyAskedFor[inv] = nNow;
-        }
-        pto->mapAskFor.erase(pto->mapAskFor.begin());
-    }
-
-    if (!vGetData.empty())
-        pto->PushMessage("getdata", vGetData);
-
-    // - If syncing and !get mblk in MBLK_RECEIVE_TIMEOUT send another getblocks to random peer
-    if (nNodeMode == NT_FULL
-        && nTimeLastMblkRecv > 0
-        && pto->nChainHeight - nBestHeight > 256
-        && nTimeNow - nTimeLastMblkRecv > MBLK_RECEIVE_TIMEOUT)
-    {
-        pto->PushGetBlocks(pindexBest, uint256(0));
-        if (fDebug)
-            LogPrintf("Sync timeout, getblocks to %s, from %d\n", pto->addr.ToString().c_str(), pindexBest->nHeight);
-        nTimeLastMblkRecv = nTimeNow; // reset timeout
-    }
+			vPendingFilteredChunks.push_back(CPendingFilteredChunk(vGetFilteredBlocks[0].hash, vGetFilteredBlocks[vGetFilteredBlocks.size()-1].hash, GetTime()));
+			pto->PushMessage("getdata", vGetFilteredBlocks);
+		};
 
 
-    if (fSecMsgEnabled)
-        SecureMsgSendData(pto, fSendTrickle); // should be in cs_main?
+		//
+		// Message: getdata
+		//
+		std::vector<CInv> vGetData;
+		int64_t nNow = GetTime() * 1000000;
+		CTxDB txdb("r");
 
-    return true;
+		while (!pto->mapAskFor.empty() && (*pto->mapAskFor.begin()).first <= nNow)
+		{
+			const CInv& inv = (*pto->mapAskFor.begin()).second;
+
+			if ((nNodeMode == NT_FULL && !AlreadyHave(txdb, inv))
+			||(nNodeMode == NT_THIN && !AlreadyHaveThin(txdb, inv)))
+			{
+				LogPrint("net", "sending getdata: %s\n", inv.ToString());
+
+				vGetData.push_back(inv);
+				if (vGetData.size() >= 1000)
+				{
+					pto->PushMessage("getdata", vGetData);
+					vGetData.clear();
+				}
+				else {
+					//If we're not going to ask, don't expect a response.
+					pto->setAskFor.erase(inv.hash);	
+					//mapAlreadyAskedFor[inv] = nNow;
+				}
+			}
+			pto->mapAskFor.erase(pto->mapAskFor.begin());
+		}
+
+		if (!vGetData.empty())
+			pto->PushMessage("getdata", vGetData);
+
+		// - If syncing and !get mblk in MBLK_RECEIVE_TIMEOUT send another getblocks to random peer
+		if (nNodeMode == NT_FULL
+			&& nTimeLastMblkRecv > 0
+			&& pto->nChainHeight - nBestHeight > 256
+			&& nTimeNow - nTimeLastMblkRecv > MBLK_RECEIVE_TIMEOUT)
+		{
+			pto->PushGetBlocks(pindexBest, uint256(0));
+			if (fDebug)
+				LogPrintf("Sync timeout, getblocks to %s, from %d\n", pto->addr.ToString().c_str(), pindexBest->nHeight);
+				nTimeLastMblkRecv = nTimeNow; // reset timeout
+		}
+		if (fSecMsgEnabled)
+			SecureMsgSendData(pto, fSendTrickle); // should be in cs_main?
+	}
+	return true;
 }
 

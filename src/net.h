@@ -22,6 +22,7 @@
 #include "bloom.h"
 #include "state.h"
 #include "hash.h"
+#include "limitedmap.h"
 
 
 class CRequestTracker;
@@ -40,6 +41,17 @@ extern CCriticalSection cs_nLastNodeId;
 static const int PING_INTERVAL = 2 * 60;
 /** Time after which to disconnect, after waiting for a ping response (or inactivity). */
 static const int TIMEOUT_INTERVAL = 20 * 60;
+/** Maximum length of strSubVer in `version` message */
+static const unsigned int MAX_SUBVERSION_LENGTH = 256;
+/** The maximum number of entries in an 'inv' protocol message */
+static const unsigned int MAX_INV_SZ = 50000;
+/** The maximum number of entries in mapAskFor */
+static const size_t MAPASKFOR_MAX_SZ = MAX_INV_SZ;
+/** The maximum number of entries in setAskFor (larger due to getdata latency)*/
+static const size_t SETASKFOR_MAX_SZ = 2 * MAX_INV_SZ;
+/** The maximum number of new addresses to accumulate before announcing. */
+static const unsigned int MAX_ADDR_TO_SEND = 1000;
+
 /** -upnp default */
 #ifdef USE_UPNP
 static const bool DEFAULT_UPNP = USE_UPNP;
@@ -157,7 +169,8 @@ extern CCriticalSection cs_vNodes;
 extern std::map<CInv, CDataStream> mapRelay;
 extern std::deque<std::pair<int64_t, CInv> > vRelayExpiration;
 extern CCriticalSection cs_mapRelay;
-extern std::map<CInv, int64_t> mapAlreadyAskedFor;
+//extern std::map<CInv, int64_t> mapAlreadyAskedFor;
+extern limitedmap<CInv, int64_t> mapAlreadyAskedFor;
 
 extern std::vector<std::string> vAddedNodes;
 extern CCriticalSection cs_vAddedNodes;
@@ -246,7 +259,7 @@ public:
 };
 
 
-
+typedef std::map<CNetAddr, int64_t> banmap_t;
 
 class SecMsgNode
 {
@@ -302,6 +315,10 @@ public:
     CService addrLocal;
     int nVersion;
     int nTypeInd;
+	// strSubVer is whatever byte array we read from the wire. However, this field is intended
+    // to be printed out, displayed to humans in various forms and so on. So we sanitize it and
+    // store the sanitized version in cleanSubVer. The original should be used when dealing with
+    // the network or wire types and the cleaned string used when displayed or logged.
     std::string strSubVer;
     bool fOneShot;
     bool fClient;
@@ -309,6 +326,10 @@ public:
     bool fNetworkNode;
     bool fSuccessfullyConnected;
     bool fDisconnect;
+	// We use fRelayTxes for two purposes -
+    // a) it allows us to not relay tx invs before receiving the peer's version message
+    // b) the peer may tell us in their version message that we should not relay tx invs
+    //    until they have initialized their bloom filter.
     bool fRelayTxes;
     CSemaphoreGrant grantOutbound;
     int nRefCount;
@@ -318,7 +339,9 @@ protected:
     // Denial-of-service detection/prevention
     // Key is IP address, value is banned-until-time
     static std::map<CNetAddr, int64_t> setBanned;
+	//static banmap_t b_setBanned;
     static CCriticalSection cs_setBanned;
+	static bool setBannedIsDirty;
     int nMisbehavior;
 
 public:
@@ -332,6 +355,7 @@ public:
     CBlockThinIndex* pindexLastGetBlockThinsBegin;
     uint256 hashLastGetBlocksEnd;
     int nChainHeight; // updates only with ping message, every 2 mins
+	bool fStartSync;
 
     // flood relay
     std::vector<CAddress> vAddrToSend;
@@ -343,6 +367,7 @@ public:
     mruset<CInv> setInventoryKnown;
     std::vector<CInv> vInventoryToSend;
     CCriticalSection cs_inventory;
+	std::set<uint256> setAskFor;
     std::multimap<int64_t, CInv> mapAskFor;
 
     SecMsgNode smsgData;
@@ -393,6 +418,7 @@ public:
         pindexLastGetBlockThinsBegin = 0;
         hashLastGetBlocksEnd = 0;
         nChainHeight = -1;
+		fStartSync = false;
         fGetAddr = false;
         nMisbehavior = 0;
         setInventoryKnown.max_size(SendBufferSize() / 1000);
@@ -505,13 +531,24 @@ public:
         }
     }
 
-    void AskFor(const CInv& inv)
+    void AskFor(const CInv& inv, bool fImmediateRetry = false)
     {
+        if (mapAskFor.size() > MAPASKFOR_MAX_SZ)
+            return;
+        // a peer may not have multiple non-responded queue positions for a single inv item
+        if (!setAskFor.insert(inv.hash).second)
+            return;
+
+
         // We're using mapAskFor as a priority queue,
         // the key is the earliest time the request can be sent
-        
-        int64_t& nRequestTime = mapAlreadyAskedFor[inv];
-        LogPrint("net", "askfor %s   %d (%s)\n", inv.ToString(), nRequestTime, DateTimeStrFormat("%H:%M:%S", nRequestTime/1000000));
+        int64_t nRequestTime;
+        limitedmap<CInv, int64_t>::const_iterator it = mapAlreadyAskedFor.find(inv);
+        if (it != mapAlreadyAskedFor.end())
+            nRequestTime = it->second;
+        else
+            nRequestTime = 0;
+        LogPrint("net", "askfor %s   %d (%s)\n", inv.ToString().c_str(), nRequestTime, DateTimeStrFormat("%H:%M:%S", nRequestTime/1000000).c_str());
 
         // Make sure not to reuse time indexes to keep things in the same order
         int64_t nNow = (GetTime() - 1) * 1000000;
@@ -520,8 +557,15 @@ public:
         nNow = std::max(nNow, nLastTime);
         nLastTime = nNow;
 
-        // Each retry is 2 minutes after the last
-        nRequestTime = std::max(nRequestTime + 2 * 60 * 1000000, nNow);
+        // Retry immediately during initial sync otherwise retry 2 minutes after the last
+        if (fImmediateRetry)
+        	nRequestTime = nNow;
+        else
+            nRequestTime = std::max(nRequestTime + 2 * 60 * 1000000, nNow);
+        if (it != mapAlreadyAskedFor.end())
+            mapAlreadyAskedFor.update(it, nRequestTime);
+        else
+            mapAlreadyAskedFor.insert(std::make_pair(inv, nRequestTime));
         mapAskFor.insert(std::make_pair(nRequestTime, inv));
     }
 
@@ -822,7 +866,17 @@ public:
     static bool IsBanned(CNetAddr ip);
     bool Misbehaving(int howmuch); // 1 == a little, 100 == a lot
     bool SoftBan();
+	static void GetBanned(banmap_t &banmap);
+	static void SetBanned(const banmap_t &banmap);
+	
     void copyStats(CNodeStats &stats);
+	
+	//!check is the banlist has unwritten changes
+    static bool BannedSetIsDirty();
+    //!set the "dirty" flag for the banlist
+    static void SetBannedSetDirty(bool dirty=true);
+    //!clean unused entires (if bantime has expired)
+    //static void SweepBanned();
     
     // Network stats
     static void RecordBytesRecv(uint64_t bytes);
