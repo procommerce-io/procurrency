@@ -306,9 +306,9 @@ Ing produktung ini atin yang makayabeng software a gewa dareng OpenSSL Project p
     </message>
 </context>
 <context>
-    <name>BitcoinGUI</name>
+    <name>ProcGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+280"/>
+        <location filename="../procgui.cpp" line="+280"/>
         <source>Sign &amp;message...</source>
         <translation>I-sign ing &amp;mensayi</translation>
     </message>

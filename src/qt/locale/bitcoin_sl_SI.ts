@@ -308,9 +308,9 @@ Ta proizvod vključuje softver razvit s strani projekta OpenSSL za uporabo v Ope
     </message>
 </context>
 <context>
-    <name>BitcoinGUI</name>
+    <name>ProcGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+280"/>
+        <location filename="../procgui.cpp" line="+280"/>
         <source>Sign &amp;message...</source>
         <translation>Podpiši &amp;sporočilo ...</translation>
     </message>

@@ -308,9 +308,9 @@ Este produto inclúe software desenvolvido polo OpenSSL Project para o uso no Op
     </message>
 </context>
 <context>
-    <name>BitcoinGUI</name>
+    <name>ProcGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+280"/>
+        <location filename="../procgui.cpp" line="+280"/>
         <source>Sign &amp;message...</source>
         <translation>&amp;Asinar mensaxe...</translation>
     </message>

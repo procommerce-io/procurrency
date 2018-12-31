@@ -1,7 +1,7 @@
 #ifndef BRIDGE_H
 #define BRIDGE_H
 
-class GUI;
+class ProcGUI;
 class TransactionModel;
 class WalletModel;
 class BlockExplorerModel;
@@ -16,15 +16,15 @@ class SendCoinsRecipient;
 
 
 
-class UIBridge : public QObject
+class UIProcBridge : public QObject
 {
     Q_OBJECT
 
     /** Information about the client */
     Q_PROPERTY(QVariantMap info READ getInfo);
 public:
-    explicit UIBridge(GUI *window, QObject *parent = 0);
-    ~UIBridge();
+    explicit UIProcBridge(ProcGUI *window, QObject *parent = 0);
+    ~UIProcBridge();
 
     void setClientModel();
     void setWalletModel();
@@ -101,7 +101,7 @@ signals:
     void networkAlert(QString alert);
 
 private:
-    GUI *window;
+    ProcGUI *window;
     TransactionModel *transactionModel;
     AddressModel *addressModel;
     MessageThread *thMessage;
@@ -109,7 +109,7 @@ private:
     QVariantMap *info;
     QThread *async;
 
-    friend class GUI;
+    friend class ProcGUI;
 
     inline QVariantMap getInfo() const { return *info; };
 

@@ -309,9 +309,9 @@ T채m채 tuote sis채lt채채 OpenSSL-projektin kehitt채m채채 ohjelmistoa OpenSSL-ty�
     </message>
 </context>
 <context>
-    <name>BitcoinGUI</name>
+    <name>ProcGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+280"/>
+        <location filename="../procgui.cpp" line="+280"/>
         <source>Sign &amp;message...</source>
         <translation>Allekirjoita &amp;viesti...</translation>
     </message>

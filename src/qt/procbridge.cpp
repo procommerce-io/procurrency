@@ -1,6 +1,6 @@
-#include "bridge.h"
+#include "procbridge.h"
 
-#include "gui.h"
+#include "procgui.h"
 #include "guiutil.h"
 
 #include "editaddressdialog.h"
@@ -22,11 +22,11 @@
 #include "coincontroldialog.h"
 #include "ringsig.h"
 
-#ifndef OTP_ENABLED
+//#ifndef OTP_ENABLED
     #include "askpassphrasedialog.h"
-#else
-    #include "askpassphrasedialog_otp.h"
-#endif
+//#else
+    //#include "askpassphrasedialog_otp.h" //del
+//#endif
 
 #include "txdb.h"
 #include "state.h"
@@ -302,9 +302,9 @@ protected:
 
 };
 
-#include "bridge.moc"
+#include "procbridge.moc"
 
-UIBridge::UIBridge(GUI *window, QObject *parent) :
+UIProcBridge::UIProcBridge(ProcGUI *window, QObject *parent) :
     QObject         (parent),
     window          (window),
     transactionModel(new TransactionModel()),
@@ -316,7 +316,7 @@ UIBridge::UIBridge(GUI *window, QObject *parent) :
     async->start();
 }
 
-UIBridge::~UIBridge()
+UIProcBridge::~UIProcBridge()
 {
     delete transactionModel;
     delete addressModel;
@@ -326,7 +326,7 @@ UIBridge::~UIBridge()
 }
 
 // This is just a hook, we won't really be setting the model...
-void UIBridge::setClientModel()
+void UIProcBridge::setClientModel()
 {
     info->insert("version", CLIENT_VERSION);
     info->insert("build",   window->clientModel->formatFullVersion());
@@ -337,7 +337,7 @@ void UIBridge::setClientModel()
 }
 
 // This is just a hook, we won't really be setting the model...
-void UIBridge::setWalletModel()
+void UIProcBridge::setWalletModel()
 {
     populateTransactionTable();
     populateAddressTable();
@@ -346,24 +346,24 @@ void UIBridge::setWalletModel()
 }
 
 // This is just a hook, we won't really be setting the model...
-void UIBridge::setMessageModel()
+void UIProcBridge::setMessageModel()
 {
     populateMessageTable();
     connectSignals();
 }
 
-void UIBridge::copy(QString text)
+void UIProcBridge::copy(QString text)
 {
     QApplication::clipboard()->setText(text);
 }
 
-void UIBridge::paste()
+void UIProcBridge::paste()
 {
     emitPaste(QApplication::clipboard()->text());
 }
 
 // Options
-void UIBridge::populateOptions()
+void UIProcBridge::populateOptions()
 {
     OptionsModel *optionsModel(window->clientModel->getOptionsModel());
 
@@ -430,7 +430,7 @@ void UIBridge::populateOptions()
 }
 
 // Transactions
-bool UIBridge::addRecipient(QString address, QString label, QString narration, qint64 amount, int txnType, int nRingSize)
+bool UIProcBridge::addRecipient(QString address, QString label, QString narration, qint64 amount, int txnType, int nRingSize)
 {
     SendCoinsRecipient rv;
     
@@ -454,12 +454,12 @@ bool UIBridge::addRecipient(QString address, QString label, QString narration, q
     return true;
 }
 
-void UIBridge::clearRecipients()
+void UIProcBridge::clearRecipients()
 {
     recipients.clear();
 }
 
-bool UIBridge::sendCoins(bool fUseCoinControl, QString sChangeAddr)
+bool UIProcBridge::sendCoins(bool fUseCoinControl, QString sChangeAddr)
 {
     WalletModel::UnlockContext ctx(window->walletModel->requestUnlock());
 
@@ -667,10 +667,10 @@ bool UIBridge::sendCoins(bool fUseCoinControl, QString sChangeAddr)
     return true;
 }
 
-#ifdef TRADING_BITTREX
-void UIBridge::openBittrex()
+/*#ifdef TRADING_BITTREX
+void UIProcBridge::openBittrex()
 {
-    if (!window || !window->walletModel)
+    if (!window || !window->walletModel)    //del
         return;
 
     tradingBittrexDialog *dlg = new tradingBittrexDialog();
@@ -678,8 +678,9 @@ void UIBridge::openBittrex()
     dlg->show();
 }
 #endif
+*/
 
-void UIBridge::openCoinControl()
+void UIProcBridge::openCoinControl()
 {
     if (!window || !window->walletModel)
         return;
@@ -691,19 +692,19 @@ void UIBridge::openCoinControl()
     CoinControlDialog::updateLabels(window->walletModel, 0, this);
 }
 
-void UIBridge::updateCoinControlAmount(qint64 amount)
+void UIProcBridge::updateCoinControlAmount(qint64 amount)
 {
     CoinControlDialog::payAmounts.clear();
     CoinControlDialog::payAmounts.append(amount);
     CoinControlDialog::updateLabels(window->walletModel, 0, this);
 }
 
-void UIBridge::updateCoinControlLabels(unsigned int &quantity, int64_t &amount, int64_t &fee, int64_t &afterfee, unsigned int &bytes, QString &priority, QString low, int64_t &change)
+void UIProcBridge::updateCoinControlLabels(unsigned int &quantity, int64_t &amount, int64_t &fee, int64_t &afterfee, unsigned int &bytes, QString &priority, QString low, int64_t &change)
 {
     emitCoinControlUpdate(quantity, amount, fee, afterfee, bytes, priority, low, change);
 }
 
-QVariantMap UIBridge::listAnonOutputs()
+QVariantMap UIProcBridge::listAnonOutputs()
 {
     QVariantMap anonOutputs;
     typedef std::map<int64_t, int> outputCount;
@@ -749,7 +750,7 @@ QVariantMap UIBridge::listAnonOutputs()
     return anonOutputs;
 };
 
-void UIBridge::populateTransactionTable()
+void UIProcBridge::populateTransactionTable()
 {
     if(transactionModel->thread() == thread())
     {
@@ -761,26 +762,26 @@ void UIBridge::populateTransactionTable()
     transactionModel->populatePage();
 }
 
-void UIBridge::updateTransactions(QModelIndex topLeft, QModelIndex bottomRight)
+void UIProcBridge::updateTransactions(QModelIndex topLeft, QModelIndex bottomRight)
 {
     // Updated transactions...
     if(topLeft.column() == TransactionTableModel::Status)
         transactionModel->populateRows(topLeft.row(), bottomRight.row());
 }
 
-void UIBridge::insertTransactions(const QModelIndex & parent, int start, int end)
+void UIProcBridge::insertTransactions(const QModelIndex & parent, int start, int end)
 {
     // New Transactions...
     transactionModel->populateRows(start, end);
 }
 
-QString UIBridge::transactionDetails(QString txid)
+QString UIProcBridge::transactionDetails(QString txid)
 {
     return window->walletModel->getTransactionTableModel()->index(window->walletModel->getTransactionTableModel()->lookupTransaction(txid), 0).data(TransactionTableModel::LongDescriptionRole).toString();
 }
 
 // Addresses
-void UIBridge::populateAddressTable()
+void UIProcBridge::populateAddressTable()
 {
     if(addressModel->thread() == thread())
     {
@@ -793,12 +794,12 @@ void UIBridge::populateAddressTable()
     addressModel->populateAddressTable();
 }
 
-void UIBridge::updateAddresses(QModelIndex topLeft, QModelIndex bottomRight)
+void UIProcBridge::updateAddresses(QModelIndex topLeft, QModelIndex bottomRight)
 {
     addressModel->poplateRows(topLeft.row(), bottomRight.row());
 }
 
-void UIBridge::insertAddresses(const QModelIndex & parent, int start, int end)
+void UIProcBridge::insertAddresses(const QModelIndex & parent, int start, int end)
 {
     // NOTE: Check inInitialBlockDownload here as many stealth addresses uncovered can slow wallet
     //       fPassGuiAddresses allows addresses added manually to still reflect
@@ -809,7 +810,7 @@ void UIBridge::insertAddresses(const QModelIndex & parent, int start, int end)
     addressModel->poplateRows(start, end);
 }
 
-QString UIBridge::newAddress(QString addressLabel, int addressType, QString address, bool send)
+QString UIProcBridge::newAddress(QString addressLabel, int addressType, QString address, bool send)
 {
     // Generate a new address to associate with given label
     
@@ -821,7 +822,7 @@ QString UIBridge::newAddress(QString addressLabel, int addressType, QString addr
     return rv;
 }
 
-QString UIBridge::lastAddressError()
+QString UIProcBridge::lastAddressError()
 {
     QString sError;
     AddressTableModel::EditStatus status = addressModel->atm->getEditStatus();
@@ -849,33 +850,33 @@ QString UIBridge::lastAddressError()
     return sError;
 }
 
-QString UIBridge::getAddressLabel(QString address)
+QString UIProcBridge::getAddressLabel(QString address)
 {
     return addressModel->atm->labelForAddress(address);
 }
 
-void UIBridge::updateAddressLabel(QString address, QString label)
+void UIProcBridge::updateAddressLabel(QString address, QString label)
 {
     addressModel->atm->setData(addressModel->atm->index(addressModel->atm->lookupAddress(address), addressModel->atm->Label), QVariant(label), Qt::EditRole);
 }
 
-bool UIBridge::validateAddress(QString address)
+bool UIProcBridge::validateAddress(QString address)
 {
     return window->walletModel->validateAddress(address);
 }
 
-bool UIBridge::deleteAddress(QString address)
+bool UIProcBridge::deleteAddress(QString address)
 {
     return addressModel->atm->removeRow(addressModel->atm->lookupAddress(address));
 }
 
 // Messages
-void UIBridge::appendMessages(QString messages, bool reset)
+void UIProcBridge::appendMessages(QString messages, bool reset)
 {
     emitMessages("[" + messages + "]", reset);
 }
 
-void UIBridge::appendMessage(int row)
+void UIProcBridge::appendMessage(int row)
 {
     emitMessage(window->messageModel->index(row, MessageModel::Key)             .data().toString(),
                 window->messageModel->index(row, MessageModel::Type)            .data().toString(),
@@ -889,7 +890,7 @@ void UIBridge::appendMessage(int row)
                 window->messageModel->index(row, MessageModel::Message)         .data().toString().toHtmlEscaped());
 }
 
-void UIBridge::populateMessageTable()
+void UIProcBridge::populateMessageTable()
 {
     thMessage->mtm = window->messageModel;
 
@@ -897,7 +898,7 @@ void UIBridge::populateMessageTable()
     thMessage->start();
 }
 
-void UIBridge::insertMessages(const QModelIndex & parent, int start, int end)
+void UIProcBridge::insertMessages(const QModelIndex & parent, int start, int end)
 {
     while(start <= end)
     {
@@ -906,17 +907,17 @@ void UIBridge::insertMessages(const QModelIndex & parent, int start, int end)
     }
 }
 
-bool UIBridge::deleteMessage(QString key)
+bool UIProcBridge::deleteMessage(QString key)
 {
     return window->messageModel->removeRow(thMessage->mtm->lookupMessage(key));
 }
 
-bool UIBridge::markMessageAsRead(QString key)
+bool UIProcBridge::markMessageAsRead(QString key)
 {
     return window->messageModel->markMessageAsRead(key);
 }
 
-QString UIBridge::getPubKey(QString address, QString label)
+QString UIProcBridge::getPubKey(QString address, QString label)
 {
     if(!label.isEmpty())
         updateAddressLabel(address, label);
@@ -924,7 +925,7 @@ QString UIBridge::getPubKey(QString address, QString label)
     return addressModel->atm->pubkeyForAddress(address);;
 }
 
-bool UIBridge::setPubKey(QString address, QString pubkey)
+bool UIProcBridge::setPubKey(QString address, QString pubkey)
 {
     std::string sendTo = address.toStdString();
     std::string pbkey  = pubkey.toStdString();
@@ -932,7 +933,7 @@ bool UIBridge::setPubKey(QString address, QString pubkey)
     return SecureMsgAddAddress(sendTo, pbkey) == 0;
 }
 
-bool UIBridge::sendMessage(const QString &address, const QString &message, const QString &from)
+bool UIProcBridge::sendMessage(const QString &address, const QString &message, const QString &from)
 {
     WalletModel::UnlockContext ctx(window->walletModel->requestUnlock());
 
@@ -981,7 +982,7 @@ bool UIBridge::sendMessage(const QString &address, const QString &message, const
 }
 
 
-void UIBridge::connectSignals()
+void UIProcBridge::connectSignals()
 {
     connect(transactionModel->getModel(), SIGNAL(dataChanged(QModelIndex,QModelIndex)), SLOT(updateTransactions(QModelIndex,QModelIndex)));
     connect(transactionModel->getModel(), SIGNAL(rowsInserted(QModelIndex,int,int)),    SLOT(insertTransactions(QModelIndex,int,int)));
@@ -993,7 +994,7 @@ void UIBridge::connectSignals()
     connect(thMessage->mtm, SIGNAL(modelReset()),                         SLOT(populateMessageTable()));
 }
 
-QVariantMap UIBridge::userAction(QVariantMap action)
+QVariantMap UIProcBridge::userAction(QVariantMap action)
 {
     QVariantMap::iterator it(action.begin());
 
@@ -1042,7 +1043,7 @@ QVariantMap UIBridge::userAction(QVariantMap action)
 }
 
 // Blocks
-QVariantMap UIBridge::listLatestBlocks()
+QVariantMap UIProcBridge::listLatestBlocks()
 {
     CBlockIndex* recentBlock = pindexBest;
     CBlock block;
@@ -1072,7 +1073,7 @@ QVariantMap UIBridge::listLatestBlocks()
     return latestBlocks;
 }
 
-QVariantMap UIBridge::findBlock(QString searchID)
+QVariantMap UIProcBridge::findBlock(QString searchID)
 {
     CBlockIndex* findBlock;
     
@@ -1127,7 +1128,7 @@ QVariantMap UIBridge::findBlock(QString searchID)
     return foundBlock;
 }
 
-QVariantMap UIBridge::blockDetails(QString blkHash)
+QVariantMap UIProcBridge::blockDetails(QString blkHash)
 {
     QVariantMap blockDetail;
     
@@ -1208,7 +1209,7 @@ QVariantMap UIBridge::blockDetails(QString blkHash)
     return blockDetail;
 }
 
-QVariantMap UIBridge::listTransactionsForBlock(QString blkHash)
+QVariantMap UIProcBridge::listTransactionsForBlock(QString blkHash)
 {
     QVariantMap blkTransactions;
 
@@ -1252,7 +1253,7 @@ QVariantMap UIBridge::listTransactionsForBlock(QString blkHash)
     return blkTransactions;
 }
 
-QVariantMap UIBridge::txnDetails(QString blkHash, QString txnHash)
+QVariantMap UIProcBridge::txnDetails(QString blkHash, QString txnHash)
 {
     QVariantMap txnDetail;
 
@@ -1404,7 +1405,7 @@ QVariantMap UIBridge::txnDetails(QString blkHash, QString txnHash)
     return txnDetail;
 }
 
-QVariantMap UIBridge::signMessage(QString address, QString message)
+QVariantMap UIProcBridge::signMessage(QString address, QString message)
 {
     QVariantMap result;
 
@@ -1450,7 +1451,7 @@ QVariantMap UIBridge::signMessage(QString address, QString message)
     return result;
 }
 
-QVariantMap UIBridge::verifyMessage(QString address, QString message, QString signature)
+QVariantMap UIProcBridge::verifyMessage(QString address, QString message, QString signature)
 {
     QVariantMap result;
 
@@ -1498,7 +1499,7 @@ QVariantMap UIBridge::verifyMessage(QString address, QString message, QString si
     return result;
 }
 
-QVariantMap UIBridge::getNewMnemonic(QString password, QString language)
+QVariantMap UIProcBridge::getNewMnemonic(QString password, QString language)
 {
     QVariantMap result;
     int nLanguage = language.toInt();
@@ -1557,7 +1558,7 @@ QVariantMap UIBridge::getNewMnemonic(QString password, QString language)
     return result;
 }
 
-QVariantMap UIBridge::importFromMnemonic(QString inMnemonic, QString inPassword, QString inLabel, bool fBip44, int64_t nCreateTime)
+QVariantMap UIProcBridge::importFromMnemonic(QString inMnemonic, QString inPassword, QString inLabel, bool fBip44, int64_t nCreateTime)
 {
     std::string sPassword = inPassword.toStdString();
     std::string sMnemonic = inMnemonic.toStdString();
@@ -1858,7 +1859,7 @@ public:
     QVariantMap *resultMap;
 };
 
-QVariantMap UIBridge::extKeyAccList() {
+QVariantMap UIProcBridge::extKeyAccList() {
     QVariantMap result;
 
     GUIListExtCallback extKeys(&result, 10 );
@@ -1875,7 +1876,7 @@ QVariantMap UIBridge::extKeyAccList() {
     return result;
 }
 
-QVariantMap UIBridge::extKeyList() {
+QVariantMap UIProcBridge::extKeyList() {
     QVariantMap result;
 
     GUIListExtCallback extKeys(&result, 10 );
@@ -1888,7 +1889,7 @@ QVariantMap UIBridge::extKeyList() {
     return result;
 }
 
-QVariantMap UIBridge::extKeyImport(QString inKey, QString inLabel, bool fBip44, int64_t nCreateTime)
+QVariantMap UIProcBridge::extKeyImport(QString inKey, QString inLabel, bool fBip44, int64_t nCreateTime)
 {
     QVariantMap result;
     std::string sInKey = inKey.toStdString();
@@ -1978,7 +1979,7 @@ QVariantMap UIBridge::extKeyImport(QString inKey, QString inLabel, bool fBip44, 
     return result;
 }
 
-QVariantMap UIBridge::extKeySetDefault(QString extKeyID)
+QVariantMap UIProcBridge::extKeySetDefault(QString extKeyID)
 {
     QVariantMap result;
 
@@ -2042,7 +2043,7 @@ QVariantMap UIBridge::extKeySetDefault(QString extKeyID)
     return result;
 }
 
-QVariantMap UIBridge::extKeySetMaster(QString extKeyID)
+QVariantMap UIProcBridge::extKeySetMaster(QString extKeyID)
 {
     QVariantMap result;
     std::string sInKey = extKeyID.toStdString();
@@ -2102,7 +2103,7 @@ QVariantMap UIBridge::extKeySetMaster(QString extKeyID)
     return result;
 }
 
-QVariantMap UIBridge::extKeySetActive(QString extKeyID, QString isActive)
+QVariantMap UIProcBridge::extKeySetActive(QString extKeyID, QString isActive)
 {
     QVariantMap result;
     std::string sInKey = extKeyID.toStdString();

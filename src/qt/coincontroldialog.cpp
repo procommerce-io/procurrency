@@ -1,7 +1,7 @@
 #include "coincontroldialog.h"
 #include "ui_coincontroldialog.h"
 
-#include "bridge.h"
+#include "procbridge.h"
 
 #include "init.h"
 #include "bitcoinunits.h"
@@ -412,7 +412,7 @@ QString CoinControlDialog::getPriorityLabel(double dPriority)
     else ui->labelLocked->setVisible(false);
 }*/
 
-void CoinControlDialog::updateLabels(WalletModel *model, QDialog *dialog, UIBridge *bridge)
+void CoinControlDialog::updateLabels(WalletModel *model, QDialog *dialog, UIProcBridge *procbridge)
 {
     if (!model) return;
 
@@ -525,7 +525,7 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog *dialog, UIBrid
 
     if(dialog == 0)
     {
-        bridge->updateCoinControlLabels(nQuantity, nAmount, nPayFee, nAfterFee, nBytes, sPriorityLabel, (fLowOutput ? (fDust ? tr("DUST") : tr("yes")) : tr("no")), nChange);
+        procbridge->updateCoinControlLabels(nQuantity, nAmount, nPayFee, nAfterFee, nBytes, sPriorityLabel, (fLowOutput ? (fDust ? tr("DUST") : tr("yes")) : tr("no")), nChange);
     } else
     {
         // actually update labels

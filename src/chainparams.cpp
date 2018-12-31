@@ -40,8 +40,8 @@ int64_t CChainParams::GetProofOfWorkReward(int nHeight, int64_t nFees) const
     return nSubsidy + nFees;
 }
 
-static const int YEARLY_BLOCKCOUNT =  525600; // 1440 * 365
-static const int YEARLY_BLOCKCOUNT_2 =  788400; //120s (1440 * 365) + (720 * 365)
+//static const int YEARLY_BLOCKCOUNT =  525600; // 1440 * 365 //del
+static const int YEARLY_BLOCKCOUNT =  899790; //
 // miner's coin stake reward based on coin age spent (coin-days)
 int64_t CChainParams::GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64_t nFees) const
 {
@@ -51,10 +51,6 @@ int64_t CChainParams::GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64
 	if(nHeight < (YEARLY_BLOCKCOUNT))
     {
         nSubsidy = 15 * COIN;   // 
-    }
-	else if(nHeight < (YEARLY_BLOCKCOUNT_2))
-	{		
-        nSubsidy = 10 * COIN;
     }
 	else
 	{

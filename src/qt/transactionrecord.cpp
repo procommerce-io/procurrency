@@ -7,7 +7,7 @@
 #endif
 #include "base58.h"
 
-#include "gui.h"
+#include "procgui.h"
 
 /* Return positive answer if transaction should be shown in list.
  */
@@ -24,22 +24,22 @@ QString TransactionRecord::getTypeLabel(const int &type)
     switch(type)
     {
     case RecvWithAddress:
-        return GUI::tr("Received with");
+        return ProcGUI::tr("Received with");
     case RecvFromOther:
-        return GUI::tr("Received from");
+        return ProcGUI::tr("Received from");
     case SendToAddress:
     case SendToOther:
-        return GUI::tr("Sent to");
+        return ProcGUI::tr("Sent to");
     case SendToSelf:
-        return GUI::tr("Payment to yourself");
+        return ProcGUI::tr("Payment to yourself");
     case Generated:
-        return GUI::tr("Mined");
+        return ProcGUI::tr("Mined");
     case RecvToken:
-        return GUI::tr("Received Token");
+        return ProcGUI::tr("Received Token");
     case SendToken:
-        return GUI::tr("Sent Token");
+        return ProcGUI::tr("Sent Token");
     case Other:
-        return GUI::tr("Other");
+        return ProcGUI::tr("Other");
     default:
         return "";
     }

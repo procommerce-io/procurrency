@@ -58,7 +58,7 @@ function updateValue(element) {
 
     address = address.data("value") ? address.data("value") : address.text();
 
-    element.html('<input class="newval" type="text" onchange="bridge.updateAddressLabel(\'' + address + '\', this.value);" value="' + value + '" size=60 />');
+    element.html('<input class="newval" type="text" onchange="procbridge.updateAddressLabel(\'' + address + '\', this.value);" value="' + value + '" size=60 />');
 
     $(".newval").focus();
     $(".newval").on("contextmenu", function(e) {
@@ -124,8 +124,8 @@ $(function() {
     // Change page handler
     $("#navitems a").on("click", changePage);
 
-    if(bridge)
-        $("[href='#about']").on("click", function() {bridge.userAction(['aboutClicked'])});
+    if(procbridge)
+        $("[href='#about']").on("click", function() {procbridge.userAction(['aboutClicked'])});
 
     overviewPage.init();
     sendPageInit();
@@ -260,21 +260,21 @@ function tooltip (event) {
 
 
 function connectSignals() {
-    bridge.emitPaste.connect(this, pasteValue);
+    procbridge.emitPaste.connect(this, pasteValue);
 
-    bridge.emitTransactions.connect(this, appendTransactions);
-    bridge.emitAddresses.connect(this, appendAddresses);
-    bridge.emitMessages.connect(this, appendMessages);
-    bridge.emitMessage.connect(this,  appendMessage);
+    procbridge.emitTransactions.connect(this, appendTransactions);
+    procbridge.emitAddresses.connect(this, appendAddresses);
+    procbridge.emitMessages.connect(this, appendMessages);
+    procbridge.emitMessage.connect(this,  appendMessage);
 
-    bridge.emitCoinControlUpdate.connect(this, updateCoinControlInfo);
+    procbridge.emitCoinControlUpdate.connect(this, updateCoinControlInfo);
 
-    bridge.emitAddressBookReturn.connect(this, addressBookReturn);
+    procbridge.emitAddressBookReturn.connect(this, addressBookReturn);
 
-    bridge.triggerElement.connect(this, triggerElement);
+    procbridge.triggerElement.connect(this, triggerElement);
 
-    bridge.emitReceipient.connect(this, addRecipientDetail);
-    bridge.networkAlert.connect(this, networkAlert);
+    procbridge.emitReceipient.connect(this, addRecipientDetail);
+    procbridge.networkAlert.connect(this, networkAlert);
 
     optionsModel.displayUnitChanged.connect(unit, "setType");
     optionsModel.reserveBalanceChanged.connect(overviewPage, "updateReserved");
@@ -327,7 +327,7 @@ function openAddressBook(field, label, sending)
     addressLookup = field;
     addressLabel  = label;
 
-    bridge.openAddressBook(sending);
+    procbridge.openAddressBook(sending);
 }
 
 function addressBookReturn(address, label)
@@ -345,7 +345,7 @@ function pasteValue(value) {
 function paste(field)
 {
     pasteTo = field;
-    bridge.paste();
+    procbridge.paste();
     if (pasteTo.indexOf("#pay_to") == 0
         || pasteTo == '#change_address')
         base58.check(pasteTo);
@@ -367,7 +367,7 @@ function copy(field, attribute)
             value = $(field).attr(attribute);
     }
 
-    bridge.copy(value);
+    procbridge.copy(value);
 }
 
 function networkAlert(alert) {
@@ -560,7 +560,7 @@ var overviewPage = {
                 name: 'Backup&nbsp;Wallet...',
                 fa: 'fa-save vred fa-fw font-20px',
                 fun: function () {
-                   bridge.userAction(['backupWallet']);
+                   procbridge.userAction(['backupWallet']);
                 }
                 }, /*
                 {
@@ -589,7 +589,7 @@ var overviewPage = {
                     name: 'Exit',
                     fa: 'fa-times vred fa-fw font-20px',
                     fun: function () {
-                       bridge.userAction(['close']);
+                       procbridge.userAction(['close']);
                     }
                 }];
 
@@ -600,7 +600,7 @@ var overviewPage = {
                      name: 'Encrypt&nbsp;Wallet...',
                      fa: 'fa-lock vred fa-fw font-20px',
                      fun: function () {
-                        bridge.userAction(['encryptWallet']);
+                        procbridge.userAction(['encryptWallet']);
                      }
                  },
                  {
@@ -608,7 +608,7 @@ var overviewPage = {
                      name: 'Change&nbsp;Passphrase...',
                      fa: 'fa-key vred fa-fw font-20px',
                      fun: function () {
-                        bridge.userAction(['changePassphrase']);
+                        procbridge.userAction(['changePassphrase']);
                      }
                  },
                  {
@@ -616,7 +616,7 @@ var overviewPage = {
                      name: 'Toggle&nbsp;Lock...',
                      fa: 'fa-unlock vred pad fa-fw font-20px',
                      fun: function () {
-                        bridge.userAction(['toggleLock']);
+                        procbridge.userAction(['toggleLock']);
                      }
                  },
                  {
@@ -639,7 +639,7 @@ var overviewPage = {
                      fa: 'fa-save vred fa-fw font-20px',
                      fun: function () {
                         //$("#navitems [href=#showBackups]").click();
-						bridge.userAction(['showBackups']);
+						procbridge.userAction(['showBackups']);
 						//$('#showBackups').click();
                      }
                  }];
@@ -650,14 +650,14 @@ var overviewPage = {
                      name: 'Debug&nbsp;Window...',
                      fa: 'fa-bug vred fa-fw font-20px',
                      fun: function () {
-                        bridge.userAction(['debugClicked']);
+                        procbridge.userAction(['debugClicked']);
                      }
                  },
                  {
                      name: ' About&nbsp;ProCurrency...',
                      img: 'qrc:///icons/procurrency',
                      fun: function () {
-                        bridge.userAction(['aboutClicked']);
+                        procbridge.userAction(['aboutClicked']);
                      }
                  },
                  {
@@ -665,7 +665,7 @@ var overviewPage = {
 					 img: 'qrc:///icons/qtlogo',
                      //fa: 'fa-question vred fa-fw font-20px',
                      fun: function () {
-                        bridge.userAction(['aboutQtClicked']);
+                        procbridge.userAction(['aboutQtClicked']);
                      }
                  }];
 
@@ -807,7 +807,7 @@ var overviewPage = {
         });*/
     },
     clientInfo: function() {
-        $('#version').text(bridge.info.build.replace(/\-[\w\d]*$/, ''));
+        $('#version').text(procbridge.info.build.replace(/\-[\w\d]*$/, ''));
     },
     encryptionStatusChanged: function(status) {
         switch(status)
@@ -824,7 +824,7 @@ var optionsPage = {
     },
 
     update: function() {
-        var options = bridge.info.options;
+        var options = procbridge.info.options;
         $("#options-ok,#options-apply").addClass("disabled");
 
         for(var option in options)
@@ -892,7 +892,7 @@ var optionsPage = {
         }
     },
     save: function() {
-        var options = bridge.info.options,
+        var options = procbridge.info.options,
             changed = {};
 
         for(var option in options)
@@ -920,7 +920,7 @@ var optionsPage = {
 
         if(!$.isEmptyObject(changed))
         {
-            bridge.userAction({'optionsChanged': changed});
+            procbridge.userAction({'optionsChanged': changed});
             optionsPage.update();
 
             if(changed.hasOwnProperty('AutoRingSize'))
@@ -946,7 +946,7 @@ function addRecipient() {
         +  '<div id="recipient[count]" class="recipient"> \
             <div class="flex-right"> \
                 <label for="pay_to[count]" class="recipient">Pay To:</label> \
-                <input id="pay_to[count]" class="pay_to input_box" data-title="The address to send the payment to  (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)" placeholder="Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)" maxlength="128" oninput="base58.check(this);" onchange="$(\'#label[count]\').val(bridge.getAddressLabel(this.value));"/> \
+                <input id="pay_to[count]" class="pay_to input_box" data-title="The address to send the payment to  (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)" placeholder="Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)" maxlength="128" oninput="base58.check(this);" onchange="$(\'#label[count]\').val(procbridge.getAddressLabel(this.value));"/> \
                 <a id="address_lookup[count]" class="button is-inverse has-fixed-icon" data-title="Choose from address book" style="margin-right:10px; margin-left:10px; height:43px; width:43px;" href="#address-lookup-modal" onclick="returnto=\'pay_to[count]\,label[count]\';prepAddressLookup(false); " ><i class="fa fa-book"></i></a> \
                 <a class="button is-inverse has-fixed-icon" data-title="Paste address from clipboard" style="margin-right:10px; height:43px; width:43px;" onclick="paste(\'#pay_to[count]\')"><i class="fa fa-files-o"></i></a> \
                 <a class="button is-inverse has-fixed-icon" data-title="Remove this recipient" style="height:43px; width:43px;" onclick="if($(\'div.recipient\').length == 1) clearRecipients(); else {var recipient=$(\'#recipient[count]\');if(recipient.next(\'hr\').remove().length==0)recipient.prev(\'hr\').remove();$(\'#recipient[count]\').remove();resizeFooter();}"><i class="fa fa-times"></i></a> \
@@ -980,7 +980,7 @@ function addRecipient() {
         // Addressbook Modal
         $("#addressbook"+(recipients-1).toString()).leanModal({ top : 10, left: 5, overlay : 0.5, closeButton: ".modal_close" });
 
-    bridge.userAction(['clearRecipients']);
+    procbridge.userAction(['clearRecipients']);
 }
 
 function clearRecipients() {
@@ -1006,7 +1006,7 @@ function changeTxnType()
 
     if (type > 1)
     {
-        $("#tx_ringsize,#suggest_ring_size")[bridge.info.options.AutoRingSize == true ? 'hide' : 'show']();
+        $("#tx_ringsize,#suggest_ring_size")[procbridge.info.options.AutoRingSize == true ? 'hide' : 'show']();
         $("#coincontrol,#spend_proc").hide();
         $("#spend_token").show();
         toggleCoinControl(false);
@@ -1024,8 +1024,8 @@ function suggestRingSize()
 {
 	//chainDataPage.updateAnonOutputs();
 	
-    var minsize = bridge.info.options.MinRingSize||3,
-        maxsize = bridge.info.options.MaxRingSize||50;
+    var minsize = procbridge.info.options.MinRingSize||3,
+        maxsize = procbridge.info.options.MaxRingSize||50;
 
     function mature(value, min_owned) {
         if(min_owned == undefined || !$.isNumeric(min_owned))
@@ -1130,7 +1130,7 @@ function updateCoinControl() {
     for(var i=0;i<recipients;i++)
         amount += unit.parse($("#amount"+i).val());
 
-    bridge.updateCoinControlAmount(amount);
+    procbridge.updateCoinControlAmount(amount);
 }
 
 function updateCoinControlInfo(quantity, amount, fee, afterfee, bytes, priority, low, change)
@@ -1183,27 +1183,27 @@ var invalid = function(el, valid) {
 }
 
 function sendCoins() {
-    bridge.userAction(['clearRecipients']);
+    procbridge.userAction(['clearRecipients']);
 
-    if(bridge.info.options.AutoRingSize && $("#txn_type").val() > 1)
+    if(procbridge.info.options.AutoRingSize && $("#txn_type").val() > 1)
         suggestRingSize();
 
     for(var i=0;i<recipients;i++) {
         var el = $("#pay_to"+i);
         var valid = true;
 
-        valid = invalid(el, bridge.validateAddress(el.val()));
+        valid = invalid(el, procbridge.validateAddress(el.val()));
 
         el = $("#amount"+i);
 
         if(unit.parse(el.val()) == 0 && !invalid(el))
             valid = false;
 
-        if(!valid || !bridge.addRecipient($("#pay_to"+i).val(), $("#label"+i).val(), $("#narration"+i).val(), unit.parse($("#amount"+i).val(), $("#unit"+i).val()), $("#txn_type").val(), $("#ring_size").val()))
+        if(!valid || !procbridge.addRecipient($("#pay_to"+i).val(), $("#label"+i).val(), $("#narration"+i).val(), unit.parse($("#amount"+i).val(), $("#unit"+i).val()), $("#txn_type").val(), $("#ring_size").val()))
             return false;
     }
 
-    if(bridge.sendCoins($("#coincontrol_enabled").css("display") != "none", $("#change_address").val()))
+    if(procbridge.sendCoins($("#coincontrol_enabled").css("display") != "none", $("#change_address").val()))
         clearRecipients();
 }
 
@@ -1281,7 +1281,7 @@ function clearRecvAddress()
 
 function addAddress()
 {
-    newAdd = bridge.newAddress($("#new-address-label").val(), $("#new-addresstype").val());
+    newAdd = procbridge.newAddress($("#new-address-label").val(), $("#new-addresstype").val());
     
     //TODO: Highlight address
     $("#add-address-modal .modal_close").click();
@@ -1303,11 +1303,11 @@ function addSendAddress()
     sendAddress = $("#new-send-address").val();
     
     var addType = 0; // not used
-    result = bridge.newAddress(sendLabel, addType, sendAddress, true);
+    result = procbridge.newAddress(sendLabel, addType, sendAddress, true);
     
     if (result == "")
     {
-        var errorMsg = bridge.lastAddressError();
+        var errorMsg = procbridge.lastAddressError();
         $("#new-send-address-error").text("Error: " + errorMsg);
         $("#new-send-address").addClass('inputError');
     } else
@@ -1350,7 +1350,7 @@ function addressBookInit() {
             img: 'qrc:///icons/delete',
             fun: function () {
                 var addr=$('#addressbook .footable .selected .address');
-                if(bridge.deleteAddress(addr.text()))
+                if(procbridge.deleteAddress(addr.text()))
                     addr.closest('tr').remove();
 
                 resizeFooter();
@@ -1367,7 +1367,7 @@ function addressBookInit() {
             name: 'Verify&nbsp;Message',
             img: 'qrc:///icons/edit',
             fun: function () {
-                bridge.userAction({'verifyMessage': $('#addressbook .footable .selected .address').text()});
+                procbridge.userAction({'verifyMessage': $('#addressbook .footable .selected .address').text()});
             }
         }];
 
@@ -1688,7 +1688,7 @@ function bindTransactionTableEvents() {
         $(this).attr("href", "#transaction-info-modal");
 
         $(this).leanModal({ top : 10, overlay : 0.5, closeButton: "#transaction-info-modal .modal_close" });
-        $("#transaction-info").html(bridge.transactionDetails($(this).attr("id")));
+        $("#transaction-info").html(procbridge.transactionDetails($(this).attr("id")));
         $(this).click();
 
         $(this).off('click');
@@ -1954,7 +1954,7 @@ function appendContact (key, newcontact) {
             for(var i=0;i<contact.messages.length;i++)
             {
                 message = contact.messages[i];
-                if(message.read == false && bridge.markMessageAsRead(message.id))
+                if(message.read == false && procbridge.markMessageAsRead(message.id))
                 {
                     var message_count = $("#message-count"),
                         message_count_val = parseInt(message_count.text())-1;
@@ -2045,7 +2045,7 @@ function newConversation() {
 
 function sendMessage() {
     $("#remove-on-send").remove();
-    if(bridge.sendMessage($("#message-to-address").val(), $("#message-text").val(), $("#message-from-address").val()))
+    if(procbridge.sendMessage($("#message-to-address").val(), $("#message-text").val(), $("#message-from-address").val()))
         $("#message-text").val("");
 }
 
@@ -2061,7 +2061,7 @@ function deleteMessages(key, messageid) {
     for(var i=0;i<contact.messages.length;i++) {
 
         if(messageid == undefined) {
-            if(bridge.deleteMessage(contact.messages[i].id))
+            if(procbridge.deleteMessage(contact.messages[i].id))
             {
                 $("#"+contact.messages[i].id).remove();
 
@@ -2083,7 +2083,7 @@ function deleteMessages(key, messageid) {
         }
         else
         if(contact.messages[i].id == messageid)
-            if(bridge.deleteMessage(messageid)) {
+            if(procbridge.deleteMessage(messageid)) {
                 $("#"+messageid).remove();
 
                 if(contact.messages[i].type=="R" && contact.messages[i].read == false)
@@ -2122,7 +2122,7 @@ function signMessage() {
     address = $('#sign-address').val().trim();
     message = $('#sign-message').val().trim();
 
-    var result = bridge.signMessage(address, message);
+    var result = procbridge.signMessage(address, message);
 
     error = result.error_msg;
     signature = result.signed_signature;
@@ -2150,7 +2150,7 @@ function verifyMessage() {
     message = $('#verify-message').val().trim();
     signature = $('#verify-signature').val().trim();
     
-    var result = bridge.verifyMessage(address, message, signature);
+    var result = procbridge.verifyMessage(address, message, signature);
 
     error = result.error_msg;
     
@@ -2250,7 +2250,7 @@ var chainDataPage = {
         });
     },
     updateAnonOutputs: function() {
-        chainDataPage.anonOutputs = bridge.listAnonOutputs();
+        chainDataPage.anonOutputs = procbridge.listAnonOutputs();
         var tbody = $('#chaindata .footable tbody');
         tbody.html('');
 
@@ -2285,7 +2285,7 @@ var blockExplorerPage =
         }
         else
         {
-            blockExplorerPage.foundBlock = bridge.findBlock(searchID);
+            blockExplorerPage.foundBlock = procbridge.findBlock(searchID);
 
             if(blockExplorerPage.foundBlock.error_msg != '' )
             { 
@@ -2314,7 +2314,7 @@ var blockExplorerPage =
     },
     updateLatestBlocks: function() 
     {
-        blockExplorerPage.latestBlocks = bridge.listLatestBlocks();
+        blockExplorerPage.latestBlocks = procbridge.listLatestBlocks();
         var txnTable = $('#block-txs-table  > tbody');
         txnTable.html('');
         $("#block-txs-table").addClass("none");
@@ -2340,7 +2340,7 @@ var blockExplorerPage =
                 { 
                     $(this).addClass("selected").siblings("tr").removeClass("selected"); 
                     var blkHash = $(this).attr("data-value").trim();
-                    blockExplorerPage.blkTxns = bridge.listTransactionsForBlock(blkHash);
+                    blockExplorerPage.blkTxns = procbridge.listTransactionsForBlock(blkHash);
                     var txnTable = $('#block-txs-table  > tbody');
                     txnTable.html('');
                     for (value in blockExplorerPage.blkTxns)
@@ -2364,7 +2364,7 @@ var blockExplorerPage =
 
                             $(this).leanModal({ top : 10, overlay : 0.5, closeButton: "#blkexp-txn-modal .modal_close" });
 
-                            selectedTxn = bridge.txnDetails(blkHash , $(this).attr("data-value").trim());
+                            selectedTxn = procbridge.txnDetails(blkHash , $(this).attr("data-value").trim());
 
                             if(selectedTxn.error_msg == '')
                             {
@@ -2433,7 +2433,7 @@ var blockExplorerPage =
 
                 $(this).leanModal({ top : 10, overlay : 0.5, closeButton: "#block-info-modal .modal_close" });
 
-                selectedBlock = bridge.blockDetails($(this).attr("data-value").trim()) ;
+                selectedBlock = procbridge.blockDetails($(this).attr("data-value").trim()) ;
 
                 if(selectedBlock)
                 {
@@ -2472,7 +2472,7 @@ var keyManagementPage = {
     },
 
     newMnemonic: function () {
-        var result = bridge.getNewMnemonic( $("#new-account-passphrase").val(), $("#new-account-language").val() );
+        var result = procbridge.getNewMnemonic( $("#new-account-passphrase").val(), $("#new-account-language").val() );
         var error  = result.error_msg;
         var mnemonic = result.mnemonic;
 
@@ -2515,7 +2515,7 @@ var keyManagementPage = {
             })
     },
     updateAccountList: function() {
-        keyManagementPage.accountList = bridge.extKeyAccList();
+        keyManagementPage.accountList = procbridge.extKeyAccList();
 
         var tbody = $('#extkey-account-table  > tbody');
         tbody.html('');
@@ -2544,7 +2544,7 @@ var keyManagementPage = {
             })   
     },
     updateKeyList: function() {
-        keyManagementPage.keyList = bridge.extKeyList();
+        keyManagementPage.keyList = procbridge.extKeyList();
 
         var tbody = $('#extkey-table  > tbody');
         tbody.html('');
@@ -2563,7 +2563,7 @@ var keyManagementPage = {
     },
     newKey: function()
     {
-        result = bridge.importFromMnemonic($('#new-key-mnemonic').val().trim(),
+        result = procbridge.importFromMnemonic($('#new-key-mnemonic').val().trim(),
                                            $('#new-account-passphrase').val().trim(),
                                            $('#new-account-label').val().trim(),
                                            $('#new-account-bip44').prop("checked"));
@@ -2576,7 +2576,7 @@ var keyManagementPage = {
     },
     recoverKey: function()
     {
-        result = bridge.importFromMnemonic($("#recover-key-mnemonic").val().trim(),
+        result = procbridge.importFromMnemonic($("#recover-key-mnemonic").val().trim(),
                                            $("#recover-passphrase").val().trim(),
                                            $("#recover-account-label").val().trim(),
                                            $("#recover-bip44").prop("checked"),
@@ -2601,7 +2601,7 @@ var keyManagementPage = {
         selected = $("#extkey-table tr.selected").attr("data-value").trim();
         if(selected != undefined && selected != "")
         {
-            result = bridge.extKeySetMaster(selected);
+            result = procbridge.extKeySetMaster(selected);
             if(result.error_msg != '' )
             { 
                 alert(result.error_msg);
@@ -2631,7 +2631,7 @@ var keyManagementPage = {
         selected = $("#extkey-account-table tr.selected").attr("data-value").trim();
         if(selected != undefined && selected != "")
         {
-            result = bridge.extKeySetDefault(selected);
+            result = procbridge.extKeySetDefault(selected);
             if(result.error_msg != '' )
             { 
                 alert(result.error_msg);
@@ -2675,7 +2675,7 @@ var keyManagementPage = {
 
         if(selected != undefined && selected != "")
         {
-            result = bridge.extKeySetActive(selected, active);
+            result = procbridge.extKeySetActive(selected, active);
             if(result.error_msg != '' )
             { 
                 alert(result.error_msg);

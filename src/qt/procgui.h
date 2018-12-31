@@ -2,8 +2,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file license.txt or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef GUI_H
-#define GUI_H
+#ifndef ProcGUI_H
+#define ProcGUI_H
 
 #include <QMainWindow>
 #include <QWebView>
@@ -13,7 +13,7 @@
 
 #include <QModelIndex>
 
-#include "bridge.h"
+#include "procbridge.h"
 #include "rpcconsole.h"
 
 #include <stdint.h>
@@ -35,12 +35,12 @@ QT_END_NAMESPACE
   ProCurrency GUI main class. This class represents the main window of the ProCurrency UI. It communicates with both the client and
   wallet models to give the user an up-to-date view of the current core state.
 */
-class GUI : public QMainWindow
+class ProcGUI : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit GUI(QWidget *parent = 0);
-    ~GUI();
+    explicit ProcGUI(QWidget *parent = 0);
+    ~ProcGUI();
 
     /** Set the client model.
         The client model represents the part of the core that communicates with the P2P network, and is wallet-agnostic.
@@ -68,7 +68,7 @@ private:
     QWebView *webView;
     QWebFrame *documentFrame;
 
-    UIBridge *bridge;
+    UIProcBridge *procbridge;
 
     ClientModel *clientModel;
     WalletModel *walletModel;
@@ -104,7 +104,7 @@ private:
     /** Create system tray (notification) icon */
     void createTrayIcon();
 
-    friend class UIBridge;
+    friend class UIProcBridge;
 
 private slots:
     /** Page finished loading */

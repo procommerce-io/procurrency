@@ -353,7 +353,7 @@ HEADERS += \
     src/qt/scicon.h \
     src/qt/trafficgraphwidget.h \
     src/qt/messagemodel.h \
-    src/qt/gui.h \
+    src/qt/procgui.h \
 	src/pubkey.h \
 	src/limitedmap.h \
 	src/support/cleanse.h \
@@ -364,7 +364,7 @@ HEADERS += \
     src/crypto/sha1.h \
     src/crypto/sha256.h \
     src/crypto/sha512.h \
-    src/qt/bridge.h
+    src/qt/procbridge.h
 
 SOURCES += \
     src/alert.cpp \
@@ -438,7 +438,7 @@ SOURCES += \
     src/qt/scicon.cpp \
     src/qt/trafficgraphwidget.cpp \
     src/qt/messagemodel.cpp \
-    src/qt/gui.cpp \
+    src/qt/procgui.cpp \
     src/qt/procurrency.cpp \
 	src/pubkey.cpp \
 	src/allocators.cpp \
@@ -450,7 +450,7 @@ SOURCES += \
     src/crypto/sha1.cpp \
     src/crypto/sha256.cpp \
     src/crypto/sha512.cpp \
-    src/qt/bridge.cpp
+    src/qt/procbridge.cpp
 
 FORMS += \
     src/qt/forms/coincontroldialog.ui \
