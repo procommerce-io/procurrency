@@ -1283,8 +1283,8 @@ bool CDarksendPool::SignFinalTransaction(CTransaction& finalTransactionNew, CNod
 
             if(mine >= 0){ //might have to do this one input at a time?
                 int foundOutputs = 0;
-                CAmount nValue1 = 0;
-                CAmount nValue2 = 0;
+                qint64 nValue1 = 0;
+                qint64 nValue2 = 0;
 
                 for(unsigned int i = 0; i < finalTransaction.vout.size(); i++){
                     BOOST_FOREACH(const CTxOut& o, e.vout) {
@@ -1423,27 +1423,27 @@ bool CDarksendPool::DoAutomaticDenominating(bool fDryRun)
 
     // ** find the coins we'll use
     std::vector<CTxIn> vCoins;
-    CAmount nValueMin = CENT;
-    CAmount nValueIn = 0;
+    qint64 nValueMin = CENT;
+    qint64 nValueIn = 0;
 
-    CAmount nOnlyDenominatedBalance;
-    CAmount nBalanceNeedsDenominated;
+    qint64 nOnlyDenominatedBalance;
+    qint64 nBalanceNeedsDenominated;
 
     // should not be less than fees in DARKSEND_COLLATERAL + few (lets say 5) smallest denoms
-    CAmount nLowestDenom = DARKSEND_COLLATERAL + darkSendDenominations[darkSendDenominations.size() - 1]*5;
+    qint64 nLowestDenom = DARKSEND_COLLATERAL + darkSendDenominations[darkSendDenominations.size() - 1]*5;
 
     // if there are no DS collateral inputs yet
     if(!pwalletMain->HasCollateralInputs())
         // should have some additional amount for them
         nLowestDenom += DARKSEND_COLLATERAL*4;
 
-    CAmount nBalanceNeedsAnonymized = nAnonymizeProcAmount*COIN - pwalletMain->GetAnonymizedBalance();
+    qint64 nBalanceNeedsAnonymized = nAnonymizeProcAmount*COIN - pwalletMain->GetAnonymizedBalance();
 
     // if balanceNeedsAnonymized is more than pool max, take the pool max
     if(nBalanceNeedsAnonymized > DARKSEND_POOL_MAX) nBalanceNeedsAnonymized = DARKSEND_POOL_MAX;
 
     // if balanceNeedsAnonymized is more than non-anonymized, take non-anonymized
-    CAmount nAnonymizableBalance = pwalletMain->GetAnonymizableBalance();
+    qint64 nAnonymizableBalance = pwalletMain->GetAnonymizableBalance();
     if(nBalanceNeedsAnonymized > nAnonymizableBalance) nBalanceNeedsAnonymized = nAnonymizableBalance;
 
     if(nBalanceNeedsAnonymized < nLowestDenom)
@@ -1631,7 +1631,7 @@ bool CDarksendPool::DoAutomaticDenominating(bool fDryRun)
                 pSubmittedToMasternode = pmn;
                 vecMasternodesUsed.push_back(pmn->vin);
 
-                std::vector<CAmount> vecAmounts;
+                std::vector<qint64> vecAmounts;
                 pwalletMain->ConvertList(vCoins, vecAmounts);
                 // try to get a single random denom out of vecAmounts
                 while(sessionDenom == 0)
