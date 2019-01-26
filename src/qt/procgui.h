@@ -23,6 +23,7 @@ class ClientModel;
 class WalletModel;
 class MessageModel;
 class Notificator;
+class MultisigDialog;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -75,6 +76,7 @@ private:
     MessageModel *messageModel;
 
     QMenuBar *appMenuBar;
+	MultisigDialog *multisigPage;
 
     QAction *quitAction;
     QAction *aboutAction;
@@ -89,6 +91,7 @@ private:
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
 	QAction *showBackupsAction;
+	QAction *multisigAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -136,6 +139,8 @@ private slots:
     */
     void askFee(qint64 nFeeRequired, bool *payFee);
     void handleURI(QString strURI);
+	
+	void gotoMultisigPage();
 
 #ifndef Q_OS_MAC
     /** Handle tray icon clicked */

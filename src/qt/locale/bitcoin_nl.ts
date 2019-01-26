@@ -1757,8 +1757,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location filename="../sendcoinsdialog.cpp" line="-173"/>
-        <source>Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Voeg een ProCurrency adres in (bijv. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Voeg een ProCurrency adres in (bijv. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -1901,8 +1901,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>The address to send the payment to  (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Het adres om naar te betalen (bijv. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>The address to send the payment to  (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Het adres om naar te betalen (bijv. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1931,8 +1931,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="+1"/>
-        <source>Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Voeg een ProCurrency adres in (bijv. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Voeg een ProCurrency adres in (bijv. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
 </context>
 <context>
@@ -1955,8 +1955,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>The address to sign the message with (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Het adres om het bericht te ondertekenen (bijv. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC) </translation>
+        <source>The address to sign the message with (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Het adres om het bericht te ondertekenen (bijv. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC) </translation>
     </message>
     <message>
         <location line="+10"/>
@@ -2019,8 +2019,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+21"/>
-        <source>The address the message was signed with (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Het adres van het bericht is ondertekend met (bijv. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>The address the message was signed with (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Het adres van het bericht is ondertekend met (bijv. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="+40"/>
@@ -2035,8 +2035,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     <message>
         <location filename="../signverifymessagedialog.cpp" line="+27"/>
         <location line="+3"/>
-        <source>Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Voeg een ProCurrency adres in (bijv. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Voeg een ProCurrency adres in (bijv. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="-2"/>

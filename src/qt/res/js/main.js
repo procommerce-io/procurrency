@@ -585,6 +585,14 @@ var overviewPage = {
                         $('#verify-message-button').click();
                     }
                 },
+				{
+                     name: 'Multisig',
+                     //fa: 'fa-save vred fa-fw font-20px',
+					 img: 'qrc:///icons/multisig',
+                     fun: function () {
+						procbridge.userAction(['multisig']);
+                     }
+                },
                 {
                     name: 'Exit',
                     fa: 'fa-times vred fa-fw font-20px',
@@ -638,9 +646,7 @@ var overviewPage = {
                      name: 'Show AutoBackups',
                      fa: 'fa-save vred fa-fw font-20px',
                      fun: function () {
-                        //$("#navitems [href=#showBackups]").click();
 						procbridge.userAction(['showBackups']);
-						//$('#showBackups').click();
                      }
                  }];
 
@@ -946,7 +952,7 @@ function addRecipient() {
         +  '<div id="recipient[count]" class="recipient"> \
             <div class="flex-right"> \
                 <label for="pay_to[count]" class="recipient">Pay To:</label> \
-                <input id="pay_to[count]" class="pay_to input_box" data-title="The address to send the payment to  (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)" placeholder="Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)" maxlength="128" oninput="base58.check(this);" onchange="$(\'#label[count]\').val(procbridge.getAddressLabel(this.value));"/> \
+                <input id="pay_to[count]" class="pay_to input_box" data-title="The address to send the payment to  (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)" placeholder="Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)" maxlength="128" oninput="base58.check(this);" onchange="$(\'#label[count]\').val(procbridge.getAddressLabel(this.value));"/> \
                 <a id="address_lookup[count]" class="button is-inverse has-fixed-icon" data-title="Choose from address book" style="margin-right:10px; margin-left:10px; height:43px; width:43px;" href="#address-lookup-modal" onclick="returnto=\'pay_to[count]\,label[count]\';prepAddressLookup(false); " ><i class="fa fa-book"></i></a> \
                 <a class="button is-inverse has-fixed-icon" data-title="Paste address from clipboard" style="margin-right:10px; height:43px; width:43px;" onclick="paste(\'#pay_to[count]\')"><i class="fa fa-files-o"></i></a> \
                 <a class="button is-inverse has-fixed-icon" data-title="Remove this recipient" style="height:43px; width:43px;" onclick="if($(\'div.recipient\').length == 1) clearRecipients(); else {var recipient=$(\'#recipient[count]\');if(recipient.next(\'hr\').remove().length==0)recipient.prev(\'hr\').remove();$(\'#recipient[count]\').remove();resizeFooter();}"><i class="fa fa-times"></i></a> \

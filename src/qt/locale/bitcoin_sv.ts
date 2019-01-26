@@ -1759,8 +1759,8 @@ Detta betyder att en avgift på minst %2 krävs.</translation>
     </message>
     <message>
         <location filename="../sendcoinsdialog.cpp" line="-173"/>
-        <source>Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Fyll i en ProCurrency adress (t.ex. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Fyll i en ProCurrency adress (t.ex. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -1903,8 +1903,8 @@ Detta betyder att en avgift på minst %2 krävs.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>The address to send the payment to  (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Adressen att skicka betalningen till  (t.ex. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>The address to send the payment to  (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Adressen att skicka betalningen till  (t.ex. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1933,8 +1933,8 @@ Detta betyder att en avgift på minst %2 krävs.</translation>
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="+1"/>
-        <source>Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Fyll i en ProCurrency adress (t.ex. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Fyll i en ProCurrency adress (t.ex. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
 </context>
 <context>
@@ -1957,8 +1957,8 @@ Detta betyder att en avgift på minst %2 krävs.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>The address to sign the message with (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Adressen att signera meddelandet med (t.ex. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>The address to sign the message with (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Adressen att signera meddelandet med (t.ex. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -2021,8 +2021,8 @@ Detta betyder att en avgift på minst %2 krävs.</translation>
     </message>
     <message>
         <location line="+21"/>
-        <source>The address the message was signed with (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Adressen meddelandet var signerad med (t.ex. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>The address the message was signed with (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Adressen meddelandet var signerad med (t.ex. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="+40"/>
@@ -2037,8 +2037,8 @@ Detta betyder att en avgift på minst %2 krävs.</translation>
     <message>
         <location filename="../signverifymessagedialog.cpp" line="+27"/>
         <location line="+3"/>
-        <source>Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Fyll i en ProCurrency adress (t.ex. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Fyll i en ProCurrency adress (t.ex. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="-2"/>

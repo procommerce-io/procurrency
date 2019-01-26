@@ -14,11 +14,7 @@
 #include "chainparams.h"
 #include "rpcserver.h"
 #include "rpcclient.h"
-#ifndef OTP_ENABLED
-    #include "util.h"
-#else
-    #include "util_otp.h"
-#endif
+#include "util.h"
 
 #include "json/json_spirit_value.h"
 

@@ -1755,8 +1755,8 @@ Tämä tarkoittaa, että ainakin %2 rahansiirtopalkkio tarvitaan.</translation>
     </message>
     <message>
         <location filename="../sendcoinsdialog.cpp" line="-173"/>
-        <source>Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Syötä ProCurrency-osoite (esim. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Syötä ProCurrency-osoite (esim. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -1899,8 +1899,8 @@ Tämä tarkoittaa, että ainakin %2 rahansiirtopalkkio tarvitaan.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>The address to send the payment to  (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Osoite, johon maksu lähetetään (esim. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>The address to send the payment to  (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Osoite, johon maksu lähetetään (esim. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1929,8 +1929,8 @@ Tämä tarkoittaa, että ainakin %2 rahansiirtopalkkio tarvitaan.</translation>
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="+1"/>
-        <source>Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Syötä ProCurrency-osoite (esim. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Syötä ProCurrency-osoite (esim. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
 </context>
 <context>
@@ -1953,8 +1953,8 @@ Tämä tarkoittaa, että ainakin %2 rahansiirtopalkkio tarvitaan.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>The address to sign the message with (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Osoite, jolle viesti kirjataan (esim. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>The address to sign the message with (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Osoite, jolle viesti kirjataan (esim. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -2017,8 +2017,8 @@ Tämä tarkoittaa, että ainakin %2 rahansiirtopalkkio tarvitaan.</translation>
     </message>
     <message>
         <location line="+21"/>
-        <source>The address the message was signed with (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Osoite, jolla viesti on allekirjoitettu (esim. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC) </translation>
+        <source>The address the message was signed with (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Osoite, jolla viesti on allekirjoitettu (esim. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC) </translation>
     </message>
     <message>
         <location line="+40"/>
@@ -2033,8 +2033,8 @@ Tämä tarkoittaa, että ainakin %2 rahansiirtopalkkio tarvitaan.</translation>
     <message>
         <location filename="../signverifymessagedialog.cpp" line="+27"/>
         <location line="+3"/>
-        <source>Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</source>
-        <translation>Syötä ProCurrency-osoite (esim. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)</translation>
+        <source>Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</source>
+        <translation>Syötä ProCurrency-osoite (esim. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)</translation>
     </message>
     <message>
         <location line="-2"/>

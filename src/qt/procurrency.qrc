@@ -45,6 +45,9 @@
 		<file alias="proc_bg">res/icons/proc_bg.png</file>
 		<file alias="sideMenu_bg">res/icons/sideMenu_bg.png</file>
 		<file alias="qtlogo">res/icons/qtlogo.png</file>
+		<file alias="receive">res/icons/receive.png</file>
+		<file alias="send">res/icons/send.png</file>
+		<file alias="multisig">res/icons/multisig.png</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="about">res/images/about.png</file>

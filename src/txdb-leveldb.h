@@ -230,13 +230,13 @@ public:
     bool WriteKeyImage(ec_point& keyImage, CKeyImageSpent& keyImageSpent);
     bool ReadKeyImage(ec_point& keyImage, CKeyImageSpent& keyImageSpent);
     bool EraseKeyImage(ec_point& keyImage);
-    
     bool WriteAnonOutput(CPubKey& pkCoin, CAnonOutput& ao);
     bool ReadAnonOutput(CPubKey& pkCoin, CAnonOutput& ao);
     bool EraseAnonOutput(CPubKey& pkCoin);
-    
     bool EraseRange(const std::string &sPrefix, uint32_t &nAffected);
     
+	bool WriteAddrIndex(uint160 addrHash, uint256 txHash);
+	bool ReadAddrIndex(uint160 addrHash, std::vector<uint256>& txHashes);
     bool ReadTxIndex(uint256 hash, CTxIndex& txindex);
     bool UpdateTxIndex(uint256 hash, const CTxIndex& txindex);
     bool AddTxIndex(const CTransaction& tx, const CDiskTxPos& pos, int nHeight);

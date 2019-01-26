@@ -68,14 +68,46 @@ CTxDB::CTxDB(const char* pszMode)
     }
 
     bool fCreate = strchr(pszMode, 'c');
-    
+
     options = GetOptions();
-    options.create_if_missing = fCreate;
-    //options.filter_policy = leveldb::NewBloomFilterPolicy(10);
-    
+    options.create_if_missing = true;
+    options.filter_policy = leveldb::NewBloomFilterPolicy(10);
+
     init_blockindex(options); // Init directory
     pdb = txdb;
-    
+
+    if (Exists(string("version")))
+    {
+        ReadVersion(nVersion);
+        LogPrintf("Transaction index version is %d\n", nVersion);
+
+        if (nVersion < DATABASE_VERSION)
+        {
+            LogPrintf("Required index version is %d, removing old database\n", DATABASE_VERSION);
+
+            // Leveldb instance destruction
+            delete txdb;
+            txdb = pdb = NULL;
+            delete activeBatch;
+            activeBatch = NULL;
+
+            init_blockindex(options, true); // Remove directory and create new database
+            pdb = txdb;
+
+            bool fTmp = fReadOnly;
+            fReadOnly = false;
+            WriteVersion(DATABASE_VERSION); // Save transaction index version
+            fReadOnly = fTmp;
+        }
+    }
+    else if (fCreate)
+    {
+        bool fTmp = fReadOnly;
+        fReadOnly = false;
+        WriteVersion(DATABASE_VERSION);
+        fReadOnly = fTmp;
+    }
+
     LogPrintf("Opened LevelDB successfully\n");
 }
 
@@ -282,8 +314,34 @@ bool CTxDB::EraseRange(const std::string &sPrefix, uint32_t &nAffected)
     
     return true;
 };
+/*****/
+bool CTxDB::WriteAddrIndex(uint160 addrHash, uint256 txHash)
+{
+    std::vector<uint256> txHashes;
+    if(!ReadAddrIndex(addrHash, txHashes))
+    {
+	txHashes.push_back(txHash);
+        return Write(make_pair(string("adr"), addrHash), txHashes);
+    }
+    else
+    {
+	if(std::find(txHashes.begin(), txHashes.end(), txHash) == txHashes.end()) 
+    	{
+    	    txHashes.push_back(txHash);
+            return Write(make_pair(string("adr"), addrHash), txHashes);
+	}
+	else
+	{
+	    return true; // already have this tx hash
+	}
+    }
+}
 
-
+bool CTxDB::ReadAddrIndex(uint160 addrHash, std::vector<uint256>& txHashes)
+{
+    return Read(make_pair(string("adr"), addrHash), txHashes);
+}
+/*****/
 bool CTxDB::ReadTxIndex(uint256 hash, CTxIndex& txindex)
 {
     txindex.SetNull();

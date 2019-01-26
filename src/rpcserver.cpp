@@ -7,21 +7,13 @@
 
 #include "base58.h"
 #include "init.h"
-#ifndef OTP_ENABLED
-    #include "util.h"
-	#include "sync.h"
-	#include "base58.h"
-	#include "db.h"
-	#include "ui_interface.h"
-    #include "wallet.h"
-#else
-    #include "util_otp.h"
-    #include "sync.h"
-	#include "base58.h"
-	#include "db.h"
-	#include "ui_interface.h"
-    #include "wallet_otp.h"
-#endif
+
+#include "util.h"
+#include "sync.h"
+#include "base58.h"
+#include "db.h"
+#include "ui_interface.h"
+#include "wallet.h"
 
 
 #include <boost/algorithm/string.hpp>
@@ -361,6 +353,7 @@ static const CRPCCommand vRPCCommands[] =
     
     { "sendalert",              &sendalert,              false,     false,     false },
     { "getnetworkinfo",         &getnetworkinfo,         false,     false,     false },
+	{ "searchrawtransactions",  &searchrawtransactions,  false,     false,     false },
     
     
     { "getnewstealthaddress",   &getnewstealthaddress,   false,     false,     false },

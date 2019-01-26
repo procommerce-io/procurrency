@@ -113,15 +113,10 @@ public:
     SendCoinsReturn sendCoinsAnon(const QList<SendCoinsRecipient> &recipients, const CCoinControl *coinControl=NULL);
     
     // Wallet encryption
-#ifndef OTP_ENABLED
     bool setWalletEncrypted(bool encrypted, const SecureString &passphrase);
+	// Passphrase only needed when unlocking
     bool setWalletLocked(bool locked, const SecureString &passPhrase=SecureString());
     bool changePassphrase(const SecureString &oldPass, const SecureString &newPass);
-#else
-    bool setWalletEncryptedOTP(bool encrypted, const SecureString &passphrase, const QByteArray otp_secret, const SecureString &veri_otpcode=SecureString(), const bool otp_enable=false);
-    bool setWalletLockedOTP(bool locked, const SecureString &passPhrase=SecureString(), const SecureString &otpcode=SecureString(), bool stakingOnly=true);
-    bool changePassphraseOTP(const SecureString &oldPass, const SecureString &newPass, const SecureString &otpcode, const QByteArray otp_secret, const SecureString &veri_otpcode, const bool otp_enable);
-#endif
     // Wallet backup
     bool backupWallet(const QString &filename);
 
@@ -154,6 +149,7 @@ public:
     void lockCoin(COutPoint& output);
     void unlockCoin(COutPoint& output);
     void listLockedCoins(std::vector<COutPoint>& vOutpts);
+	CWallet* getWallet();
     
 private:
     CWallet *wallet;

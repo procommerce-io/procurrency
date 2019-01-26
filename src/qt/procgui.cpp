@@ -20,6 +20,7 @@
 #include "wallet.h"
 #include "util.h"
 #include "init.h"
+#include "multisig/multisigdialog.h"
 
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
@@ -107,14 +108,17 @@ ProcGUI::ProcGUI(QWidget *parent):
 
     // Create the tray icon (or setup the dock icon)
     createTrayIcon();
-
+	
+	// multisig dialog
+	multisigPage = new MultisigDialog(this);
+	
     rpcConsole = new RPCConsole(this);
     connect(openRPCConsoleAction, SIGNAL(triggered()), rpcConsole, SLOT(show()));
 	
 	// clicking on automatic backups shows details
     connect(showBackupsAction, SIGNAL(triggered()), rpcConsole, SLOT(showBackups()));
     
-    // prevents an oben debug window from becoming stuck/unusable on client shutdown
+    // prevents an open debug window from becoming stuck/unusable on client shutdown
     connect(quitAction, SIGNAL(triggered()), rpcConsole, SLOT(hide()));
 
     documentFrame = webView->page()->mainFrame();
@@ -209,7 +213,12 @@ void ProcGUI::createActions()
 	
 	showBackupsAction = new QAction(QIcon(":/icons/filesave"), tr("Show Auto&Backups"), this);
     showBackupsAction->setToolTip(tr("Open Auto Backups Folder"));
+	
+	multisigAction = new QAction(QIcon(":/icons/multisig"), tr("Multisig"), this);
 
+	connect(multisigAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(multisigAction, SIGNAL(triggered()), this, SLOT(gotoMultisigPage()));
+	
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), SLOT(aboutClicked()));
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
@@ -237,6 +246,7 @@ void ProcGUI::createMenuBar()
     QMenu *file = appMenuBar->addMenu(tr("&File"));
     file->addAction(backupWalletAction);
     //file->addAction(exportAction);
+	file->addAction(multisigAction);
     file->addSeparator();
     file->addAction(quitAction);
 
@@ -855,6 +865,12 @@ void ProcGUI::changePassphrase()
     AskPassphraseDialog dlg(AskPassphraseDialog::ChangePass, this);
     dlg.setModel(walletModel);
     dlg.exec();
+}
+
+void ProcGUI::gotoMultisigPage()
+{
+    multisigPage->show();
+    multisigPage->setFocus();
 }
 
 void ProcGUI::unlockWallet()

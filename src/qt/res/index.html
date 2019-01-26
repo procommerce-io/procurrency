@@ -57,6 +57,7 @@
             <li class="none"><a href="#keymanagement" onclick="$('#key-options').show(); $('#wizards').hide(); $('#keymanagement-advanced').hide();">Key Management</a></li>
             <li class="none"><a href="#options">Options</a></li>
 			<li class="none"><a href="#showBackups">Show AutoBackups</a></li>
+			<li class="none"><a href="#multisig">Multisig</a></li>
             <!--li><a href="#news">news</a></li   showWizardScreen('key-manage-wizard'); -->
         </ul>
 
@@ -170,7 +171,7 @@
 
             <span style="white-space:nowrap;">
                 <label for="qraddress" class="recipient">Address:</label>
-                <input id="qraddress" class="pay_to input_box" style="width:250px" placeholder="Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)" onchange="showQRCode();" />
+                <input id="qraddress" class="pay_to input_box" style="width:250px" placeholder="Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)" onchange="showQRCode();" />
             </span>
 
             <span style="white-space:nowrap;">
@@ -318,7 +319,7 @@
 
                         <label>Custom change address: </label>
                         <div class="flex-left">
-                            <input id="change_address" data-title="Optional address to receive transaction change" placeholder="Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)" maxlength="128" oninput="base58.check(this);" />
+                            <input id="change_address" data-title="Optional address to receive transaction change" placeholder="Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)" maxlength="128" oninput="base58.check(this);" />
                             <a id="cust-add-lkp" class="button is-inverse has-fixed-icon"  style="margin-right:10px; margin-left:10px; height:43px; width:43px;" href="#address-lookup-modal" onclick="returnto='change_address'; prepAddressLookup(true);" ><i class="fa fa-book"></i></a>
                             <a class="button is-inverse has-fixed-icon"  style="margin-right:10px; height:43px; width:43px;" onclick="paste('#change_address')"><i class="fa fa-files-o"></i></a>
                             <a class="button is-inverse has-fixed-icon"  style="height:43px; width:43px;" onclick="$('#change_address').val('').css('background', '').css('color', '');"><i class="fa fa-times"></i></a>
@@ -569,7 +570,7 @@
             <a class="modal_close" href="#close"><i class="fa fa-times-circle red"></i></a>
             <div style="white-space:nowrap;">
                 <label for="new-contact-address" class="recipient">Address: </label>
-                <input id="new-contact-address"  class="recipient input_box" style="width: 300px;" data-title="The address to send the payment to  (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)" placeholder="Enter a ProCurrency address (e.g. PSFDPgW4wuGSHDXAJ3qUbpGJnDBVX8KBBC)" onchange="if(base58.check(this)) $('#new-contact-pubkey').val(procbridge.getPubKey(this.value, $('#new-contact-name').val()));" maxlength="128" oninput="base58.check(this);"/>
+                <input id="new-contact-address"  class="recipient input_box" style="width: 300px;" data-title="The address to send the payment to  (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)" placeholder="Enter a ProCurrency address (e.g. PSF2P9W4PuGSHDXAJ3QUb6GJnDBVX8KLBC)" onchange="if(base58.check(this)) $('#new-contact-pubkey').val(procbridge.getPubKey(this.value, $('#new-contact-name').val()));" maxlength="128" oninput="base58.check(this);"/>
                 <a class="button is-inverse has-fixed-icon" data-title="Choose address from address book" style="margin-right:10px; margin-left:10px; height:43px; width:43px;" onclick="openAddressBook('#new-contact-address', '#new-contact-name', true)"><i class="fa fa-book"></i></a>
                 <a class="button is-inverse has-fixed-icon" data-title="Paste address from clipboard"     style="margin-right:10px; height:43px; width:43px;" onclick="paste('#new-contact-address')"><i class="fa fa-files-o"></i></a>
                 <a class="button is-inverse has-fixed-icon" data-title="Remove this recipient"            style="height:43px; width:43px;" onclick="$('#new-contact-address').val('').css('background', '').css('color', '');"><i class="fa fa-times"></i></a>

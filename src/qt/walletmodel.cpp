@@ -5,13 +5,8 @@
 #include "transactiontablemodel.h"
 
 #include "ui_interface.h"
-#ifndef OTP_ENABLED
-    #include "wallet.h"
-    #include "walletdb.h" // for BackupWallet
-#else
-    #include "wallet_otp.h"
-    #include "walletdb_otp.h" // for BackupWallet
-#endif
+#include "wallet.h"
+#include "walletdb.h" // for BackupWallet
 #include "base58.h"
 
 #include <QSet>
@@ -999,3 +994,38 @@ void WalletModel::listLockedCoins(std::vector<COutPoint>& vOutpts)
 {
     return;
 }
+	
+CWallet* WalletModel::getWallet()
+{
+    return wallet;
+}
+
+/** //setLockedCoins
+bool WalletModel::isLockedCoin(uint256 hash, unsigned int n) const
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+    return wallet->IsLockedCoin(hash, n);
+}
+
+void WalletModel::lockCoin(COutPoint& output)
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+    wallet->LockCoin(output);
+}
+
+void WalletModel::unlockCoin(COutPoint& output)
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+    wallet->UnlockCoin(output);
+}
+
+void WalletModel::listLockedCoins(std::vector<COutPoint>& vOutpts)
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+    wallet->ListLockedCoins(vOutpts);
+}
+
+CWallet* WalletModel::getWallet()
+{
+    return wallet;
+}**/
