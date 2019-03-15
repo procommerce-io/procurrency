@@ -118,11 +118,12 @@ extern int64_t nTransactionFee;
 extern int64_t nReserveBalance;
 extern int64_t nMinimumInputValue;
 extern bool fUseFastIndex;
-
 extern bool fEnforceCanonical;
+extern bool fCheckForUpdates;
 
 // Minimum disk space required - used in CheckDiskSpace()
 static const uint64_t nMinDiskSpace = 52428800;
+static const bool DEFAULT_CHECK_FOR_UPDATES = true;
 
 class CReserveKey;
 class CTxDB;

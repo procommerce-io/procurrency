@@ -60,6 +60,8 @@ CBlockThinIndex* pindexBestHeader;
 
 int64_t nTimeBestReceived = 0;
 bool fImporting = false;
+// Proc Release Checker
+bool fCheckForUpdates = DEFAULT_CHECK_FOR_UPDATES;
 
 CMedianFilter<int> cPeerBlockCounts(5, 0); // Amount of blocks that other nodes claim to have
 
