@@ -24,6 +24,7 @@ class WalletModel;
 class MessageModel;
 class Notificator;
 class MultisigDialog;
+class ProcReleaseChecker;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -81,6 +82,7 @@ private:
     QAction *quitAction;
     QAction *aboutAction;
     QAction *optionsAction;
+	QAction *options2Action;
     QAction *toggleHideAction;
     QAction *exportAction;
     QAction *encryptWalletAction;
@@ -96,6 +98,7 @@ private:
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
     RPCConsole *rpcConsole;
+	ProcReleaseChecker *procReleaseChecker;
 
     uint64_t nWeight;
 
@@ -160,6 +163,8 @@ private slots:
 
     /** Show configuration dialog */
     void optionsClicked();
+	/** Show options dialog */
+    void options2Clicked();
     /** Show about dialog */
     void aboutClicked();
 

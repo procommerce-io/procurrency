@@ -1,7 +1,6 @@
 // Copyright (c) 2014 The ProCurrency developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file license.txt or http://www.opensource.org/licenses/mit-license.php.
-
 #include "procgui.h"
 #include "transactiontablemodel.h"
 #include "transactionrecord.h"
@@ -10,6 +9,7 @@
 #include "clientmodel.h"
 #include "walletmodel.h"
 #include "messagemodel.h"
+#include "optionsdialog.h"
 #include "optionsmodel.h"
 #include "addresstablemodel.h"
 #include "bitcoinunits.h"
@@ -21,6 +21,7 @@
 #include "util.h"
 #include "init.h"
 #include "multisig/multisigdialog.h"
+#include "procreleasechecker.h"
 
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
@@ -71,6 +72,7 @@ ProcGUI::ProcGUI(QWidget *parent):
     trayIcon(0),
     notificator(0),
     rpcConsole(0),
+	procReleaseChecker(0),
     nWeight(0)
 {
     webView = new QWebView();
@@ -111,6 +113,7 @@ ProcGUI::ProcGUI(QWidget *parent):
 	
 	// multisig dialog
 	multisigPage = new MultisigDialog(this);
+	procReleaseChecker = new ProcReleaseChecker(this);
 	
     rpcConsole = new RPCConsole(this);
     connect(openRPCConsoleAction, SIGNAL(triggered()), rpcConsole, SLOT(show()));
@@ -124,9 +127,15 @@ ProcGUI::ProcGUI(QWidget *parent):
     documentFrame = webView->page()->mainFrame();
 
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+	
+	if(fCheckForUpdates && procReleaseChecker->newVersionAvailable())
+    {
+        QString link = QString("<a href=%1>%2</a>").arg(PROC_RELEASES, PROC_RELEASES);
+        QString message(tr("A new version of ProCurrency wallet is available on Github: <br /> %1. <br />It is recommended to download and update your wallet to the latest release").arg(link));
+        QMessageBox::information(this, tr("Check for updates"), message);
+    }
 
-    //connect(webView->page()->action(QWebPage::Reload), SIGNAL(triggered()), SLOT(pageLoaded(bool)));
-
+    /*connect(webView->page()->action(QWebPage::Reload), SIGNAL(triggered()), SLOT(pageLoaded(bool)));*/
     connect(webView, SIGNAL(loadFinished(bool)),                    SLOT(pageLoaded(bool)));
     connect(documentFrame, SIGNAL(javaScriptWindowObjectCleared()), SLOT(addJavascriptObjects()));
     connect(documentFrame, SIGNAL(urlChanged(QUrl)),                SLOT(urlClicked(const QUrl&)));
@@ -190,9 +199,12 @@ void ProcGUI::createActions()
     aboutQtAction = new QAction(QIcon(":/trolltech/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
     aboutQtAction->setToolTip(tr("Show information about Qt"));
     aboutQtAction->setMenuRole(QAction::AboutQtRole);
-    optionsAction = new QAction(QIcon(":/icons/options"), tr("&Options..."), this);
+    optionsAction = new QAction(QIcon(":/icons/config"), tr("&Configuration..."), this);
     optionsAction->setToolTip(tr("Modify configuration options for ProCurrency"));
     optionsAction->setMenuRole(QAction::PreferencesRole);
+	options2Action = new QAction(QIcon(":/icons/options2"), tr("&Options..."), this);
+    options2Action->setToolTip(tr("Modify configuration options for ProCurrency"));
+    options2Action->setMenuRole(QAction::PreferencesRole);
     toggleHideAction = new QAction(QIcon(":/icons/bitcoin"), tr("&Show / Hide"), this);
     encryptWalletAction = new QAction(QIcon(":/icons/lock_closed"), tr("&Encrypt Wallet..."), this);
     encryptWalletAction->setToolTip(tr("Encrypt or decrypt wallet"));
@@ -223,6 +235,7 @@ void ProcGUI::createActions()
     connect(aboutAction, SIGNAL(triggered()), SLOT(aboutClicked()));
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(optionsAction, SIGNAL(triggered()), SLOT(optionsClicked()));
+	connect(options2Action, SIGNAL(triggered()), SLOT(options2Clicked()));
     connect(toggleHideAction, SIGNAL(triggered()), SLOT(toggleHidden()));
     connect(encryptWalletAction, SIGNAL(triggered(bool)), SLOT(encryptWallet(bool)));
     connect(backupWalletAction, SIGNAL(triggered()), SLOT(backupWallet()));
@@ -257,6 +270,7 @@ void ProcGUI::createMenuBar()
     settings->addAction(lockWalletAction);
     settings->addSeparator();
     settings->addAction(optionsAction);
+	settings->addAction(options2Action);
 	settings->addAction(showBackupsAction);
 
     QMenu *help = appMenuBar->addMenu(tr("&Help"));
@@ -384,6 +398,7 @@ void ProcGUI::createTrayIcon()
     trayIconMenu->addSeparator();
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(optionsAction);
+	trayIconMenu->addAction(options2Action);
     trayIconMenu->addAction(openRPCConsoleAction);
 	trayIconMenu->addAction(showBackupsAction);
 #ifndef Q_OS_MAC // This is built-in on Mac
@@ -708,6 +723,15 @@ void ProcGUI::optionsClicked()
 {
     procbridge->triggerElement("#navitems a[href=#options]", "click");
     showNormalIfMinimized();
+}
+
+void ProcGUI::options2Clicked()
+{
+    if(!clientModel || !clientModel->getOptionsModel())
+        return;
+    OptionsDialog dlg;
+    dlg.setModel(clientModel->getOptionsModel());
+    dlg.exec();
 }
 
 void ProcGUI::dragEnterEvent(QDragEnterEvent *event)

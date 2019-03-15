@@ -1025,6 +1025,8 @@ QVariantMap UIProcBridge::userAction(QVariantMap action)
         window->showBackupsAction->trigger();
 	if(key == "multisig")
         window->multisigAction->trigger();
+	if(key == "options2")
+        window->options2Action->trigger();
     if(key == "debugClicked")
         window->rpcConsole->show();
     if(key == "clearRecipients")
