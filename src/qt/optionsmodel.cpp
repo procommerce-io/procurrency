@@ -1,15 +1,21 @@
+// Copyright (c) 2011-2017 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include "optionsmodel.h"
 #include "bitcoinunits.h"
-#include <QSettings>
+
 
 #include "init.h"
-#ifndef OTP_ENABLED
-    #include "walletdb.h"
-#else
-    #include "walletdb_otp.h"
-#endif
 #include "guiutil.h"
 #include "ringsig.h"
+
+#ifdef ENABLE_WALLET
+#include "wallet.h"
+#include "walletdb.h"
+#endif
+
+#include <QSettings>
 
 OptionsModel::OptionsModel(QObject *parent) :
     QAbstractListModel(parent)
@@ -41,13 +47,19 @@ void OptionsModel::Init()
     QSettings settings;
 
     // These are Qt-only settings:
-    nDisplayUnit = settings.value("nDisplayUnit", BitcoinUnits::PROC).toInt();
-    bDisplayAddresses = settings.value("bDisplayAddresses", false).toBool();
+	
+	// Window
     fMinimizeToTray = settings.value("fMinimizeToTray", false).toBool();
     fMinimizeOnClose = settings.value("fMinimizeOnClose", false).toBool();
+	
+	// Display
+    nDisplayUnit = settings.value("nDisplayUnit", BitcoinUnits::PROC).toInt();
+    bDisplayAddresses = settings.value("bDisplayAddresses", false).toBool();
+	language = settings.value("language", "").toString();
+	
+	// Main
     nTransactionFee = settings.value("nTransactionFee").toLongLong();
     nReserveBalance = settings.value("nReserveBalance").toLongLong();
-    language = settings.value("language", "").toString();
     nRowsPerPage = settings.value("nRowsPerPage", 20).toInt();
     notifications = settings.value("notifications", "*").toStringList();
     visibleTransactions = settings.value("visibleTransactions", "*").toStringList();
@@ -56,18 +68,30 @@ void OptionsModel::Init()
     nMinRingSize = settings.value("nMinRingSize", MIN_RING_SIZE).toInt();
     nMaxRingSize = settings.value("nMaxRingSize", MAX_RING_SIZE).toInt();
 
+	
     // These are shared with core Bitcoin; we want
-    // command-line options to override the GUI settings:
+    // command-line options to override the GUI settings.
+	//
+    // If setting doesn't exist create it with defaults.
+    //
+    // If SoftSetArg() or SoftSetBoolArg() return false we were overridden
+    // by command-line and show this in the UI.
+	
+	// Network
     if (settings.contains("fUseUPnP"))
         SoftSetBoolArg("-upnp", settings.value("fUseUPnP").toBool());
     if (settings.contains("addrProxy") && settings.value("fUseProxy").toBool())
         SoftSetArg("-proxy", settings.value("addrProxy").toString().toStdString());
     if (settings.contains("nSocksVersion") && settings.value("fUseProxy").toBool())
         SoftSetArg("-socks", settings.value("nSocksVersion").toString().toStdString());
-    if (settings.contains("detachDB"))
-        SoftSetBoolArg("-detachdb", settings.value("detachDB").toBool());
+	
+	// Display
     if (!language.isEmpty())
         SoftSetArg("-lang", language.toStdString());
+	
+	// Main
+	if (settings.contains("detachDB"))
+        SoftSetBoolArg("-detachdb", settings.value("detachDB").toBool());
     if (settings.contains("fStaking"))
         SoftSetBoolArg("-staking", settings.value("fStaking").toBool());
     if (settings.contains("nMinStakeInterval"))
@@ -80,6 +104,22 @@ void OptionsModel::Init()
         SoftSetBoolArg("-thinfullindex", settings.value("fThinFullIndex").toBool());
     if (settings.contains("nThinIndexWindow"))
         SoftSetArg("-thinindexmax", settings.value("nThinIndexWindow").toString().toStdString());
+	if (!settings.contains("fCheckForUpdates"))
+        settings.setValue("fCheckForUpdates", DEFAULT_CHECK_FOR_UPDATES);
+    fCheckForUpdates = settings.value("fCheckForUpdates").toBool();
+	
+}
+
+void OptionsModel::Reset()
+{
+    QSettings settings;
+
+    // Remove all entries from our QSettings object
+    settings.clear();
+
+    // default setting for OptionsModel::StartAtStartup - disabled
+    if (GUIUtil::GetStartOnSystemStartup())
+        GUIUtil::SetStartOnSystemStartup(false);
 }
 
 int OptionsModel::rowCount(const QModelIndex & parent) const
@@ -87,6 +127,7 @@ int OptionsModel::rowCount(const QModelIndex & parent) const
     return OptionIDRowCount;
 }
 
+// read QSettings values and return them
 QVariant OptionsModel::data(const QModelIndex & index, int role) const
 {
     if(role == Qt::EditRole)
@@ -120,10 +161,12 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
 
         case ProxySocksVersion:
             return settings.value("nSocksVersion", 5);
+#ifdef ENABLE_WALLET			
         case Fee:
             return (qint64) nTransactionFee;
         case ReserveBalance:
             return (qint64) nReserveBalance;
+#endif			
         case DisplayUnit:
             return nDisplayUnit;
         case DisplayAddresses:
@@ -158,6 +201,10 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return notifications;
         case VisibleTransactions:
             return visibleTransactions;
+		case CheckForUpdates:
+            return settings.value("fCheckForUpdates");
+        default:
+            return QVariant();	
         }
     }
 
@@ -209,6 +256,7 @@ int OptionsModel::optionNameID(QString name)
     return -1;
 }
 
+// write QSettings values
 bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
     bool successful = true; /* set to false on parse error */
@@ -352,6 +400,12 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             settings.setValue("fSecMsgEnabled", fSecMsgEnabled);
             }
             break;
+		case CheckForUpdates:
+            if (settings.value("fCheckForUpdates") != value) {
+                settings.setValue("fCheckForUpdates", value);
+                fCheckForUpdates = value.toBool();
+            }
+            break;	
         default:
             break;
         }
@@ -390,6 +444,18 @@ bool OptionsModel::getDisplayAddresses()
 {
     return bDisplayAddresses;
 }
+
+/*void OptionsModel::setRestartRequired(bool fRequired)
+{
+    QSettings settings;
+    return settings.setValue("fRestartRequired", fRequired);
+}
+
+bool OptionsModel::isRestartRequired()
+{
+    QSettings settings;
+    return settings.value("fRestartRequired", false).toBool();
+}*/
 
 int OptionsModel::getRowsPerPage() { return nRowsPerPage; }
 QStringList OptionsModel::getNotifications() { return notifications; }

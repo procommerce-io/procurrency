@@ -50,6 +50,7 @@ public:
         RowsPerPage,         // int
         Notifications,       // QStringList
         VisibleTransactions, // QStringList
+		CheckForUpdates,        // bool
         OptionIDRowCount,
     };
 
@@ -57,6 +58,7 @@ public:
     int optionNameID(QString name);
 
     void Init();
+	void Reset();
 
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
@@ -77,6 +79,10 @@ public:
     QStringList getNotifications();
     QStringList getVisibleTransactions();
     QString getLanguage() { return language; }
+	
+	/* Restart flag helper */
+    //void setRestartRequired(bool fRequired);
+    //bool isRestartRequired() const;
 
 private:
     int nDisplayUnit;
