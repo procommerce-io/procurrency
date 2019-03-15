@@ -16,7 +16,7 @@
         <file alias="connect_5">res/icons/connect5_16.png</file>
         <file alias="connect_6">res/icons/connect6_16.png</file>
         <file alias="transaction_0">res/icons/transaction0.png</file>
-        <file alias="options">res/icons/configure.png</file>
+        <file alias="config">res/icons/config.png</file>
         <file alias="editpaste">res/icons/editpaste.png</file>
         <file alias="editcopy">res/icons/editcopy.png</file>
         <file alias="add">res/icons/add.png</file>
@@ -48,6 +48,7 @@
 		<file alias="receive">res/icons/receive.png</file>
 		<file alias="send">res/icons/send.png</file>
 		<file alias="multisig">res/icons/multisig.png</file>
+		<file alias="options2">res/icons/options2.png</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="about">res/images/about.png</file>

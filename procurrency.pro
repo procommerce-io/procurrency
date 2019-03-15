@@ -353,6 +353,7 @@ HEADERS += \
     src/qt/procgui.h \
 	src/qt/askpassphrasedialog.h \
 	src/qt/procbridge.h \
+	src/qt/optionsdialog.h \
 	src/crypter.h \
     src/util.h \
     src/wallet.h \
@@ -369,6 +370,7 @@ HEADERS += \
     src/crypto/sha512.h \
 	src/qt/sendcoinsentry.h \
 	src/qt/addressbookpage.h \
+	src/qt/procreleasechecker.h \
 	src/qt/multisig/multisigaddressentry.h \
     src/qt/multisig/multisiginputentry.h \
     src/qt/multisig/multisigdialog.h 
@@ -452,6 +454,7 @@ SOURCES += \
     src/qt/procurrency.cpp \
 	src/qt/askpassphrasedialog.cpp \
 	src/qt/procbridge.cpp \
+	src/qt/optionsdialog.cpp \
     src/crypter.cpp \
     src/rpcwallet.cpp \
     src/util.cpp \
@@ -468,6 +471,7 @@ SOURCES += \
     src/crypto/sha512.cpp \
 	src/qt/sendcoinsentry.cpp \
 	src/qt/addressbookpage.cpp \
+	src/qt/procreleasechecker.cpp \
 	src/qt/multisig/multisigaddressentry.cpp \
     src/qt/multisig/multisiginputentry.cpp \
     src/qt/multisig/multisigdialog.cpp 
@@ -476,6 +480,7 @@ SOURCES += \
 FORMS += \
     src/qt/forms/coincontroldialog.ui \
     src/qt/forms/aboutdialog.ui \
+	src/qt/forms/optionsdialog.ui \
     src/qt/forms/editaddressdialog.ui \
     src/qt/forms/transactiondescdialog.ui \
     src/qt/forms/rpcconsole.ui \

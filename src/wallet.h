@@ -19,24 +19,12 @@
 #include "ui_interface.h"
 #include "util.h"
 #include "walletdb.h" // for BackupWallet
-/*#ifndef OTP_ENABLED
-    #include "crypter.h"
-    #include "script.h"				//del
-    #include "ui_interface.h"
-    #include "util.h"
-    #include "walletdb.h" // for BackupWallet
-#else
-    #include "crypter_otp.h"
-    #include "script.h"
-    #include "ui_interface.h"
-    #include "util_otp.h"
-    #include "walletdb_otp.h" // for BackupWallet
-#endif*/
 #include "stealth.h"
 #include "smessage.h"
 
 extern bool fWalletUnlockStakingOnly;
 extern bool fConfChange;
+
 class CAccountingEntry;
 class CWalletTx;
 class CReserveKey;
