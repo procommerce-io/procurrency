@@ -635,13 +635,20 @@ var overviewPage = {
                      }                                                                                                                                
                  },
                  {
-                     name: 'Options',
+                     name: 'Configuration',
                      fa: 'fa-wrench vred fa-fw font-20px',
                      fun: function () {
                         $("#navitems [href=#options]").click();
                      }
                  },
-				 
+				 {
+                     name: 'Options',
+                     //fa: 'fa-save vred fa-fw font-20px',
+					 img: 'qrc:///icons/options2',
+                     fun: function () {
+						procbridge.userAction(['options2']);
+                     }
+                 },
 				 {
                      name: 'Show AutoBackups',
                      fa: 'fa-save vred fa-fw font-20px',
