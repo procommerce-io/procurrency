@@ -53,9 +53,11 @@
             <!-- <li><a href="#messages" onclick="iscrollReload(true);">CHAT</a></li> -->
 			<!-- <li><a href="#chaindata" onclick="chainDataPage.updateAnonOutputs();">Chain Data</a></li>-->
             <li><a href="#blockdata" onclick="blockExplorerPage.updateLatestBlocks();">Block Explorer</a></li>
+			<li><a href="#masternode" data-title="Masternodes development in Progress">masternodes</a></li>
 			<!-- <li><a href="#bittrex" onclick="procbridge.openBittrex();">Bittrex</a></li>-->
             <li class="none"><a href="#keymanagement" onclick="$('#key-options').show(); $('#wizards').hide(); $('#keymanagement-advanced').hide();">Key Management</a></li>
-            <li class="none"><a href="#options">Options</a></li>
+            <li class="none"><a href="#options">Configuration</a></li>
+			<li class="none"><a href="#options2">Options</a></li>
 			<li class="none"><a href="#showBackups">Show AutoBackups</a></li>
 			<li class="none"><a href="#multisig">Multisig</a></li>
             <!--li><a href="#news">news</a></li   showWizardScreen('key-manage-wizard'); -->
@@ -252,7 +254,7 @@
                             </div>
                         </div>
                         <div class="flex-item grow one-third-width">
-							<!-- <h2 align="center">My OKCash Wallet</h2>
+							<!-- <h2 align="center">My ProCurrency Wallet</h2>
                             <div>
 							
                             </div> -->
@@ -1123,7 +1125,7 @@
         <!-- Options Page -->
         <article id="options" style="display:none;">
             <div class="content top">
-                <h2>Options</h2>
+                <h2>Configuration</h2>
             </div>
 
             <div class="bottom">
@@ -1140,7 +1142,7 @@
                             <input  id="optDetachDatabases" type="checkbox" />
                             <label for="optDetachDatabases" class="option">Detach databases at shutdown</label>
                         </div>
-                        <div class="option">
+                        <!--<div class="option">
                             <p>Optional transaction fee per kB that helps make sure your transactions are processed quickly. Most transactions are 1kB. Fee 0.01 recommended.</p>
                             <label for="optFee" class="option">Pay transaction fee:</label>
                             <input  id="optFee" type="number" placeholder="0.00000000" step="0.01" value="0.00000000" onchange="unit.parse(this, $('#optFeeunit').val());" />
@@ -1150,12 +1152,12 @@
                                 <option class="vred" value="2" title="Micro-ProCurrency (1 / 1000000)">&micro;PROC</option>
                                 <option class="vred" value="3" title="Satoshi-ProCurrencys (1 / 100000000)">Satoshi-PROC</option>
                             </select>
-                        </div>
+                        </div>-->
                         <div class="option">
                             <input  id="optStaking" type="checkbox" data-linked="optReserveBalance optReserveBalanceunit" />
                             <label for="optStaking" class="option">Enable Staking</label>
                         </div>
-                        <div class="option">
+                        <!--<div class="option">
                             <p>Reserved amount does not participate in staking and is therefore spendable at any time.</p>
                             <label for="optReserveBalance" class="option">Reserve:</label>
                             <input  id="optReserveBalance" type="number" placeholder="0.00000000" step="0.01" value="0.00000000" onchange="unit.parse(this, $('#optReserveBalanceunit').val());" />
@@ -1165,7 +1167,7 @@
                                 <option class="vred" value="2" title="Micro-ProCurrency (1 / 1000000)">&micro;PROC</option>
                                 <option class="vred" value="3" title="Satoshi-ProCurrencys (1 / 100000000)">sPROC</option>
                             </select>
-                        </div>
+                        </div>-->
                         <div class="option">
                             <label for="optMinStakeInterval" class="option" data-title="Minimum time in seconds between successful stakes">Minimum Stake Interval</label>
                             <input  id="optMinStakeInterval" type="number" placeholder="30" step="1" data-title="Minimum time in seconds between successful stakes" />
