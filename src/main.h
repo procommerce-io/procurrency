@@ -16,6 +16,9 @@
 
 #include <list>
 
+//TODO: Masternodes
+/*class CValidationState;*/
+
 class CWallet;
 class CWalletTx;
 
@@ -32,14 +35,16 @@ class CInv;
 class CRequestTracker;
 class CNode;
 
+/** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE = 20000000;
+/** The maximum size for mined blocks */
 static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_SIZE/2;
+/** The maximum allowed number of signature check operations in a block (network rule) */
 static const unsigned int MAX_BLOCK_SIGOPS = MAX_BLOCK_SIZE/50;
+/** The maximum number of orphan transactions kept in memory */
 static const unsigned int MAX_ORPHAN_TRANSACTIONS = MAX_BLOCK_SIZE/100;
 /** Default for -maxorphanblocksmib, maximum number of memory to keep orphan blocks */
 static const unsigned int DEFAULT_MAX_ORPHAN_BLOCKS = 50;
-/** The maximum number of entries in an 'inv' protocol message */ //del
-//static const unsigned int MAX_INV_SZ = 50000; //del
 static const unsigned int MAX_GETHEADERS_SZ = 2000;
 
 static const unsigned int MAX_MULTI_BLOCK_SIZE = 5120000;    // 5MiB, most likely to hit MAX_MULTI_BLOCK_ELEMNTS first
@@ -97,8 +102,8 @@ extern int64_t nLastCoinStakeSearchInterval;
 extern const std::string strMessageMagic;
 extern int64_t nTimeBestReceived;
 extern bool fImporting;
-extern CCriticalSection cs_setpwalletRegistered;
-extern std::set<CWallet*> setpwalletRegistered;
+//extern CCriticalSection cs_setpwalletRegistered;
+//extern std::set<CWallet*> setpwalletRegistered;
 struct COrphanBlock {
     uint256 hashBlock;
     uint256 hashPrev;
@@ -107,31 +112,42 @@ struct COrphanBlock {
 };
 extern std::map<uint256, COrphanBlock*> mapOrphanBlocks;
 extern std::map<uint256, CBlockThin*> mapOrphanBlockThins;
-
 extern std::map<int64_t, CAnonOutputCount> mapAnonOutputStats;
-
 extern CTxMemPool mempool;
 
 
 // Settings
-extern int64_t nTransactionFee;
-extern int64_t nReserveBalance;
-extern int64_t nMinimumInputValue;
 extern bool fUseFastIndex;
 extern bool fEnforceCanonical;
 extern bool fCheckForUpdates;
 
 // Minimum disk space required - used in CheckDiskSpace()
 static const uint64_t nMinDiskSpace = 52428800;
+//PROC Release Checker
 static const bool DEFAULT_CHECK_FOR_UPDATES = true;
 
 class CReserveKey;
 class CTxDB;
 class CTxIndex;
+class CWalletInterface;
+struct CNodeStateStats;
 
-void RegisterWallet(CWallet* pwalletIn);
-void UnregisterWallet(CWallet* pwalletIn);
+/** Register a wallet to receive updates from core */
+void RegisterWallet(CWalletInterface* pwalletIn);
+/** Unregister a wallet from core */
+void UnregisterWallet(CWalletInterface* pwalletIn);
+/** Unregister all wallets from core */
+void UnregisterAllWallets();
+/** Push an updated transaction to all registered wallets */
 void SyncWithWallets(const CTransaction& tx, const CBlock* pblock = NULL, bool fUpdate = false, bool fConnect = true);
+/** Ask wallets to resend their transactions */
+void ResendWalletTransactions(bool fForce = false);
+
+/** Register with a network node to receive its signals */
+void RegisterNodeSignals(CNodeSignals& nodeSignals);
+/** Unregister a network node */
+void UnregisterNodeSignals(CNodeSignals& nodeSignals);
+
 bool ProcessBlock(CNode* pfrom, CBlock* pblock, uint256& hash);
 bool CheckDiskSpace(uint64_t nAdditionalBytes=0);
 FILE* OpenBlockFile(bool fHeaderFile, unsigned int nFile, unsigned int nBlockPos, const char* pszMode="rb");
@@ -141,7 +157,8 @@ void PrintBlockTree();
 CBlockIndex* FindBlockByHeight(int nHeight);
 CBlockThinIndex* FindBlockThinByHeight(int nHeight);
 bool ProcessMessages(CNode* pfrom);
-bool SendMessages(CNode* pto, std::vector<CNode*> &vNodesCopy, bool fSendTrickle);
+//bool SendMessages(CNode* pto, std::vector<CNode*> &vNodesCopy, bool fSendTrickle);
+bool SendMessages(CNode* pto, bool fSendTrickle);
 
 bool LoadExternalBlockFile(int nFile, FILE* fileIn);
 void ThreadImport(std::vector<boost::filesystem::path> vImportFiles);
@@ -163,9 +180,9 @@ bool TxnHashInSystem(CTxDB* ptxdb, uint256& txnHash);
 uint256 WantedByOrphan(const CBlock* pblockOrphan);
 uint256 WantedByOrphanHeader(const CBlockThin* pblockOrphan);
 const COrphanBlock* AddOrphanBlock(const CBlock* pblock);
+//uint256 WantedByOrphan(const COrphanBlock* pblockOrphan);
 const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake);
 const CBlockThinIndex* GetLastBlockThinIndex(const CBlockThinIndex* pindex, bool fProofOfStake);
-void ResendWalletTransactions(bool fForce = false);
 
 bool ChangeNodeState(int newState, bool fProcess = true);
 
@@ -2171,6 +2188,80 @@ public:
         READWRITE(merkleBlock);
         READWRITE(vtx);
     )
+};
+
+
+/** Capture information about block/transaction validation */
+//TODO: Masternodes
+/*class CValidationState {
+private:
+    enum mode_state {
+        MODE_VALID,   //! everything ok
+        MODE_INVALID, //! network rule violation (DoS value may be set)
+        MODE_ERROR,   //! run-time error
+    } mode;
+    int nDoS;
+    std::string strRejectReason;
+    unsigned char chRejectCode;
+    bool corruptionPossible;
+public:
+    CValidationState() : mode(MODE_VALID), nDoS(0), chRejectCode(0), corruptionPossible(false) {}
+    bool DoS(int level, bool ret = false,
+             unsigned char chRejectCodeIn=0, std::string strRejectReasonIn="",
+             bool corruptionIn=false) {
+        chRejectCode = chRejectCodeIn;
+        strRejectReason = strRejectReasonIn;
+        corruptionPossible = corruptionIn;
+        if (mode == MODE_ERROR)
+            return ret;
+        nDoS += level;
+        mode = MODE_INVALID;
+        return ret;
+    }
+    bool Invalid(bool ret = false,
+                 unsigned char _chRejectCode=0, std::string _strRejectReason="") {
+        return DoS(0, ret, _chRejectCode, _strRejectReason);
+    }
+    bool Error(std::string strRejectReasonIn="") {
+        if (mode == MODE_VALID)
+            strRejectReason = strRejectReasonIn;
+        mode = MODE_ERROR;
+        return false;
+    }
+    bool Abort(const std::string &msg) {
+        AbortNode(msg);
+        return Error(msg);
+    }
+    bool IsValid() const {
+        return mode == MODE_VALID;
+    }
+    bool IsInvalid() const {
+        return mode == MODE_INVALID;
+    }
+    bool IsError() const {
+        return mode == MODE_ERROR;
+    }
+    bool IsInvalid(int &nDoSOut) const {
+        if (IsInvalid()) {
+            nDoSOut = nDoS;
+            return true;
+        }
+        return false;
+    }
+    bool CorruptionPossible() const {
+        return corruptionPossible;
+    }
+    unsigned char GetRejectCode() const { return chRejectCode; }
+    std::string GetRejectReason() const { return strRejectReason; }
+};*/
+
+class CWalletInterface {
+protected:
+    virtual void ResendWalletTransactions(bool fForce) =0;
+	virtual void EraseFromWallet(const uint256 &hash) =0;
+    friend void ::RegisterWallet(CWalletInterface*);
+    friend void ::UnregisterWallet(CWalletInterface*);
+    friend void ::UnregisterAllWallets();
 };
 
 #endif
