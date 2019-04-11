@@ -6,22 +6,13 @@
 #include "init.h"
 
 #include "txdb.h"
-///#include "walletdb.h"
-//#include "rpcserver.h"
-//#include "rpcclient.h"
 #include "net.h"
-//#include "init.h"
-//#include "state.h"
-//#include "sync.h"
 #include "util.h"
-//#include "walletdb_otp.h"
 #include "rpcserver.h"
 #include "rpcclient.h"
 #include "net.h"
-//#include "init.h"
 #include "state.h"
 #include "sync.h"
-//#include "util_otp.h"
 #include "ui_interface.h"
 #include "smessage.h"
 #include "ringsig.h"
@@ -107,20 +98,33 @@ static boost::scoped_ptr<ECCVerifyHandle> globalVerifyHandle;
 // Shutdown
 //
 
-bool Finalise()
+//bool Finalise()
+void Shutdown()
 {
-    LogPrintf("Finalise()\n");
+	fRequestShutdown = true; // Needed when we shutdown the wallet
+    LogPrintf("Shutdown : In progress...\n");
+    static CCriticalSection cs_Shutdown;
+    TRY_LOCK(cs_Shutdown, lockShutdown);
+    if (!lockShutdown) return;
+	
+    //LogPrintf("Finalise()\n");
     
-    StopRPCThreads();
-    ShutdownRPCMining();
-    SecureMsgShutdown();
-    
+    RenameThread("procurrency-shutoff");
     mempool.AddTransactionsUpdated(1);
+	StopRPCThreads();
+    SecureMsgShutdown();
+	
+#ifdef ENABLE_WALLET
+	ShutdownRPCMining();	
     if (pwalletMain)
         bitdb.Flush(false);
+#endif	
     
     StopNode();
+	UnregisterNodeSignals(GetNodeSignals());
+    /*DumpMasternodes();*/ //TODO
     
+#ifdef ENABLE_WALLET	
     if (pwalletMain)
     {
         {
@@ -129,10 +133,11 @@ bool Finalise()
         }
         bitdb.Flush(true);
         UnregisterWallet(pwalletMain);
-        delete pwalletMain;
-        pwalletMain = NULL;
+        //delete pwalletMain;
+        //pwalletMain = NULL;
     };
-    
+#endif
+	
     finaliseRingSigs();
     
     if (nNodeMode == NT_FULL)
@@ -161,14 +166,20 @@ bool Finalise()
     
     CTxDB().Close();
     
-    fs::remove(GetPidFile());
-    return true;
-	
+    //fs::remove(GetPidFile());
+    //return true;
+	boost::filesystem::remove(GetPidFile());
+    UnregisterAllWallets();
+#ifdef ENABLE_WALLET
+    delete pwalletMain;
+    pwalletMain = NULL;
+#endif
 	globalVerifyHandle.reset();
     ECC_Stop();
+	LogPrintf("Shutdown completed.\n\n");
 }
 
-void Shutdown()
+/*void Shutdown()
 {
     static CCriticalSection cs_Shutdown;
     TRY_LOCK(cs_Shutdown, lockShutdown);
@@ -177,8 +188,11 @@ void Shutdown()
     Finalise();
     
     LogPrintf("Shutdown complete.\n\n");
-}
+}*/
 
+//
+// Signal handlers are very limited in what they are allowed to do, so:
+//
 void HandleSIGTERM(int)
 {
     fRequestShutdown = true;
@@ -817,6 +831,16 @@ bool AppInit2(boost::thread_group& threadGroup)
     nMaxThinPeers = GetArg("-maxthinpeers", 8);
 
     nBloomFilterElements = GetArg("-bloomfilterelements", 1536);
+	
+	RegisterNodeSignals(GetNodeSignals());
+
+    // format user agent, check total size
+    strSubVersion = FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, mapMultiArgs.count("-uacomment") ? mapMultiArgs["-uacomment"] : std::vector<string>());
+    if (strSubVersion.size() > MAX_SUBVERSION_LENGTH) {
+        return InitError(strprintf("Total length of network version string %i exceeds maximum of %i characters. Reduce the number and/or size of uacomments.",
+            strSubVersion.size(), MAX_SUBVERSION_LENGTH));
+    }
+    
 
     if (mapArgs.count("-onlynet"))
     {
@@ -1086,57 +1110,13 @@ bool AppInit2(boost::thread_group& threadGroup)
 #endif // !ENABLE_WALLET	
     // ********************************************************* Step 9: import blocks
 
+    std::vector<boost::filesystem::path> vImportFiles;
     if (mapArgs.count("-loadblock"))
     {
-        uiInterface.InitMessage(_("Importing blockchain data file."));
-
-        BOOST_FOREACH(std::string strFile, mapMultiArgs["-loadblock"])
-        {
-            FILE* file = fopen(strFile.c_str(), "rb");
-            if (file)
-                LoadExternalBlockFile(0, file);
-            else
-                LogPrintf("Error: -loadblock '%s' - file not found.\n", strFile.c_str());
-        };
-        LogPrintf("Terminating: loadblock completed.\n");
-        Finalise();
-        exit(0);
-    };
-
-    fs::path pathBootstrap = GetDataDir() / "bootstrap.dat";
-    if (fs::exists(pathBootstrap))
-    {
-        uiInterface.InitMessage(_("Importing bootstrap blockchain data file."));
-
-        FILE* file = fopen(pathBootstrap.string().c_str(), "rb");
-        if (file)
-        {
-            fs::path pathBootstrapOld = GetDataDir() / "bootstrap.dat.old";
-            LoadExternalBlockFile(0, file);
-            RenameOver(pathBootstrap, pathBootstrapOld);
-        };
-    };
-    
-    if (mapArgs.count("-reindex"))
-    {
-        uiInterface.InitMessage(_("Reindexing from blk000?.dat files."));
-        
-        fReindexing = true;
-        int nFile = 1;
-        while (true) 
-        {
-            FILE* file = OpenBlockFile(false, nFile, 0, "rb");
-            if (!file)
-                break;
-            LogPrintf("Reindexing block file blk%04u.dat...\n", (unsigned int)nFile);
-            LoadExternalBlockFile(nFile, file);
-            nFile++;
-        };
-        
-        LogPrintf("Terminating: reindex completed.\n");
-        Finalise();
-        exit(0);
-    };
+        BOOST_FOREACH(string strFile, mapMultiArgs["-loadblock"])
+            vImportFiles.push_back(strFile);
+    }
+    threadGroup.create_thread(boost::bind(&ThreadImport, vImportFiles));
     
     // ********************************************************* Step 10: load peers
 
