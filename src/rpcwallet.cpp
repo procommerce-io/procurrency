@@ -5,13 +5,7 @@
 
 #include "wallet.h"
 #include "walletdb.h" // for BackupWallet
-/*#ifndef OTP_ENABLED
-    #include "wallet.h"
-    #include "walletdb.h" // for BackupWallet	//del
-#else
-    #include "wallet_otp.h"
-    #include "walletdb_otp.h" // for BackupWallet
-#endif*/
+
 #include "rpcserver.h"
 #include "init.h"
 #include "base58.h"

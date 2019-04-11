@@ -17,11 +17,7 @@
 #include "kernel.h"
 #include "checkpoints.h"
 #include "txdb.h"
-#ifndef OTP_ENABLED
-    #include "util.h"
-#else
-    #include "util_otp.h"
-#endif
+#include "util.h"
 #include "main.h"
 
 using namespace std;

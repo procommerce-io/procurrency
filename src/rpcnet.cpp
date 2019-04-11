@@ -5,16 +5,10 @@
 #include "net.h"
 #include "rpcserver.h"
 #include "alert.h"
-#ifndef OTP_ENABLED
-    #include "wallet.h"
-    #include "db.h"
-    #include "walletdb.h"
-#else
-    #include "wallet_otp.h"
-    #include "db.h"
-    #include "walletdb_otp.h"
-#endif
-
+#include "wallet.h"
+#include "db.h"
+#include "walletdb.h"
+	
 #include <boost/foreach.hpp>
 #include "json/json_spirit_value.h"
 

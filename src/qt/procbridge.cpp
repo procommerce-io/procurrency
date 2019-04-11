@@ -22,11 +22,7 @@
 #include "coincontroldialog.h"
 #include "ringsig.h"
 
-//#ifndef OTP_ENABLED
-    #include "askpassphrasedialog.h"
-//#else
-    //#include "askpassphrasedialog_otp.h" //del
-//#endif
+#include "askpassphrasedialog.h"
 
 #include "txdb.h"
 #include "state.h"
