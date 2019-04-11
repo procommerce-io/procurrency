@@ -5,6 +5,8 @@
 #ifndef BITCOIN_WALLET_H
 #define BITCOIN_WALLET_H
 
+#include "walletdb.h" // for BackupWallet
+
 #include <stdlib.h>
 #include <string>
 #include <vector>
@@ -18,9 +20,13 @@
 #include "script.h"
 #include "ui_interface.h"
 #include "util.h"
-#include "walletdb.h" // for BackupWallet
 #include "stealth.h"
 #include "smessage.h"
+
+// Settings
+extern int64_t nTransactionFee;
+extern int64_t nReserveBalance;
+extern int64_t nMinimumInputValue;
 
 extern bool fWalletUnlockStakingOnly;
 extern bool fConfChange;
@@ -30,6 +36,7 @@ class CWalletTx;
 class CReserveKey;
 class COutput;
 class CCoinControl;
+class CWalletDB;
 
 typedef std::map<CKeyID, CStealthKeyMetadata> StealthKeyMetaMap;
 typedef std::map<std::string, std::string> mapValue_t;
@@ -82,9 +89,10 @@ bool IsMine(const CWallet& wallet, const CScript& scriptPubKey);
 /** A CWallet is an extension of a keystore, which also maintains a set of transactions and balances,
  * and provides the ability to create new transactions.
  */
-class CWallet : public CCryptoKeyStore
+//class CWallet : public CCryptoKeyStore
+class CWallet : public CCryptoKeyStore, public CWalletInterface
 {
-public:
+private:
     bool SelectCoinsForStaking(int64_t nTargetValue, unsigned int nSpendTime, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64_t& nValueRet) const;
     bool SelectCoins(int64_t nTargetValue, unsigned int nSpendTime, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64_t& nValueRet, const CCoinControl *coinControl=NULL) const;
 
@@ -95,7 +103,20 @@ public:
 
     // the maximum wallet format version: memory-only variable that specifies to what version this wallet may be upgraded
     int nWalletMaxVersion;
+	
+	/* //TODO: double-spends
+	// Used to keep track of spent outpoints, and
+    // detect and report conflicts (double-spends or
+    // mutated transactions where the mutant gets mined).
+    typedef std::multimap<COutPoint, uint256> TxSpends;
+    TxSpends mapTxSpends;
+    void AddToSpends(const COutPoint& outpoint, const uint256& wtxid);
+    void AddToSpends(const uint256& wtxid);
 
+    void SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator>);
+	*/
+
+public:	
     /// Main wallet lock.
     /// This lock protects all the fields added by CWallet
     ///   except for:
@@ -162,6 +183,8 @@ public:
         nLastFilteredHeight = 0;
         
     }
+	
+	std::set<COutPoint> setLockedCoins;
     
     int Finalise();
     
@@ -172,6 +195,13 @@ public:
     void AvailableCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed=true, const CCoinControl *coinControl=NULL) const;
     bool SelectCoinsMinConf(int64_t nTargetValue, unsigned int nSpendTime, int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64_t& nValueRet) const;
 
+	
+	bool IsLockedCoin(uint256 hash, unsigned int n) const;
+    void LockCoin(COutPoint& output);
+    void UnlockCoin(COutPoint& output);
+    void UnlockAllCoins();
+    void ListLockedCoins(std::vector<COutPoint>& vOutpts);
+	
     // keystore implementation
     // Generate a new key
     CPubKey GenerateNewKey();
@@ -179,10 +209,7 @@ public:
     // Adds a key to the store, and saves it to disk.
     bool AddKey(const CKey &key);
     bool AddKeyPubKey(const CKey &key, const CPubKey &pubkey);
-    
     bool AddKeyInDBTxn(CWalletDB *pdb, const CKey &key);
-    
-    
     // Adds a key to the store, without saving it to disk (used by LoadWallet)
     bool LoadKey(const CKey& key, const CPubKey &pubkey) { return CCryptoKeyStore::AddKeyPubKey(key, pubkey); }
     // Load metadata (used by LoadWallet)
@@ -222,8 +249,7 @@ public:
     void MarkDirty();
     bool AddToWallet(const CWalletTx& wtxIn, const uint256& hashIn);
     bool AddToWalletIfInvolvingMe(const CTransaction& tx, const uint256& hash, const void* pblock, bool fUpdate = false, bool fFindBlock = false);
-    
-    bool EraseFromWallet(uint256 hash);
+    void EraseFromWallet(const uint256 &hash);
     void WalletUpdateSpent(const CTransaction& prevout, bool fBlock = false);
     int ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate = false);
     void ReacceptWalletTransactions();
@@ -658,11 +684,9 @@ public:
         fCreditCached = false;
         fAvailableCreditCached = false;
         fAvailableTokenCreditCached = false;
-        
         nCredPROCCached = 0;
         nCredTokenCached = 0;
         fCreditSplitCached = false;
-        
         fChangeCached = false;
         nDebitCached = 0;
         nCreditCached = 0;
