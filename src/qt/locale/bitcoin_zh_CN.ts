@@ -20,7 +20,7 @@ Copyright © 2014-2015 The ProCurrency developers</source>
         <translation>版权所有 © 2009-2014 比特币Bitcoin开发组
 版权所有 © 2012-2014 新星币Novacoin开发组
 版权所有 © 2014 黑币BlackCoin开发组
-版权所有 © 2014-2015 暗影币ShadowCoin开发组</translation>
+版权所有 © 2014-2015 暗影币ProCurrency开发组</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -1068,7 +1068,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <location filename="../guiutil.cpp" line="+420"/>
         <location line="+12"/>
         <source>ProCurrency-Qt</source>
-        <translation>暗影币客户端ShadowCoin-Qt</translation>
+        <translation>暗影币客户端ProCurrency-Qt</translation>
     </message>
     <message>
         <location line="-12"/>

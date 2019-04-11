@@ -9,7 +9,7 @@
     <message>
         <location line="+39"/>
         <source>&lt;b&gt;ProCurrency&lt;/b&gt; version</source>
-        <translation>verzia &lt;b&gt;ShadowCoinu&lt;/b&gt;</translation>
+        <translation>verzia &lt;b&gt;ProCurrencyu&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+41"/>

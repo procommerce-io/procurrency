@@ -4,12 +4,12 @@
     <message>
         <location filename="../forms/aboutdialog.ui" line="+14"/>
         <source>About ProCurrency</source>
-        <translation>O ShadowCoinu</translation>
+        <translation>O ProCurrencyu</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>&lt;b&gt;ProCurrency&lt;/b&gt; version</source>
-        <translation>Verze &lt;b&gt;ShadowCoinu&lt;/b&gt; </translation>
+        <translation>Verze &lt;b&gt;ProCurrencyu&lt;/b&gt; </translation>
     </message>
     <message>
         <location line="+41"/>

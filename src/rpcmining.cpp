@@ -4,6 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "rpcserver.h"
+#include "chainparams.h"
 #include "main.h"
 #include "db.h"
 #include "txdb.h"
@@ -52,6 +53,7 @@ Value getsubsidy(const Array& params, bool fHelp)
        nShowHeight = nBestHeight+1; // block currently being solved
 
    return (uint64_t)Params().GetProofOfWorkReward(nShowHeight, 0);
+   //return (int64_t)Params().GetProofOfStakeReward(pindexBest->pprev, 0, 0);
 
 }
 
@@ -79,8 +81,9 @@ Value getstakesubsidy(const Array& params, bool fHelp)
     if (!tx.GetCoinAge(txdb, pindexBest, nCoinAge))
         throw JSONRPCError(RPC_MISC_ERROR, "GetCoinAge failed");
 
-    //return (uint64_t)Params().GetProofOfStakeReward(pindexBest, nCoinAge, 0);//del
-	return (uint64_t)Params().GetProofOfStakeReward(pindexBest->nHeight, nCoinAge, 0);
+    return (uint64_t)Params().GetProofOfStakeReward(pindexBest, nCoinAge, 0);
+	//return (uint64_t)Params().GetProofOfStakeReward(pindexBest->nHeight, nCoinAge, 0);
+	//return (uint64_t)Params().GetProofOfStakeReward(pindexBest->pprev, nCoinAge, 0);
 }
 
 Value getmininginfo(const Array& params, bool fHelp)
@@ -188,10 +191,10 @@ Value checkkernel(const Array& params, bool fHelp)
     bool fCreateBlockTemplate = params.size() > 1 ? params[1].get_bool() : false;
 
     if (vNodes.empty())
-        throw JSONRPCError(-9, "ShadowCoin is not connected!");
+        throw JSONRPCError(-9, "ProCurrency is not connected!");
 
     if (IsInitialBlockDownload())
-        throw JSONRPCError(-10, "ShadowCoin is downloading blocks...");
+        throw JSONRPCError(-10, "ProCurrency is downloading blocks...");
 
     COutPoint kernel;
     CBlockIndex* pindexPrev = pindexBest;

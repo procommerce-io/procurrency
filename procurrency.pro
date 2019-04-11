@@ -272,9 +272,9 @@ HEADERS += \
     src/alert.h \
     src/allocators.h \
     src/keystore.h \
-    src/version.h \
     src/netbase.h \
     src/clientversion.h \
+	src/version.h \
     src/threadsafety.h \
     src/protocol.h \
     src/ui_interface.h \
@@ -380,7 +380,7 @@ HEADERS += \
 
 SOURCES += \
     src/alert.cpp \
-    src/version.cpp \
+    src/clientversion.cpp \
     src/chainparams.cpp \
     src/sync.cpp \
     src/smessage.cpp \
