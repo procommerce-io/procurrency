@@ -12,6 +12,8 @@
 
 #include <vector>
 
+using namespace std;
+
 #define MESSAGE_START_SIZE 4
 typedef unsigned char MessageStartChars[MESSAGE_START_SIZE];
 
@@ -20,8 +22,10 @@ class CBlock;
 class CBlockIndex;
 
 struct CDNSSeedData {
-    std::string name, host;
-    CDNSSeedData(const std::string &strName, const std::string &strHost) : name(strName), host(strHost) {}
+	string name, host;
+    CDNSSeedData(const string &strName, const string &strHost) : name(strName), host(strHost) {}
+    //std::string name, host;
+    //CDNSSeedData(const std::string &strName, const std::string &strHost) : name(strName), host(strHost) {} //del
 };
 
 
@@ -93,7 +97,8 @@ public:
     int LastPOWBlock() const { return nLastPOWBlock; }
 
     int64_t GetProofOfWorkReward(int nHeight, int64_t nFees) const;
-    int64_t GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64_t nFees) const;
+    //int64_t GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64_t nFees) const;
+	int64_t GetProofOfStakeReward(const CBlockIndex* pindexPrev, int64_t nCoinAge, int64_t nFees) const;
 
 protected:
     CChainParams() {};

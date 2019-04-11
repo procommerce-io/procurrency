@@ -12,6 +12,7 @@
 #include <boost/assign/list_of.hpp>
 
 using namespace boost::assign;
+using namespace std;
 
 struct SeedSpec6 {
     uint8_t addr[16];
@@ -40,15 +41,16 @@ int64_t CChainParams::GetProofOfWorkReward(int nHeight, int64_t nFees) const
     return nSubsidy + nFees;
 }
 
-//static const int YEARLY_BLOCKCOUNT =  525600; // 1440 * 365 //del
 static const int YEARLY_BLOCKCOUNT =  899790; //
 // miner's coin stake reward based on coin age spent (coin-days)
-int64_t CChainParams::GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64_t nFees) const
+/*int64_t CChainParams::GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64_t nFees) const*/
+int64_t CChainParams::GetProofOfStakeReward(const CBlockIndex* pindexPrev, int64_t nCoinAge, int64_t nFees) const
 {
     int64_t nSubsidy = 5 * COIN;
 	
 	//if(nHeight < 100)
-	if(nHeight < (YEARLY_BLOCKCOUNT))
+	//if(nHeight < (YEARLY_BLOCKCOUNT))
+	if(pindexPrev->nHeight < (YEARLY_BLOCKCOUNT))
     {
         nSubsidy = 15 * COIN;   // 
     }
@@ -173,8 +175,8 @@ public:
         
         genesis.nBits    = bnProofOfWorkLimit.GetCompact();
         genesis.nNonce   = 163555;
+		
         hashGenesisBlock = genesis.GetHash();
-        
         assert(hashGenesisBlock == uint256("0x0000040154f262df86de1eb539d4bb05ebd5aa8448bdbff066c614e705b5af26"));
         assert(genesis.hashMerkleRoot == uint256("0x2c859a6fd90361e455f327235fb106546ea6ef1f5821462be3094c94ca80b13b"));
 		
