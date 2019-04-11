@@ -10,6 +10,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "version.h"
 
 #include <db_cxx.h>
 
@@ -330,19 +331,5 @@ public:
     bool Read(CAddrMan& addr);
 };
 
-////////----
-/** Access to the banlist database (banlist.dat) */
-class CBanDB
-{
-private:
-    boost::filesystem::path pathBanlist;
-public:
-    CBanDB();
-    bool Write(const banmap_t& banSet);
-    bool Read(banmap_t& banSet);
-};
-
-void DumpBanlist();
-////////----
 
 #endif // BITCOIN_DB_H
