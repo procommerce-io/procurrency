@@ -11,6 +11,7 @@
 <tr><td>Difficulty Retargeting</td><td>Every Block</td></tr>
 <tr><td>Max Coin Supply</td><td>75B PROC</td></tr>
 <tr><td>Premine</td><td>15B PROC</td></tr>
+<tr><td>Circulating Supply</td><td>3,260,661,311 PROC (March, 2019)</td></tr>
 
 <tr><td>RPC Port</td><td> <s>35960</s> now 45960</td></tr>
 <tr><td>P2P Port</td><td> <s>35950</s> now 45950</td></tr>
