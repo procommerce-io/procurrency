@@ -1,9 +1,10 @@
 // Copyright (c) 2012 The Bitcoin Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#include <string>
 
+#include "clientversion.h"
 #include "version.h"
+#include <string>
 
 // Name of client reported in the 'version' message. Report the same name
 // for both bitcoind and bitcoin-qt, to make it harder for attackers to
@@ -36,7 +37,7 @@ const std::string CLIENT_NAME("ProcCore");
 // git will put "#define GIT_ARCHIVE 1" on the next line inside archives. 
 #define GIT_ARCHIVE 1
 #ifdef GIT_ARCHIVE
-#    define GIT_COMMIT_ID ": BR"
+#    define GIT_COMMIT_ID ": LR"
 //#    define GIT_COMMIT_DATE "$Format:%cD"
 #endif
 
