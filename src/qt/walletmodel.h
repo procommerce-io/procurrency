@@ -170,6 +170,8 @@ private:
     qint64 cachedNumTransactions;
     EncryptionStatus cachedEncryptionStatus;
     int cachedNumBlocks;
+	/*int cachedTxLocks; //TODO: Masternodes
+    int cachedDarksendRounds;*/
 
     QTimer *pollTimer;
 
