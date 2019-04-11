@@ -79,8 +79,11 @@ void SocketSendData(CNode *pnode);
 // Signals for message handling
 struct CNodeSignals
 {
+	boost::signals2::signal<int ()> GetHeight;
     boost::signals2::signal<bool (CNode*)> ProcessMessages;
     boost::signals2::signal<bool (CNode*, bool)> SendMessages;
+	boost::signals2::signal<void (NodeId, const CNode*)> InitializeNode;
+    boost::signals2::signal<void (NodeId)> FinalizeNode;
 };
 
 CNodeSignals& GetNodeSignals();
@@ -183,6 +186,8 @@ struct LocalServiceInfo {
 extern CCriticalSection cs_mapLocalHost;
 extern std::map<CNetAddr, LocalServiceInfo> mapLocalHost;
 
+/** Subversion as sent to the P2P network in `version` messages */
+extern std::string strSubVersion;
 
 class CNodeStateStats
 {

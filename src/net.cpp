@@ -31,7 +31,7 @@
 using namespace std;
 using namespace boost;
 
-static const int MAX_OUTBOUND_CONNECTIONS = 56;
+static const int MAX_OUTBOUND_CONNECTIONS = 56; //60
 
 bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOutbound = NULL, const char *strDest = NULL, bool fOneShot = false);
 
@@ -51,6 +51,7 @@ CAddress addrSeenByPeer(CService("0.0.0.0", 0), nLocalServices);
 uint64_t nLocalHostNonce = 0;
 static std::vector<SOCKET> vhListenSocket;
 CAddrMan addrman;
+std::string strSubVersion;
 
 vector<CNode*> vNodes;
 CCriticalSection cs_vNodes;
@@ -70,10 +71,14 @@ CCriticalSection cs_setservAddNodeAddresses;
 vector<std::string> vAddedNodes;
 CCriticalSection cs_vAddedNodes;
 
-static CSemaphore *semOutbound = NULL;
-
 NodeId nLastNodeId = 0;
 CCriticalSection cs_nLastNodeId;
+
+static CSemaphore *semOutbound = NULL;
+
+// Signals for message handling
+static CNodeSignals g_signals;
+CNodeSignals& GetNodeSignals() { return g_signals; }
 
 void AddOneShot(string strDest)
 {
@@ -524,14 +529,13 @@ void CNode::PushVersion()
     unsigned char *p = (unsigned char*)&nServices; // fortify
     memcpy(p+4, &nLocalRequirements, 4);
 
-    PushMessage("version", PROTOCOL_VERSION, nServices, nTime, addrYou, addrMe,
-                nLocalHostNonce, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<string>()), nBestHeight, nNodeMode);
+    PushMessage("version", PROTOCOL_VERSION, nLocalServices, nTime, addrYou, addrMe,
+                nLocalHostNonce, strSubVersion, nBestHeight);
 }
 
 
 
 
-//banmap_t CNode::setBanned;
 std::map<CNetAddr, int64_t> CNode::setBanned;
 CCriticalSection CNode::cs_setBanned;
 bool CNode::setBannedIsDirty;
@@ -1270,32 +1274,6 @@ void DumpAddresses()
            addrman.size(), GetTimeMillis() - nStart);
 }
 
-/////-----
-void CNode::GetBanned(banmap_t &banMap)
-{
-    LOCK(cs_setBanned);
-    banMap = setBanned; //create a thread safe copy
-}
-
-void CNode::SetBanned(const banmap_t &banMap)
-{
-    LOCK(cs_setBanned);
-    setBanned = banMap;
-    setBannedIsDirty = true;
-}
-
-void DumpData()
-{
-    DumpAddresses();
-
-    if (CNode::BannedSetIsDirty())
-    {
-        DumpBanlist();
-        CNode::SetBannedSetDirty(false);
-    }
-}
-////------
-
 void static ProcessOneShot()
 {
     string strDest;
@@ -1609,8 +1587,10 @@ void ThreadMessageHandler()
             {
                 TRY_LOCK(pnode->cs_vSend, lockSend);
                 if (lockSend)
-                    SendMessages(pnode, vNodesCopy, pnode == pnodeTrickle);
+                    //SendMessages(pnode, vNodesCopy, pnode == pnodeTrickle);
+					g_signals.SendMessages(pnode, pnode == pnodeTrickle);
             } // cs_vSend
+			boost::this_thread::interruption_point();
         };
 
         {
@@ -1789,12 +1769,6 @@ void static Discover(boost::thread_group& threadGroup)
 
 void StartNode(boost::thread_group& threadGroup)
 {
-	//try to read stored banlist
-    CBanDB bandb;
-    banmap_t banmap;
-    if (!bandb.Read(banmap))
-        LogPrintf("Invalid or missing banlist.dat; recreating\n");
-
     //CNode::SetBanned(banmap); //thread save setter
     CNode::SetBannedSetDirty(false); //no need to write down just read or nonexistent data
     //CNode::SweepBanned(); //sweap out unused entries
