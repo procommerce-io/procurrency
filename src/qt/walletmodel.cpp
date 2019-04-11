@@ -975,32 +975,7 @@ void WalletModel::listCoins(std::map<QString, std::vector<COutput> >& mapCoins) 
     }
 }
 
-bool WalletModel::isLockedCoin(uint256 hash, unsigned int n) const
-{
-    return false;
-}
-
-void WalletModel::lockCoin(COutPoint& output)
-{
-    return;
-}
-
-void WalletModel::unlockCoin(COutPoint& output)
-{
-    return;
-}
-
-void WalletModel::listLockedCoins(std::vector<COutPoint>& vOutpts)
-{
-    return;
-}
-	
-CWallet* WalletModel::getWallet()
-{
-    return wallet;
-}
-
-/** //setLockedCoins
+//setLockedCoins
 bool WalletModel::isLockedCoin(uint256 hash, unsigned int n) const
 {
     LOCK2(cs_main, wallet->cs_wallet);
@@ -1028,4 +1003,4 @@ void WalletModel::listLockedCoins(std::vector<COutPoint>& vOutpts)
 CWallet* WalletModel::getWallet()
 {
     return wallet;
-}**/
+}
