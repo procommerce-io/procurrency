@@ -98,42 +98,42 @@ std::set<uint256> setValidatedTx;
 
 // These functions dispatch to one or all registered wallets
 
-namespace {
+/*namespace { //cleanup
 
 struct CMainSignals {
-    // Tells listeners to broadcast their data.
+    // Tells listeners to broadcast their data.			//cleanup
     boost::signals2::signal<void (bool)> Broadcast;
 	// Notifies listeners of an erased transaction (currently disabled, requires transaction replacement).
     boost::signals2::signal<void (const uint256 &)> EraseTransaction;
 } g_signals;
-}
+}*/
 
-//void RegisterWallet(CWallet* pwalletIn)
-void RegisterWallet(CWalletInterface* pwalletIn)
+void RegisterWallet(CWallet* pwalletIn)
+//void RegisterWallet(CWalletInterface* pwalletIn)
 {
-    /*{
+    {
         LOCK(cs_setpwalletRegistered);
         setpwalletRegistered.insert(pwalletIn);
-    }*/
-    g_signals.Broadcast.connect(boost::bind(&CWalletInterface::ResendWalletTransactions, pwalletIn, _1));
-	g_signals.EraseTransaction.connect(boost::bind(&CWalletInterface::EraseFromWallet, pwalletIn, _1));
+    }
+    //g_signals.Broadcast.connect(boost::bind(&CWalletInterface::ResendWalletTransactions, pwalletIn, _1));
+	//g_signals.EraseTransaction.connect(boost::bind(&CWalletInterface::EraseFromWallet, pwalletIn, _1));
 }
 
-//void UnregisterWallet(CWallet* pwalletIn)
-void UnregisterWallet(CWalletInterface* pwalletIn)
+void UnregisterWallet(CWallet* pwalletIn)
+//void UnregisterWallet(CWalletInterface* pwalletIn)
 {
-    /*{
+    {
         LOCK(cs_setpwalletRegistered);
         setpwalletRegistered.erase(pwalletIn);
-    }*/
-	g_signals.Broadcast.disconnect(boost::bind(&CWalletInterface::ResendWalletTransactions, pwalletIn, _1));
-	g_signals.EraseTransaction.disconnect(boost::bind(&CWalletInterface::EraseFromWallet, pwalletIn, _1));
+    }
+	//g_signals.Broadcast.disconnect(boost::bind(&CWalletInterface::ResendWalletTransactions, pwalletIn, _1));
+	//g_signals.EraseTransaction.disconnect(boost::bind(&CWalletInterface::EraseFromWallet, pwalletIn, _1));
 }
 
-void UnregisterAllWallets() {
-    g_signals.Broadcast.disconnect_all_slots();
+/*void UnregisterAllWallets() {
+    g_signals.Broadcast.disconnect_all_slots();			//cleanup
 	g_signals.EraseTransaction.disconnect_all_slots();
-}
+}*/
 
 // check whether the passed transaction is from us
 bool static IsFromMe(CTransaction& tx)
@@ -155,7 +155,7 @@ bool static GetTransaction(const uint256& hashTx, CWalletTx& wtx)
 
 // erases transaction with the given hash from all wallets
 /*void static EraseFromWallets(uint256 hash)
-{
+{															//cleanup
     BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
     pwallet->EraseFromWallet(hash);
 }*/
@@ -247,9 +247,9 @@ void static Inventory(const uint256& hash)
 // ask wallets to resend their transactions
 void ResendWalletTransactions(bool fForce)
 {
-	g_signals.Broadcast(fForce);
-    //BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
-        //pwallet->ResendWalletTransactions(fForce);
+	//g_signals.Broadcast(fForce); //cleanup
+    BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
+        pwallet->ResendWalletTransactions(fForce);
 }
 
 bool SetHeightFilteredNeeded()
@@ -681,7 +681,7 @@ bool CTransaction::IsStandard() const
             
             if (nVersion != ANON_TXN_VERSION
                 || nRingSize < 1
-                || nRingSize > (Params().IsProtocolV3(pindexBest->nHeight) ? (int)MAX_RING_SIZE : (int)MAX_RING_SIZE_OLD)
+                || nRingSize > (Params().IsProtocolVFork1(pindexBest->nHeight) ? (int)MAX_RING_SIZE : (int)MAX_RING_SIZE_OLD)
                 || txin.scriptSig.size() > sizeof(COutPoint) + 2 + (33 + 32 + 32) * nRingSize)
             {
                 LogPrintf("IsStandard() anon txin failed.\n");
@@ -2023,7 +2023,7 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
 {
 	CBigNum bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit(pindexLast->nHeight) : Params().ProofOfWorkLimit();
 	
-	CBigNum bnTargetLimitV4 = fProofOfStake ? Params().ProofOfStakeLimitV4(pindexLast->nHeight) : Params().ProofOfWorkLimit();
+	CBigNum bnTargetLimitV4 = fProofOfStake ? Params().ProofOfStakeLimitVFork2(pindexLast->nHeight) : Params().ProofOfWorkLimit();
 
     if (pindexLast == NULL)
         return bnTargetLimit.GetCompact(); // genesis block
@@ -2047,11 +2047,11 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
     if (nActualSpacing < 0)
 		nActualSpacing = nTargetSpacing;
 
-	if (Params().IsProtocolV3(pindexLast->nHeight)) {
+	if (Params().IsProtocolVFork1(pindexLast->nHeight)) {
         if (nActualSpacing > nTargetSpacing * 10)
             nActualSpacing = nTargetSpacing * 10;
 	}
-    if (Params().IsProtocolV4(pindexLast->nHeight)) {
+    if (Params().IsProtocolVFork2(pindexLast->nHeight)) {
         if (nActualSpacing > nTargetSpacing * 20)
             nActualSpacing = nTargetSpacing * 20;
 	}
@@ -2064,7 +2064,7 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
     bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
 	bnNew /= ((nInterval + 1) * nTargetSpacing);
 	
-	if (Params().IsProtocolV4(pindexLast->nHeight)) {	
+	if (Params().IsProtocolVFork2(pindexLast->nHeight)) {	
 		if (bnNew <= 0 || bnNew > bnTargetLimitV4)
 			bnNew = bnTargetLimitV4;
 	}else{
@@ -2079,7 +2079,7 @@ unsigned int GetNextTargetRequiredThin(const CBlockThinIndex* pindexLast, bool f
 {
 	CBigNum bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit(pindexLast->nHeight) : Params().ProofOfWorkLimit();
 	
-	CBigNum bnTargetLimitV4 = fProofOfStake ? Params().ProofOfStakeLimitV4(pindexLast->nHeight) : Params().ProofOfWorkLimit();
+	CBigNum bnTargetLimitV4 = fProofOfStake ? Params().ProofOfStakeLimitVFork2(pindexLast->nHeight) : Params().ProofOfWorkLimit();
 
     if (pindexLast == NULL)
         return bnTargetLimit.GetCompact(); // genesis block
@@ -2106,7 +2106,7 @@ unsigned int GetNextTargetRequiredThin(const CBlockThinIndex* pindexLast, bool f
 		nActualSpacing = nTargetSpacing;
 
 
-    if (Params().IsProtocolV4(pindexLast->nHeight)) {
+    if (Params().IsProtocolVFork2(pindexLast->nHeight)) {
         if (nActualSpacing > nTargetSpacing * 20)
             nActualSpacing = nTargetSpacing * 20;
 	}
@@ -2119,7 +2119,7 @@ unsigned int GetNextTargetRequiredThin(const CBlockThinIndex* pindexLast, bool f
     bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
 	bnNew /= ((nInterval + 1) * nTargetSpacing);
 	
-	if (Params().IsProtocolV4(pindexLast->nHeight)) {	
+	if (Params().IsProtocolVFork2(pindexLast->nHeight)) {	
 		if (bnNew <= 0 || bnNew > bnTargetLimitV4)
 			bnNew = bnTargetLimitV4;
 	}else{
@@ -2448,7 +2448,7 @@ bool CTransaction::CheckAnonInputs(CTxDB& txdb, int64_t& nSumValue, bool& fInval
         int64_t nCoinValue = -1;
         int nRingSize = txin.ExtractRingSize();
         if (nRingSize < 1
-          ||nRingSize > (Params().IsProtocolV3(pindexBest->nHeight) ? (int)MAX_RING_SIZE : (int)MAX_RING_SIZE_OLD))
+          ||nRingSize > (Params().IsProtocolVFork1(pindexBest->nHeight) ? (int)MAX_RING_SIZE : (int)MAX_RING_SIZE_OLD))
         {
             LogPrintf("CheckAnonInputs(): Error input %d ringsize %d not in range [%d, %d].\n", i, nRingSize, MIN_RING_SIZE, MAX_RING_SIZE);
             fInvalid = true; return false;
@@ -2605,7 +2605,7 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
             if (txPrev.nTime > nTime)
                 return DoS(100, error("ConnectInputs() : transaction timestamp earlier than input transaction"));
 
-            if (Params().IsProtocolV3(pindexBlock->nHeight))
+            if (Params().IsProtocolVFork1(pindexBlock->nHeight))
             {
                 if (txPrev.vout[prevout.n].IsEmpty())
                     return DoS(1, error("ConnectInputs() : special marker is not spendable"));
@@ -2851,7 +2851,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
 
     unsigned int flags = SCRIPT_VERIFY_NOCACHE;
 
-    if (Params().IsProtocolV3(pindex->nHeight))
+    if (Params().IsProtocolVFork1(pindex->nHeight))
     {
         flags |= SCRIPT_VERIFY_NULLDUMMY |
                  SCRIPT_VERIFY_STRICTENC |
@@ -3565,7 +3565,7 @@ bool CTransaction::GetCoinAge(CTxDB& txdb, const CBlockIndex* pindexPrev, uint64
         if (nTime < txPrev.nTime)
             return false;  // Transaction timestamp violation
 
-        if (Params().IsProtocolV3(pindexPrev->nHeight))
+        if (Params().IsProtocolVFork1(pindexPrev->nHeight))
         {
             int nSpendDepth;
             if (IsConfirmedInNPrevBlocks(txindex, pindexPrev, nStakeMinConfirmations - 1, nSpendDepth))
@@ -3806,10 +3806,10 @@ bool CBlock::AcceptBlock()
     if (GetBlockTime() > FutureDrift((int64_t)vtx[0].nTime, nHeight))
         return DoS(50, error("AcceptBlock() : coinbase timestamp is too early"));
 	
-	//if (Params().IsProtocolV4(nHeight) // ProtocolV4 //del
+	//if (Params().IsProtocolVFork2(nHeight) // ProtocolVFork2 //del
           //{
-			// Check coinbase timestamp | ProtocolV4  
-            if ((Params().IsProtocolV4(nHeight)) && (GetBlockTime() > FutureDriftV4((int64_t)vtx[0].nTime, nHeight)))
+			// Check coinbase timestamp | ProtocolVFork2  
+            if ((Params().IsProtocolVFork2(nHeight)) && (GetBlockTime() > FutureDriftVFork2((int64_t)vtx[0].nTime, nHeight)))
                 return DoS(50, error("AcceptBlock() : coinbase timestamp is too early"));
           //}
     //else
@@ -3830,8 +3830,8 @@ bool CBlock::AcceptBlock()
     // Check timestamp against prev
     if (GetBlockTime() <= pindexPrev->GetPastTimeLimit() || FutureDrift(GetBlockTime(), nHeight) < pindexPrev->GetBlockTime())
         return error("AcceptBlock() : block's timestamp is too early");
-	// Check timestamp against prev | ProtocolV4
-    if ((Params().IsProtocolV4(nHeight)) && (GetBlockTime() <= pindexPrev->GetPastTimeLimit() || FutureDriftV4(GetBlockTime(), nHeight) < pindexPrev->GetBlockTime()))
+	// Check timestamp against prev | ProtocolVFork2
+    if ((Params().IsProtocolVFork2(nHeight)) && (GetBlockTime() <= pindexPrev->GetPastTimeLimit() || FutureDriftVFork2(GetBlockTime(), nHeight) < pindexPrev->GetBlockTime()))
         return error("AcceptBlock() : block's timestamp is too early");
 
     // Check that all transactions are finalized
@@ -4136,7 +4136,7 @@ bool CBlock::SignBlock(CWallet& wallet, int64_t nFees)
 
     CKey key;
     CTransaction txCoinStake;
-    if ((!Params().IsProtocolV1(nBestHeight+1)) || (!Params().IsProtocolV4(nBestHeight+1)))
+    if ((!Params().IsProtocolV1(nBestHeight+1)) || (!Params().IsProtocolVFork2(nBestHeight+1)))
         txCoinStake.nTime &= ~STAKE_TIMESTAMP_MASK;
     
     int64_t nSearchTime = txCoinStake.nTime; // search to current time
@@ -4146,8 +4146,8 @@ bool CBlock::SignBlock(CWallet& wallet, int64_t nFees)
     {
 		//int64_t nSearchInterval = Params().IsProtocolV1(nBestHeight+1) ? nSearchTime - nLastCoinStakeSearchTime : 1; //del
 		//int64_t nSearchInterval = 0;
-		if (Params().IsProtocolV4(nBestHeight+1)) {
-			nSearchInterval = Params().IsProtocolV4(nBestHeight+1) ? 1 : nSearchTime - nLastCoinStakeSearchTime;
+		if (Params().IsProtocolVFork2(nBestHeight+1)) {
+			nSearchInterval = Params().IsProtocolVFork2(nBestHeight+1) ? 1 : nSearchTime - nLastCoinStakeSearchTime;
 		}else{
 			nSearchInterval = Params().IsProtocolV1(nBestHeight+1) ? nSearchTime - nLastCoinStakeSearchTime : 1;
 		}
@@ -4201,7 +4201,7 @@ bool CBlock::CheckBlockSignature() const
         valtype& vchPubKey = vSolutions[0];
         return CPubKey(vchPubKey).Verify(GetHash(), vchBlockSig);
     }
-    else if (Params().IsProtocolV3(pindexBest->nHeight))
+    else if (Params().IsProtocolVFork1(pindexBest->nHeight))
     {
         // Block signing key also can be encoded in the nonspendable output
         // This allows to not pollute UTXO set with useless outputs e.g. in case of multisig staking
@@ -6483,7 +6483,7 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
                 pto->nPingNonceSent = 0;
                 pto->PushMessage("ping");
             }
-			/*
+			/* //cleanup
 			// Resend wallet transactions that haven't gotten in a block yet
 			// Except during reindex, importing and IBD, when old wallet
 			// transactions become unconfirmed and spams other nodes.
