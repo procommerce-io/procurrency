@@ -170,7 +170,7 @@ static int hashToEC(const uint8_t *p, uint32_t len, BIGNUM *bnTmp, EC_POINT *ptR
     if (!bnTmp || !BN_bin2bn(pkHash.begin(), EC_SECRET_SIZE, bnTmp))
         return errorN(1, "%s: BN_bin2bn failed.", __func__);
 
-    if (fNew || Params().IsProtocolV3(nBestHeight))
+    if (fNew || Params().IsProtocolVFork1(nBestHeight))
         while(!EC_POINT_set_compressed_coordinates_GFp(ecGrp, ptRet, bnTmp, 0, bnCtx) && count < 100)
         {
             count += 1;

@@ -1008,8 +1008,8 @@ void ProcGUI::updateStakingIcon()
         uint64_t nWeight = this->nWeight;
 
 		unsigned nEstimateTime = 0;
-		if (Params().IsProtocolV4(nBestHeight))
-			nEstimateTime = GetTargetSpacingV4(nBestHeight) * nNetworkWeight / nWeight;
+		if (Params().IsProtocolVFork2(nBestHeight))
+			nEstimateTime = GetTargetSpacingVFork2(nBestHeight) * nNetworkWeight / nWeight;
 		else
 			nEstimateTime = GetTargetSpacing(nBestHeight) * nNetworkWeight / nWeight;
 		
