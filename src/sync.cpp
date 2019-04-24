@@ -9,7 +9,7 @@
 //#else
     //#include "util_otp.h"
 //#endif
-#include "state.h"
+#include "procstate.h"
 
 #include <stdio.h>
 

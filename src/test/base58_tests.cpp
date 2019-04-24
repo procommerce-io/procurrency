@@ -8,7 +8,7 @@
 #include "script.h"
 #include "uint256.h"
 #include "util.h"
-#include "state.h"
+#include "procstate.h"
 #include "chainparams.h"
 
 #include <boost/foreach.hpp>

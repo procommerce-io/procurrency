@@ -2,8 +2,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file license.txt or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef COIN_STATE_H
-#define COIN_STATE_H
+#ifndef PROCSTATE_H
+#define PROCSTATE_H
 
 #include <string>
 #include <limits>
@@ -57,27 +57,34 @@ static const int64_t MIN_TX_FEE = 10000;
 static const int64_t MIN_TX_FEE_ANON = 1000000;
 /** Fees smaller than this (in satoshi) are considered zero fee (for relaying) */
 static const int64_t MIN_RELAY_TX_FEE = MIN_TX_FEE;
+
 static const int64_t COIN_YEAR_REWARD = 5 * CENT; // 5% per year
-
 static const int64_t MBLK_RECEIVE_TIMEOUT = 60; // seconds
-
-extern int nNodeMode;
-extern int nNodeState;
-
-extern int nMaxThinPeers;
-extern int nBloomFilterElements;
-
-
-extern int nMinStakeInterval;
-
-extern int nThinIndexWindow;
 
 static const int nTryStakeMempoolTimeout = 5 * 60; // seconds
 static const int nTryStakeMempoolMaxAsk = 16;
 
+
+// FORKS ZONE
+
+/** MBLK Removal **/
+static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
+/** New Blocktime Correction **/
+static const signed int NEW_TARGET_SPACING_FORK_BLOCK = 390000;
+/** MN Enforcement **/
+//static const signed int MN_ENFORCEMENT_FORK_BLOCK = xxxxxxxxx;
+
+
+
+extern int nNodeMode;
+extern int nNodeState;
+extern int nMaxThinPeers;
+extern int nBloomFilterElements;
+extern int nMinStakeInterval;
+extern int nThinIndexWindow;
+
 extern uint64_t nLocalServices;
 extern uint32_t nLocalRequirements;
-
 
 
 

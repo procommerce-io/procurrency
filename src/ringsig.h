@@ -6,7 +6,7 @@
 #define PROC_RINGSIG_H
 
 #include "stealth.h"
-#include "state.h"
+#include "procstate.h"
 #include "proc-types.h"
 
 class CPubKey;

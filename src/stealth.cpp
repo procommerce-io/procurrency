@@ -4,7 +4,7 @@
 
 #include "stealth.h"
 #include "base58.h"
-#include "state.h"
+#include "procstate.h"
 
 #include <openssl/err.h>
 #include <openssl/rand.h>

@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
 
-#include "state.h"
+#include "procstate.h"
 #include "db.h"
 #include "main.h"
 #include "wallet.h"

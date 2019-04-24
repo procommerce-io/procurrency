@@ -2,7 +2,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file license.txt or http://www.opensource.org/licenses/mit-license.php.
 
-#include "state.h"
+#include "procstate.h"
 
 int nNodeMode = NT_FULL;
 int nNodeState = NS_STARTUP;

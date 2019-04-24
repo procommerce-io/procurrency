@@ -16,7 +16,7 @@
 #include "serialize.h"
 #include "netbase.h"
 #include "uint256.h"
-#include "state.h"
+#include "procstate.h"
 
 /** Message header.
  * (4) message start.

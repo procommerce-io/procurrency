@@ -20,7 +20,7 @@
 #include "protocol.h"
 #include "addrman.h"
 #include "bloom.h"
-#include "state.h"
+#include "procstate.h"
 #include "hash.h"
 #include "limitedmap.h"
 

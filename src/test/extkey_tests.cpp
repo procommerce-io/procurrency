@@ -10,7 +10,7 @@
 #include "uint256.h"
 #include "util.h"
 #include "chainparams.h"
-#include "state.h"
+#include "procstate.h"
 #include "serialize.h"
 
 

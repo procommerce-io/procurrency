@@ -25,7 +25,7 @@
 #include "askpassphrasedialog.h"
 
 #include "txdb.h"
-#include "state.h"
+#include "procstate.h"
 
 #include "extkey.h"
 
