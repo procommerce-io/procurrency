@@ -56,7 +56,7 @@ int64_t CChainParams::GetProofOfStakeReward(const CBlockIndex* pindexPrev, int64
     }
 	else
 	{
-		nSubsidy = 5 * COIN;
+		nSubsidy = 10 * COIN; //Fixed Standard POS reward
 	}
 
     if (fDebug && GetBoolArg("-printcreation"))
@@ -163,15 +163,15 @@ public:
         
         nLastPOWBlock = 5000;
         
-        nFirstPosv2Block = 920; // POSv2 Start
-        nFirstPosv3Block = 30000; // POSv3 Start
-		nFirstPosv4Block = 440000; // POSv4 start
+        nStartPosv2Block = 920; // POSv2 Start
+        nStartPosvFork1Block = 30000; // POSvFork1 Start
+		nStartPosvFork2Block = 440000; // POSvFork2 start
 
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20); // PoW starting difficulty = 0.0002441
         bnProofOfStakeLimit = CBigNum(~uint256(0) >> 20); // PoS starting difficulty = 0.0002441
         bnProofOfStakeLimitV2 = CBigNum(~uint256(0) >> 34);
-		bnProofOfStakeLimitV3 = CBigNum(~uint256(0) >> 34);
-		bnProofOfStakeLimitV4 = CBigNum(~uint256(0) >> 40); // ProtocolV4
+		bnProofOfStakeLimitVFork1 = CBigNum(~uint256(0) >> 34);
+		bnProofOfStakeLimitVFork2 = CBigNum(~uint256(0) >> 40); // ProtocolVFork2
         
         genesis.nBits    = bnProofOfWorkLimit.GetCompact();
         genesis.nNonce   = 163555;
@@ -252,8 +252,8 @@ public:
 
         nLastPOWBlock = 1000;
 
-        nFirstPosv2Block = 2000;
-        nFirstPosv3Block = 3000;
+        nStartPosv2Block = 2000;
+        nStartPosvFork1Block = 3000;
         
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 16);
         bnProofOfStakeLimit = CBigNum(~uint256(0) >> 20);
@@ -293,8 +293,8 @@ public:
         strNetworkID = "regtest";
         strDataDir = "regtest";
 
-        nFirstPosv2Block = -1;
-        nFirstPosv3Block = -1;
+        nStartPosv2Block = -1;
+        nStartPosvFork1Block = -1;
 
         pchMessageStart[0] = 0xfa;
         pchMessageStart[1] = 0xbf;
