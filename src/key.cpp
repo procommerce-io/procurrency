@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "key.h"
-#include "eckey.h"
+#include "eckeywrapper.h"
 
 #include "crypto/common.h"
 #include "crypto/hmac_sha512.h"
@@ -184,7 +184,8 @@ CPubKey CKey::GetPubKey(bool fForceCompressed) const
     assert(fValid);
     CECKey key;
     key.SetSecretBytes(vch);
-    CPubKey pubkey;
+    //CPubKey pubkey;
+	std::vector<unsigned char> pubkey;
     key.GetPubKey(pubkey, fForceCompressed);
     return pubkey;
 }
@@ -204,6 +205,20 @@ bool CKey::Sign(const uint256 &hash, std::vector<unsigned char>& vchSig, uint32_
     secp256k1_ecdsa_signature_serialize_der(secp256k1_context_sign, (unsigned char*)&vchSig[0], &nSigLen, &sig);
     vchSig.resize(nSigLen);
     return true;
+}
+
+bool CKey::VerifyPubKey(const CPubKey& pubkey) const {
+    if (pubkey.IsCompressed() != fCompressed) {
+        return false;
+    }
+    unsigned char rnd[8];
+    std::string str = "Bitcoin key verification\n";
+    GetRandBytes(rnd, sizeof(rnd));
+    uint256 hash;
+    CHash256().Write((unsigned char*)str.data(), str.size()).Write(rnd, sizeof(rnd)).Finalize(hash.begin());
+    std::vector<unsigned char> vchSig;
+    Sign(hash, vchSig);
+    return pubkey.Verify(hash, vchSig);
 }
 
 bool CKey::SignCompact(const uint256 &hash, std::vector<unsigned char>& vchSig) const {
@@ -255,21 +270,6 @@ bool CKey::Derive(CKey& keyChild, unsigned char ccChild[32], unsigned int nChild
     keyChild.fCompressed = true;
     keyChild.fValid = ret;
     return ret;
-}
-
-bool CKey::VerifyPubKey(const CPubKey& pubkey) const
-{
-    if (pubkey.IsCompressed() != fCompressed)
-    {
-        return false;
-    }
-    unsigned char rnd[8];
-    std::string str = "Bitcoin key verification\n";
-    RAND_bytes(rnd, sizeof(rnd));
-    uint256 hash = CHashWriter(SER_GETHASH, 0).write((char*)str.data(), str.size()).write((char*)rnd, sizeof(rnd)).GetHash();
-    std::vector<unsigned char> vchSig;
-    Sign(hash, vchSig);
-    return pubkey.Verify(hash, vchSig);
 }
 
 bool CExtKey::Derive(CExtKey &out, unsigned int nChild) const {
