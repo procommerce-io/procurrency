@@ -6,11 +6,7 @@
 
 #include <map>
 #include "net.h"
-#ifndef OTP_ENABLED
-    #include "util.h"
-#else
-    #include "util_otp.h"
-#endif
+#include "util.h"
 
 class uint256;
 class CBlockIndex;
