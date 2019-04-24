@@ -32,21 +32,13 @@ public:
     EC_KEY* GetECKey() {return pkey;};
 
     void GetSecretBytes(unsigned char vch[32]) const;
-
     void SetSecretBytes(const unsigned char vch[32]);
-
     void GetPrivKey(CPrivKey &privkey, bool fCompressed);
-
     bool SetPrivKey(const CPrivKey &privkey, bool fSkipCheck=false);
-
     void GetPubKey(CPubKey &pubkey, bool fCompressed);
-
     bool SetPubKey(const CPubKey &pubkey);
-
     bool Sign(const uint256 &hash, std::vector<unsigned char>& vchSig);
-
     bool Verify(const uint256 &hash, const std::vector<unsigned char>& vchSig);
-
     bool SignCompact(const uint256 &hash, unsigned char *p64, int &rec);
 
     // reconstruct public key from a compact signature
