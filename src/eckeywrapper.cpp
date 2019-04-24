@@ -2,7 +2,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "ecwrapper.h"
+#include "eckeywrapper.h"
 
 #include "serialize.h"
 #include "uint256.h"

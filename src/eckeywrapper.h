@@ -2,13 +2,15 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_EC_WRAPPER_H
-#define BITCOIN_EC_WRAPPER_H
+#ifndef ECKEY_WRAPPER_H
+#define ECKEY_WRAPPER_H
 
 #include <cstddef>
 #include <vector>
 
 #include <openssl/ec.h>
+
+#include "key.h"
 
 class uint256;
 
@@ -28,7 +30,7 @@ public:
     int GetPrivKeySize(bool fCompressed);
     int GetPrivKey(unsigned char* privkey, bool fCompressed);
     bool SetPrivKey(const unsigned char* privkey, size_t size, bool fSkipCheck=false);
-    void GetPubKey(std::vector<unsigned char>& pubkey, bool fCompressed);
+    void GetPubKey(std::vector<unsigned char> &pubkey, bool fCompressed);
     bool SetPubKey(const unsigned char* pubkey, size_t size);
     bool Sign(const uint256 &hash, std::vector<unsigned char>& vchSig);
     bool Verify(const uint256 &hash, const std::vector<unsigned char>& vchSig);
