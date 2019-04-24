@@ -207,8 +207,8 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
 
     // Sort candidate blocks by timestamp
     std::vector<std::pair<int64_t, uint256> > vSortedByTimestamp;
-	if (Params().IsProtocolV4(pindexPrev->nHeight))
-		vSortedByTimestamp.reserve(64 * nModifierInterval / GetTargetSpacingV4(pindexPrev->nHeight));
+	if (Params().IsProtocolVFork2(pindexPrev->nHeight))
+		vSortedByTimestamp.reserve(64 * nModifierInterval / GetTargetSpacingVFork2(pindexPrev->nHeight));
 	else
 		vSortedByTimestamp.reserve(64 * nModifierInterval / GetTargetSpacing(pindexPrev->nHeight));
     int64_t nSelectionInterval = GetStakeModifierSelectionInterval();
@@ -301,8 +301,8 @@ bool ComputeNextStakeModifierThin(const CBlockThinIndex* pindexPrev, uint64_t& n
 
     // Sort candidate blocks by timestamp
     std::vector<std::pair<int64_t, uint256> > vSortedByTimestamp;
-    if (Params().IsProtocolV4(pindexPrev->nHeight))
-		vSortedByTimestamp.reserve(64 * nModifierInterval / GetTargetSpacingV4(pindexPrev->nHeight));
+    if (Params().IsProtocolVFork2(pindexPrev->nHeight))
+		vSortedByTimestamp.reserve(64 * nModifierInterval / GetTargetSpacingVFork2(pindexPrev->nHeight));
 	else
 		vSortedByTimestamp.reserve(64 * nModifierInterval / GetTargetSpacing(pindexPrev->nHeight));
     int64_t nSelectionInterval = GetStakeModifierSelectionInterval();
@@ -690,7 +690,7 @@ static inline bool CheckStakeKernelHashV2(CStakeModifier* pStakeMod, unsigned in
     targetProofOfStake = bnTarget.getuint256();
 
     CDataStream ss(SER_GETHASH, 0);
-    if (Params().IsProtocolV3(pStakeMod->nHeight))
+    if (Params().IsProtocolVFork1(pStakeMod->nHeight))
         ss << pStakeMod->bnModifierV2;
     else
         ss << pStakeMod->nModifier << nTimeBlockFrom;
@@ -767,7 +767,7 @@ bool CheckProofOfStake(CBlockIndex* pindexPrev, const CTransaction& tx, unsigned
     if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
         return fDebug? error("CheckProofOfStake() : read block failed") : false; // unable to read block of previous transaction
 
-    if (Params().IsProtocolV3(pindexPrev->nHeight))
+    if (Params().IsProtocolVFork1(pindexPrev->nHeight))
     {
         int nDepth;
         if (IsConfirmedInNPrevBlocks(txindex, pindexPrev, nStakeMinConfirmations - 1, nDepth))
@@ -813,7 +813,7 @@ bool CheckKernel(CBlockIndex* pindexPrev, unsigned int nBits, int64_t nTime, con
     if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
         return false;
 
-    if (Params().IsProtocolV3(nTime))
+    if (Params().IsProtocolVFork1(nTime))
     {
         int nDepth;
         if (IsConfirmedInNPrevBlocks(txindex, pindexPrev, nStakeMinConfirmations - 1, nDepth))
