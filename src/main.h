@@ -12,7 +12,7 @@
 #include "net.h"
 #include "script.h"
 #include "scrypt.h"
-#include "state.h"
+#include "procstate.h"
 
 #include <list>
 
@@ -58,21 +58,21 @@ inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MO
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 
-/** REMOVE MBLK **/
-static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
+/** REMOVE MBLK **/ // All Forks Moved to prostate.h
+//static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
 /** New Blocktime Correction **/
-static const signed int NEW_TARGET_SPACING_FORK_BLOCK = 390000;
+//static const signed int NEW_TARGET_SPACING_FORK_BLOCK = 390000;
 /** MN Enforcement **/
 //static const signed int MN_ENFORCEMENT_FORK_BLOCK = xxxxxxxxx;
 
 inline int64_t FutureDriftV1(int64_t nTime) { return nTime + 10 * 60; } // ProtocolV1
 inline int64_t FutureDriftV2(int64_t nTime) { return nTime + 15; } // ProtocolV2/V3
-inline int64_t FutureDriftV4(int64_t nTime, int nHeight) { return nTime + 20 * 60; } // ProtocolV4
+inline int64_t FutureDriftVFork2(int64_t nTime, int nHeight) { return nTime + 20 * 60; } // ProtocolVFork2
 
 inline int64_t FutureDrift(int64_t nTime, int nHeight) { return Params().IsProtocolV1(nHeight) ? FutureDriftV1(nTime) : FutureDriftV2(nTime); }
 
 inline unsigned int GetTargetSpacing(int nHeight) { return Params().IsProtocolV1(nHeight) ? 60 : 69; }
-inline unsigned int GetTargetSpacingV4(int nHeight) { return Params().IsProtocolV4(nHeight) ? 120 : 60; } // ProtocolV4
+inline unsigned int GetTargetSpacingVFork2(int nHeight) { return Params().IsProtocolVFork2(nHeight) ? 120 : 60; } // ProtocolVFork2
 
 extern CScript COINBASE_FLAGS;
 extern CCriticalSection cs_main;
@@ -129,15 +129,13 @@ static const bool DEFAULT_CHECK_FOR_UPDATES = true;
 class CReserveKey;
 class CTxDB;
 class CTxIndex;
-class CWalletInterface;
+//class CWalletInterface; //cleanup
 struct CNodeStateStats;
 
 /** Register a wallet to receive updates from core */
-void RegisterWallet(CWalletInterface* pwalletIn);
+void RegisterWallet(CWallet* pwalletIn);
 /** Unregister a wallet from core */
-void UnregisterWallet(CWalletInterface* pwalletIn);
-/** Unregister all wallets from core */
-void UnregisterAllWallets();
+void UnregisterWallet(CWallet* pwalletIn);
 /** Push an updated transaction to all registered wallets */
 void SyncWithWallets(const CTransaction& tx, const CBlock* pblock = NULL, bool fUpdate = false, bool fConnect = true);
 /** Ask wallets to resend their transactions */
@@ -2255,13 +2253,13 @@ public:
     std::string GetRejectReason() const { return strRejectReason; }
 };*/
 
-class CWalletInterface {
+/*class CWalletInterface {
 protected:
-    virtual void ResendWalletTransactions(bool fForce) =0;
+    virtual void ResendWalletTransactions(bool fForce) =0;	//cleanup
 	virtual void EraseFromWallet(const uint256 &hash) =0;
     friend void ::RegisterWallet(CWalletInterface*);
     friend void ::UnregisterWallet(CWalletInterface*);
     friend void ::UnregisterAllWallets();
-};
+};*/
 
 #endif
