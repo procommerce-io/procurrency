@@ -92,7 +92,7 @@ OBJS= \
     obj/crypter.o \
     obj/key.o \
 	obj/pubkey.o \
-    obj/eckey.o \
+    obj/eckeywrapper.o \
     obj/extkey.o \
     obj/init.o \
     obj/procd.o \
@@ -126,7 +126,7 @@ OBJS= \
     obj/core.o \
     obj/txmempool.o \
     obj/chainparams.o \
-    obj/state.o \
+    obj/procstate.o \
 	obj/crypto/hmac_sha256.o \
     obj/crypto/hmac_sha512.o \
     obj/crypto/ripemd160.o \
