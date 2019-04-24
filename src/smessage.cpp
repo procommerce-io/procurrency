@@ -56,7 +56,7 @@ Notes:
 #include "init.h" // pwalletMain
 #include "txdb.h"
 #include "sync.h"
-#include "eckey.h"
+#include "eckeywrapper.h"
 
 #include "lz4/lz4.c"
 
@@ -3488,7 +3488,8 @@ int SecureMsgEncrypt(SecureMessage &smsg, const std::string &addressFrom, const 
 
     // -- Do an EC point multiply with public key K and private key r. This gives you public key P.
     CECKey ecKeyK;
-    if (!ecKeyK.SetPubKey(cpkDestK))
+    //if (!ecKeyK.SetPubKey(cpkDestK))
+	if (!ecKeyK.SetPubKey(cpkDestK.begin(), cpkDestK.size()))	
     {
         // address to is invalid
         return errorN(4, "%s: Could not set pubkey for K: %s.", __func__, HexStr(cpkDestK).c_str());
@@ -3874,7 +3875,8 @@ int SecureMsgDecrypt(bool fTestOnly, std::string &address, uint8_t *pHeader, uin
     };
 
     CECKey ecKeyR;
-    if (!ecKeyR.SetPubKey(cpkR))
+    //if (!ecKeyR.SetPubKey(cpkR))
+	if (!ecKeyR.SetPubKey(cpkR.begin(), cpkR.size()))	
     {
         return errorN(1, "%s: Could not set pubkey for key R: %s.", __func__, HexStr(cpkR).c_str());
     };
