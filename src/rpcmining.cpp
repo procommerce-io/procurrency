@@ -151,8 +151,8 @@ Value getstakinginfo(const Array& params, bool fHelp)
     bool staking = nLastCoinStakeSearchInterval && nWeight;
 	
 	uint64_t nExpectedTime = 0;
-	if (Params().IsProtocolV4(nBestHeight))
-		nExpectedTime = staking ? (GetTargetSpacingV4(nBestHeight) * nNetworkWeight / nWeight) : 0;
+	if (Params().IsProtocolVFork2(nBestHeight))
+		nExpectedTime = staking ? (GetTargetSpacingVFork2(nBestHeight) * nNetworkWeight / nWeight) : 0;
 	else
 		nExpectedTime = staking ? (GetTargetSpacing(nBestHeight) * nNetworkWeight / nWeight) : 0;
 		
