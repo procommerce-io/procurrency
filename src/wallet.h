@@ -22,6 +22,7 @@
 #include "util.h"
 #include "stealth.h"
 #include "smessage.h"
+#include "procstate.h"
 
 // Settings
 extern int64_t nTransactionFee;
@@ -89,8 +90,7 @@ bool IsMine(const CWallet& wallet, const CScript& scriptPubKey);
 /** A CWallet is an extension of a keystore, which also maintains a set of transactions and balances,
  * and provides the ability to create new transactions.
  */
-//class CWallet : public CCryptoKeyStore
-class CWallet : public CCryptoKeyStore, public CWalletInterface
+class CWallet : public CCryptoKeyStore
 {
 private:
     bool SelectCoinsForStaking(int64_t nTargetValue, unsigned int nSpendTime, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64_t& nValueRet) const;
@@ -249,6 +249,7 @@ public:
     void MarkDirty();
     bool AddToWallet(const CWalletTx& wtxIn, const uint256& hashIn);
     bool AddToWalletIfInvolvingMe(const CTransaction& tx, const uint256& hash, const void* pblock, bool fUpdate = false, bool fFindBlock = false);
+	
     void EraseFromWallet(const uint256 &hash);
     void WalletUpdateSpent(const CTransaction& prevout, bool fBlock = false);
     int ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate = false);
