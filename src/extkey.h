@@ -8,14 +8,8 @@
 #include "key.h"
 #include "hash.h"
 #include "crypter.h"
-//#ifndef OTP_ENABLED
-    //#include "crypter.h"  //del
-//#else
-    //#include "crypter_otp.h"
-//#endif
 #include "stealth.h"
-
-#include "state.h"
+#include "procstate.h"
 
 static const uint32_t MAX_DERIVE_TRIES = 16;
 static const uint32_t BIP32_KEY_LEN = 82; // raw, 74 + 4 bytes id + 4 checksum
