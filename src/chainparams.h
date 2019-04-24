@@ -68,15 +68,15 @@ public:
     const std::vector<unsigned char>& AlertKey() const { return vAlertPubKey; }
     int GetDefaultPort() const { return nDefaultPort; }
 
-    const bool IsProtocolV1(int nHeight) const { return nHeight < nFirstPosv2Block; }
-    const bool IsProtocolV2(int nHeight) const { return nHeight > nFirstPosv2Block; }
-    const bool IsProtocolV3(int nHeight) const { return nHeight > nFirstPosv3Block; }
-	const bool IsProtocolV4(int nHeight) const { return nHeight > nFirstPosv4Block; } // ProtocolV4
+    const bool IsProtocolV1(int nHeight) const { return nHeight < nStartPosv2Block; }
+    const bool IsProtocolV2(int nHeight) const { return nHeight > nStartPosv2Block; }
+    const bool IsProtocolVFork1(int nHeight) const { return nHeight > nStartPosvFork1Block; }
+	const bool IsProtocolVFork2(int nHeight) const { return nHeight > nStartPosvFork2Block; } // ProtocolVFork2
 
     const CBigNum& ProofOfWorkLimit() const { return bnProofOfWorkLimit; }
     const CBigNum& ProofOfStakeLimit(int nHeight) const { return IsProtocolV2(nHeight) ? bnProofOfStakeLimitV2 : bnProofOfStakeLimit; }
-	// ProtocolV4
-	const CBigNum& ProofOfStakeLimitV4(int nHeight) const { return IsProtocolV4(nHeight) ? bnProofOfStakeLimitV4 : bnProofOfStakeLimitV3; }
+	// ProtocolVFork2
+	const CBigNum& ProofOfStakeLimitVFork2(int nHeight) const { return IsProtocolVFork2(nHeight) ? bnProofOfStakeLimitVFork2 : bnProofOfStakeLimitVFork1; }
     
     
     virtual const CBlock& GenesisBlock() const = 0;
@@ -112,14 +112,14 @@ protected:
     int nRPCPort;
     int nBIP44ID;
     
-    int nFirstPosv2Block;
-    int nFirstPosv3Block;
-	int nFirstPosv4Block; //ProtocolV4
+    int nStartPosv2Block;
+    int nStartPosvFork1Block;
+	int nStartPosvFork2Block; //ProtocolVFork2
     CBigNum bnProofOfWorkLimit;
     CBigNum bnProofOfStakeLimit;
     CBigNum bnProofOfStakeLimitV2;
-	CBigNum bnProofOfStakeLimitV3;
-	CBigNum bnProofOfStakeLimitV4; //ProtocolV4
+	CBigNum bnProofOfStakeLimitVFork1;
+	CBigNum bnProofOfStakeLimitVFork2; //ProtocolVFork2
     
     std::string strDataDir;
     std::vector<CDNSSeedData> vSeeds;
