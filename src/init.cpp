@@ -11,7 +11,7 @@
 #include "rpcserver.h"
 #include "rpcclient.h"
 #include "net.h"
-#include "state.h"
+#include "procstate.h"
 #include "sync.h"
 #include "ui_interface.h"
 #include "smessage.h"
@@ -169,7 +169,7 @@ void Shutdown()
     //fs::remove(GetPidFile());
     //return true;
 	boost::filesystem::remove(GetPidFile());
-    UnregisterAllWallets();
+    //UnregisterAllWallets(); //cleanup
 #ifdef ENABLE_WALLET
     delete pwalletMain;
     pwalletMain = NULL;
