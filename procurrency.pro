@@ -299,7 +299,7 @@ HEADERS += \
     src/net.h \
     src/key.h \
     src/extkey.h \
-    src/eckey.h \
+    src/eckeywrapper.h \
     src/db.h \
     src/txdb.h \
     src/script.h \
@@ -307,7 +307,7 @@ HEADERS += \
     src/ringsig.h  \
     src/core.h  \
     src/txmempool.h  \
-    src/state.h \
+    src/procstate.h \
     src/bloom.h \
     src/init.h \
     src/mruset.h \
@@ -388,7 +388,7 @@ SOURCES += \
     src/netbase.cpp \
     src/key.cpp \
     src/extkey.cpp \
-    src/eckey.cpp \
+    src/eckeywrapper.cpp \
     src/script.cpp \
     src/main.cpp \
     src/miner.cpp \
@@ -410,7 +410,7 @@ SOURCES += \
     src/core.cpp  \
     src/txmempool.cpp  \
     src/keystore.cpp \
-    src/state.cpp \
+    src/procstate.cpp \
     src/bloom.cpp \
     src/protocol.cpp \
     src/rpcprotocol.cpp \
