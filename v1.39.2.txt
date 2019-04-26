@@ -1,0 +1,18 @@
+
+================================ RELEASE NOTES ============ v1.39.2 RC
+v1.39.2 RC is a quick bug fix to the staking notification and balance update in the GUI wallet and
+plus some few new additions and changes.
+
+-Renamed "state" to "procstate"
+-Changed "eckey" to "eckeywrapper"
+-Past and Future Forks will now be located in procstate.h
+-Changed stake reward halving, from 5 to 10 PROC ahead for Standard POS
+(Note: We are planing to implement in the near Future, a Dual Proof-of-Stake Mechanism: Standard POS [PROC] - Anon Stake Booster POS [PROA]. More details will be given while we progress with ProCurrency development)
+-Corrections in chainparams to prepare for our POS upgrade ahead
+-Wallet Signals Bug fix (Fix staking notification and balance update)
+-Made changes in "key"
+-Planned ahead for PoSv3 Fork
+-Hardcoded new Checkpoint block #602487
+-Created "mnbase" (Masternodes Base) to hold Collateral and other MN Information
+-Created a New directory "hashcore" for our next POS Algo - Planning to switch from SHA256
+-Corrected Params() Protocol Version
