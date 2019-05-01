@@ -7,6 +7,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
+#include "main.h"
+
 #include "alert.h"
 #include "checkpoints.h"
 #include "db.h"
@@ -41,14 +43,19 @@ std::map<uint256, CBlockThinIndex*> mapBlockThinIndex;
 std::set<std::pair<COutPoint, unsigned int> > setStakeSeen;
 
 
-unsigned int nStakeMinAge       = 6 * 60 * 60;      // 6 hours
-unsigned int nStakeMaxAge       = -1; // Unlimited
-unsigned int nModifierInterval  = 30 * 60;          // time to elapse before new modifier is computed
+//unsigned int nStakeMinAge       = 6 * 60 * 60;      // 6 hours //cleanup
+unsigned int nStakeMinAge = 0;					//Initialization see Main chain forks
+unsigned int nStakeMaxAge       = -1; 			// Unlimited
+unsigned int nModifierInterval  = 30 * 60;      // time to elapse before new modifier is computed
 
-int nCoinbaseMaturity = 49; // 50
-int nStakeMinConfirmations = 60;
+//int nCoinbaseMaturity = 50; // 50 //cleanup
+int nCoinbaseMaturity = 0;						//Initialization see Main chain forks
+int nStakeMinConfirmationsOld = 60;
+//TODO: PoSv3 Fork - to be moved to "Chainparams"
+/* int nStakeMinConfirmations = 220 */ //Planning ahead for PoSv3 Fork
+/* int nAnonStakeMinConfirmations = 320 */ //Planning ahead for PoSv3 Fork
+
 CBlockIndex* pindexGenesisBlock = NULL;
-
 CBlockThinIndex* pindexGenesisBlockThin = NULL;
 CBlockThinIndex* pindexRear = NULL;
 
@@ -91,9 +98,47 @@ const string strMessageMagic = "ProCurrency Signed Message:\n";
 
 std::set<uint256> setValidatedTx;
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// Main chain forks
+//
+
+/** Min Coinbase Maturity Fork **/
+unsigned int GetCoinbaseMaturity(const CBlockIndex* pindexBest)
+{
+	if (pindexBest->nHeight > COINBASE_MATURITY_FORK_BLOCK+1) {
+		nCoinbaseMaturity = 219;		// 220 Confirmations
+	}else{
+		nCoinbaseMaturity = 49;			// 50 Confirmations
+	}
+	return nCoinbaseMaturity;	
+}
+
+/** Min Stake Age Fork **/
+unsigned int GetMinStakeAge(const CBlockIndex* pindexBest)
+{
+	if (pindexBest->nHeight > MIN_STAKE_AGE_FORK_BLOCK+1){
+		nStakeMinAge = 2 * 60 * 60;      // 2 hours
+	}else{
+		nStakeMinAge = 6 * 60 * 60;      // 6 hours
+	}
+	return nStakeMinAge;
+}
+
+/** Min TxFee Fork **/
+unsigned int GetMinTxFee(const CBlockIndex* pindexBest)
+{
+	if (pindexBest->nHeight > MIN_TX_FEE_FORK_BLOCK+1){
+		int64_t MIN_TX_FEE = MIN_TX_FEE_BASE * 10; 			//	0.001
+	}else{
+		int64_t MIN_TX_FEE = MIN_TX_FEE_BASE; 				//	0.0001
+	}
+	return MIN_TX_FEE;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //
-// dispatching functions
+// Dispatching functions
 //
 
 // These functions dispatch to one or all registered wallets
@@ -2023,7 +2068,7 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
 {
 	CBigNum bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit(pindexLast->nHeight) : Params().ProofOfWorkLimit();
 	
-	CBigNum bnTargetLimitV4 = fProofOfStake ? Params().ProofOfStakeLimitVFork2(pindexLast->nHeight) : Params().ProofOfWorkLimit();
+	CBigNum bnTargetLimitVFork2 = fProofOfStake ? Params().ProofOfStakeLimitVFork2(pindexLast->nHeight) : Params().ProofOfWorkLimit();
 
     if (pindexLast == NULL)
         return bnTargetLimit.GetCompact(); // genesis block
@@ -2035,26 +2080,39 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
     if (pindexPrevPrev->pprev == NULL)
         return bnTargetLimit.GetCompact(); // second block
     
-    //int64_t nTargetSpacing = GetTargetSpacing(pindexLast->nHeight);
+    //int64_t nTargetSpacing = GetTargetSpacing(pindexLast->nHeight); //cleanup
 	int64_t nTargetSpacing = 0; //
+	//int64_t nTargetSpacing = BLOCK_SPACINGv3; //
 	
+	//TODO: Blocktime Enforcement
 	if(pindexLast->nHeight < NEW_TARGET_SPACING_FORK_BLOCK){
 		nTargetSpacing = 90; //90s
-	}else{
+		//int64_t nTargetSpacing = BLOCK_SPACINGv3 - 90;
+	}else{ // if (pindexLast->nHeight < TARGET_SPACING_V3_FORK_BLOCK + 1){
 		nTargetSpacing = 120; //120s
-	}
+		//nTargetSpacing = BLOCK_SPACINGv3 - 60;
+	}//else{
+		//nTargetSpacing = BLOCK_SPACINGv3;
+	//}
+	//return nTargetSpacing;
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
     if (nActualSpacing < 0)
 		nActualSpacing = nTargetSpacing;
+	
+	//TODO: PoSv3 Fork
+	/*if (Params().IsProtocolVFork1(pindexLast->nHeight)) {
+        if (nActualSpacing < 0)
+			nActualSpacing = nTargetSpacing;
+	}*/
 
-	if (Params().IsProtocolVFork1(pindexLast->nHeight)) {
-        if (nActualSpacing > nTargetSpacing * 10)
-            nActualSpacing = nTargetSpacing * 10;
-	}
-    if (Params().IsProtocolVFork2(pindexLast->nHeight)) {
-        if (nActualSpacing > nTargetSpacing * 20)
-            nActualSpacing = nTargetSpacing * 20;
-	}
+	if (Params().IsProtocolVFork1(pindexLast->nHeight)) {	///
+        if (nActualSpacing > nTargetSpacing * 10)			///
+            nActualSpacing = nTargetSpacing * 10;			///
+	}														/// cleanup
+    if (Params().IsProtocolVFork2(pindexLast->nHeight)) {	///
+        if (nActualSpacing > nTargetSpacing * 20)			///
+            nActualSpacing = nTargetSpacing * 20;			///
+	}														///
     // ppcoin: target change every block
     // ppcoin: retarget with exponential moving toward target spacing
     CBigNum bnNew;
@@ -2065,8 +2123,8 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
 	bnNew /= ((nInterval + 1) * nTargetSpacing);
 	
 	if (Params().IsProtocolVFork2(pindexLast->nHeight)) {	
-		if (bnNew <= 0 || bnNew > bnTargetLimitV4)
-			bnNew = bnTargetLimitV4;
+		if (bnNew <= 0 || bnNew > bnTargetLimitVFork2)
+			bnNew = bnTargetLimitVFork2;
 	}else{
 		if (bnNew <= 0 || bnNew > bnTargetLimit)
 			bnNew = bnTargetLimit;
@@ -2079,7 +2137,7 @@ unsigned int GetNextTargetRequiredThin(const CBlockThinIndex* pindexLast, bool f
 {
 	CBigNum bnTargetLimit = fProofOfStake ? Params().ProofOfStakeLimit(pindexLast->nHeight) : Params().ProofOfWorkLimit();
 	
-	CBigNum bnTargetLimitV4 = fProofOfStake ? Params().ProofOfStakeLimitVFork2(pindexLast->nHeight) : Params().ProofOfWorkLimit();
+	CBigNum bnTargetLimitVFork2 = fProofOfStake ? Params().ProofOfStakeLimitVFork2(pindexLast->nHeight) : Params().ProofOfWorkLimit();
 
     if (pindexLast == NULL)
         return bnTargetLimit.GetCompact(); // genesis block
@@ -2098,9 +2156,11 @@ unsigned int GetNextTargetRequiredThin(const CBlockThinIndex* pindexLast, bool f
 	int64_t nTargetSpacing = 0; //Initiation
 	if(pindexLast->nHeight < NEW_TARGET_SPACING_FORK_BLOCK){
 		nTargetSpacing = 90; //90s
-	}else{
+	}else{ // if (pindexLast->nHeight < TARGET_SPACING_ENFORCEMENT_FORK_BLOCK{
 		nTargetSpacing = 120; //120s
-	}
+	}//else{
+		//nTargetSpacing = GetTargetSpacing(pindexLast->nHeight);
+	//}
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
     if (nActualSpacing < 0)
 		nActualSpacing = nTargetSpacing;
@@ -2120,8 +2180,8 @@ unsigned int GetNextTargetRequiredThin(const CBlockThinIndex* pindexLast, bool f
 	bnNew /= ((nInterval + 1) * nTargetSpacing);
 	
 	if (Params().IsProtocolVFork2(pindexLast->nHeight)) {	
-		if (bnNew <= 0 || bnNew > bnTargetLimitV4)
-			bnNew = bnTargetLimitV4;
+		if (bnNew <= 0 || bnNew > bnTargetLimitVFork2)
+			bnNew = bnTargetLimitVFork2;
 	}else{
 		if (bnNew <= 0 || bnNew > bnTargetLimit)
 			bnNew = bnTargetLimit;
@@ -3568,7 +3628,7 @@ bool CTransaction::GetCoinAge(CTxDB& txdb, const CBlockIndex* pindexPrev, uint64
         if (Params().IsProtocolVFork1(pindexPrev->nHeight))
         {
             int nSpendDepth;
-            if (IsConfirmedInNPrevBlocks(txindex, pindexPrev, nStakeMinConfirmations - 1, nSpendDepth))
+            if (IsConfirmedInNPrevBlocks(txindex, pindexPrev, nStakeMinConfirmationsOld - 1, nSpendDepth))
             {
                 LogPrint("coinage", "coin age skip nSpendDepth=%d\n", nSpendDepth + 1);
                 continue; // only count coins meeting min confirmations requirement

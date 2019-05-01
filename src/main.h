@@ -58,6 +58,9 @@ inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MO
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 
+//TODO: Block-Spacing
+/*static const int64_t BLOCK_SPACINGv3 = 180;*/
+
 /** REMOVE MBLK **/ // All Forks Moved to prostate.h
 //static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
 /** New Blocktime Correction **/
@@ -164,6 +167,12 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles);
 bool CheckProofOfWork(uint256 hash, unsigned int nBits);
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake);
 unsigned int GetNextTargetRequiredThin(const CBlockThinIndex* pindexLast, bool fProofOfStake);
+/** Min Coinbase Maturity Fork **/
+unsigned int GetCoinbaseMaturity(const CBlockIndex* pindexBest);
+/** Min Stake Age Fork **/
+unsigned int GetMinStakeAge(const CBlockIndex* pindexBest);
+/** Min TxFee Fork **/
+unsigned int GetMinTxFee(const CBlockIndex* pindexBest);
 
 int GetNumBlocksOfPeers();
 bool IsInitialBlockDownload();
@@ -178,7 +187,6 @@ bool TxnHashInSystem(CTxDB* ptxdb, uint256& txnHash);
 uint256 WantedByOrphan(const CBlock* pblockOrphan);
 uint256 WantedByOrphanHeader(const CBlockThin* pblockOrphan);
 const COrphanBlock* AddOrphanBlock(const CBlock* pblock);
-//uint256 WantedByOrphan(const COrphanBlock* pblockOrphan);
 const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake);
 const CBlockThinIndex* GetLastBlockThinIndex(const CBlockThinIndex* pindex, bool fProofOfStake);
 
