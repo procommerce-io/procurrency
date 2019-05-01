@@ -52,9 +52,11 @@ const int64_t GENESIS_BLOCK_TIME = 1488375642;
 static const int64_t COIN = 100000000;
 static const int64_t CENT = 1000000;
 
-/** Fees smaller than this (in satoshi) are considered zero fee (for transaction creation) */
-static const int64_t MIN_TX_FEE = 10000;
-static const int64_t MIN_TX_FEE_ANON = 1000000;
+/** Fees smaller than this (in satoshi) are considered zero fee (for transaction creation) **/
+static const int64_t MIN_TX_FEE_BASE = 10000; //0.0001
+static const int64_t MIN_TX_FEE = MIN_TX_FEE_BASE; //0.0001
+/** Anon Stake Booster (ASB) Chain Tx Fees **/
+static const int64_t MIN_TX_FEE_ANON = 1000000; //0.01
 /** Fees smaller than this (in satoshi) are considered zero fee (for relaying) */
 static const int64_t MIN_RELAY_TX_FEE = MIN_TX_FEE;
 
@@ -65,14 +67,24 @@ static const int nTryStakeMempoolTimeout = 5 * 60; // seconds
 static const int nTryStakeMempoolMaxAsk = 16;
 
 
-// FORKS ZONE
+//////////////////////////////////////////////////////////////////////////
+// Forks Zone
 
 /** MBLK Removal **/
 static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
 /** New Blocktime Correction **/
 static const signed int NEW_TARGET_SPACING_FORK_BLOCK = 390000;
+/** Coinbase Maturity Fork **/
+static const signed int COINBASE_MATURITY_FORK_BLOCK = 649000;
+/** Min Stake Age Fork **/
+static const signed int MIN_STAKE_AGE_FORK_BLOCK = 649001;
+/** Min TxFee Fork **/
+static const signed int MIN_TX_FEE_FORK_BLOCK = 649002;
+/** PoSv3 Blocktime Enforcement **/
+//static const signed int TARGET_SPACING_V3_FORK_BLOCK = xxxxx;
 /** MN Enforcement **/
 //static const signed int MN_ENFORCEMENT_FORK_BLOCK = xxxxxxxxx;
+
 
 
 
@@ -121,10 +133,11 @@ extern unsigned int nMinerSleep;
 extern unsigned int nBlockMaxSize;
 extern unsigned int nBlockPrioritySize;
 extern unsigned int nBlockMinSize;
+
 extern int64_t nMinTxFee;
 
 extern unsigned int nStakeSplitAge;
-extern int nStakeMinConfirmations;
+extern int nStakeMinConfirmationsOld;
 extern int64_t nStakeSplitThreshold;
 extern int64_t nStakeCombineThreshold;
 
@@ -132,5 +145,5 @@ extern uint32_t nExtKeyLookAhead;
 extern int64_t nTimeLastMblkRecv;
 
 
-#endif /* COIN_STATE_H */
+#endif // PROCSTATE_H
 
