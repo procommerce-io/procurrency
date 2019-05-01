@@ -104,7 +104,7 @@ private:
     // the maximum wallet format version: memory-only variable that specifies to what version this wallet may be upgraded
     int nWalletMaxVersion;
 	
-	/* //TODO: double-spends
+	/***** //TODO: double-spends
 	// Used to keep track of spent outpoints, and
     // detect and report conflicts (double-spends or
     // mutated transactions where the mutant gets mined).
@@ -114,7 +114,7 @@ private:
     void AddToSpends(const uint256& wtxid);
 
     void SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator>);
-	*/
+	******/
 
 public:	
     /// Main wallet lock.

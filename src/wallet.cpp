@@ -395,6 +395,106 @@ bool CWallet::SetMaxVersion(int nVersion)
     return true;
 }
 
+/******* TODO: double-spends
+set<uint256> CWallet::GetConflicts(const uint256& txid) const
+{
+    set<uint256> result;
+    AssertLockHeld(cs_wallet);
+
+    std::map<uint256, CWalletTx>::const_iterator it = mapWallet.find(txid);
+    if (it == mapWallet.end())
+        return result;
+    const CWalletTx& wtx = it->second;
+
+    std::pair<TxSpends::const_iterator, TxSpends::const_iterator> range;
+
+    BOOST_FOREACH(const CTxIn& txin, wtx.vin)
+    {
+        if (mapTxSpends.count(txin.prevout) <= 1)
+            continue;  // No conflict if zero or one spends
+        range = mapTxSpends.equal_range(txin.prevout);
+        for (TxSpends::const_iterator it = range.first; it != range.second; ++it)
+            result.insert(it->second);
+    }
+    return result;
+}
+
+void CWallet::SyncMetaData(pair<TxSpends::iterator, TxSpends::iterator> range)
+{
+    // We want all the wallet transactions in range to have the same metadata as
+    // the oldest (smallest nOrderPos).
+    // So: find smallest nOrderPos:
+
+    int nMinOrderPos = std::numeric_limits<int>::max();
+    const CWalletTx* copyFrom = NULL;
+    for (TxSpends::iterator it = range.first; it != range.second; ++it)
+    {
+        const uint256& hash = it->second;
+        int n = mapWallet[hash].nOrderPos;
+        if (n < nMinOrderPos)
+        {
+            nMinOrderPos = n;
+            copyFrom = &mapWallet[hash];
+        }
+    }
+    // Now copy data from copyFrom to rest:
+    for (TxSpends::iterator it = range.first; it != range.second; ++it)
+    {
+        const uint256& hash = it->second;
+        CWalletTx* copyTo = &mapWallet[hash];
+        if (copyFrom == copyTo) continue;
+        copyTo->mapValue = copyFrom->mapValue;
+        copyTo->vOrderForm = copyFrom->vOrderForm;
+        // fTimeReceivedIsTxTime not copied on purpose
+        // nTimeReceived not copied on purpose
+        copyTo->nTimeSmart = copyFrom->nTimeSmart;
+        copyTo->fFromMe = copyFrom->fFromMe;
+        copyTo->strFromAccount = copyFrom->strFromAccount;
+        // nOrderPos not copied on purpose
+        // cached members not copied on purpose
+    }
+}
+
+// Outpoint is spent if any non-conflicted transaction
+// spends it:
+bool CWallet::IsSpent(const uint256& hash, unsigned int n) const
+{
+    const COutPoint outpoint(hash, n);
+    pair<TxSpends::const_iterator, TxSpends::const_iterator> range;
+    range = mapTxSpends.equal_range(outpoint);
+
+    for (TxSpends::const_iterator it = range.first; it != range.second; ++it)
+    {
+        const uint256& wtxid = it->second;
+        std::map<uint256, CWalletTx>::const_iterator mit = mapWallet.find(wtxid);
+        if (mit != mapWallet.end() && mit->second.GetDepthInMainChain() >= 0)
+            return true; // Spent
+    }
+    return false;
+}
+
+void CWallet::AddToSpends(const COutPoint& outpoint, const uint256& wtxid)
+{
+    mapTxSpends.insert(make_pair(outpoint, wtxid));
+
+    pair<TxSpends::iterator, TxSpends::iterator> range;
+    range = mapTxSpends.equal_range(outpoint);
+    SyncMetaData(range);
+}
+
+
+void CWallet::AddToSpends(const uint256& wtxid)
+{
+    assert(mapWallet.count(wtxid));
+    CWalletTx& thisTx = mapWallet[wtxid];
+    if (thisTx.IsCoinBase()) // Coinbases don't spend anything!
+        return;
+
+    BOOST_FOREACH(const CTxIn& txin, thisTx.vin)
+        AddToSpends(txin.prevout, wtxid);
+}
+**********/
+
 bool CWallet::EncryptWallet(const SecureString& strWalletPassphrase)
 {
     if (IsCrypted())
@@ -627,9 +727,20 @@ void CWallet::MarkDirty()
     }
 }
 
+/*bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet)*/ //TODO: double-spends
 bool CWallet::AddToWallet(const CWalletTx& wtxIn, const uint256& hashIn)
 {
     //uint256 hashIn = wtxIn.GetHash();
+	/*uint256 hash = wtxIn.GetHash();
+    if (fFromLoadWallet)
+    {										//TODO: double-spends
+        mapWallet[hash] = wtxIn;
+        CWalletTx& wtx = mapWallet[hash];
+        wtx.BindWallet(this);
+        wtxOrdered.insert(make_pair(wtx.nOrderPos, TxPair(&wtx, (CAccountingEntry*)0)));
+        AddToSpends(hash);
+    }
+    else*/
     {
         LOCK(cs_wallet);
 
@@ -924,6 +1035,37 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const uint256& ha
     }
     return false;
 }
+
+/*** //TODO: SyncTransaction
+void CWallet::SyncTransaction(const CTransaction& tx, const CBlock* pblock, bool fConnect)
+{
+    LOCK2(cs_main, cs_wallet);
+    if (!AddToWalletIfInvolvingMe(tx, pblock, true))
+        return; // Not one of ours
+
+    // If a transaction changes 'conflicted' state, that changes the balance
+    // available of the outputs it spends. So force those to be
+    // recomputed, also:
+    BOOST_FOREACH(const CTxIn& txin, tx.vin)
+    {
+        if (mapWallet.count(txin.prevout.hash))
+            mapWallet[txin.prevout.hash].MarkDirty();
+    }
+
+    if (!fConnect)
+    {
+        // wallets need to refund inputs when disconnecting coinstake
+        if (tx.IsCoinStake())
+        {
+            if (IsFromMe(tx))
+                DisableTransaction(tx);
+        }
+        return;
+    }
+
+    AddToWalletIfInvolvingMe(tx, pblock, true);
+}
+***/
 
 void CWallet::EraseFromWallet(const uint256 &hash)
 {
@@ -6364,11 +6506,12 @@ string CWallet::PrepareDarksendDenominate(int minRounds, int maxRounds)
     int64_t nValueIn = 0;
     CReserveKey reservekey(this);
 
-    /*
+    /comment(*)
         Select the coins we'll use
 
         if minRounds >= 0 it means only denominated inputs are going in and coming out
     comment(*)/
+	
     if(minRounds >= 0){
         if (!SelectCoinsByDenominations(darkSendPool.sessionDenom, 0.1*COIN, DARKSEND_POOL_MAX, vCoins, vCoins2, nValueIn, minRounds, maxRounds))
             return _("Error: Can't select current denominated inputs");
@@ -6385,7 +6528,7 @@ string CWallet::PrepareDarksendDenominate(int minRounds, int maxRounds)
     int64_t nValueLeft = nValueIn;
     std::vector<CTxOut> vOut;
 
-    /*
+    /comment(*)
         TODO: Front load with needed denominations (e.g. .1, 1 )
     comment(*)/
 
@@ -7176,7 +7319,7 @@ int CWallet::ExtKeyImportLoose(CWalletDB *pwdb, CStoredExtKey &sekIn, bool fBip4
         
         std::vector<uint8_t> v;
         sek.mapValue[EKVT_KEY_TYPE] = SetChar(v, EKT_BIP44_MASTER);
-        CKeyID idRoot = sek.GetID();
+        //CKeyID idRoot = sek.GetID(); //cleanup
         
         CExtKey evDerivedKey;
         sek.kp.Derive(evDerivedKey, BIP44_PURPOSE);
