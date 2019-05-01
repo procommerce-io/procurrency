@@ -16,10 +16,8 @@ int64_t GetWeight(int nHeight, int64_t nIntervalBeginning, int64_t nIntervalEnd)
     // this change increases active coins participating the hash and helps
     // to secure the network when proof-of-stake difficulty is low
     if (Params().IsProtocolV1(nHeight))
-		//return nIntervalEnd - nIntervalBeginning - nStakeMinAge;
         return min(nIntervalEnd - nIntervalBeginning - nStakeMinAge, (int64_t)nStakeMaxAge);
     else
-		//return min(nIntervalEnd - nIntervalBeginning - nStakeMinAge, (int64_t)nStakeMaxAge);
         return nIntervalEnd - nIntervalBeginning - nStakeMinAge;
 }
 
@@ -770,7 +768,7 @@ bool CheckProofOfStake(CBlockIndex* pindexPrev, const CTransaction& tx, unsigned
     if (Params().IsProtocolVFork1(pindexPrev->nHeight))
     {
         int nDepth;
-        if (IsConfirmedInNPrevBlocks(txindex, pindexPrev, nStakeMinConfirmations - 1, nDepth))
+        if (IsConfirmedInNPrevBlocks(txindex, pindexPrev, nStakeMinConfirmationsOld - 1, nDepth))
             return tx.DoS(100, error("CheckProofOfStake() : tried to stake at depth %d", nDepth + 1));
     }
     else
@@ -816,7 +814,7 @@ bool CheckKernel(CBlockIndex* pindexPrev, unsigned int nBits, int64_t nTime, con
     if (Params().IsProtocolVFork1(nTime))
     {
         int nDepth;
-        if (IsConfirmedInNPrevBlocks(txindex, pindexPrev, nStakeMinConfirmations - 1, nDepth))
+        if (IsConfirmedInNPrevBlocks(txindex, pindexPrev, nStakeMinConfirmationsOld - 1, nDepth))
             return false;
     }
     else
