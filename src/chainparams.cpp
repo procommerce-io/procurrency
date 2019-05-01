@@ -70,13 +70,13 @@ int64_t CChainParams::GetProofOfStakeReward(const CBlockIndex* pindexPrev, int64
 //
 
 // Convert the pnSeeds6 array into usable address objects.
-static void convertSeed6(std::vector<CAddress> &vSeedsOut, const SeedSpec6 *data, unsigned int count)
+/*static void convertSeed6(std::vector<CAddress> &vSeedsOut, const SeedSpec6 *data, unsigned int count)
 {
     // It'll only connect to one or two seed nodes because once it connects,
     // it'll get a pile of addresses with newer timestamps.
     // Seed nodes are given a random 'last seen time' of between one and two
     // weeks ago.
-    const int64_t nOneWeek = 7*24*60*60;
+    const int64_t nOneWeek = 7*24*60*60;				//cleanup
     for (unsigned int i = 0; i < count; i++)
     {
         struct in6_addr ip;
@@ -85,7 +85,7 @@ static void convertSeed6(std::vector<CAddress> &vSeedsOut, const SeedSpec6 *data
         addr.nTime = GetTime() - GetRand(nOneWeek) - nOneWeek;
         vSeedsOut.push_back(addr);
     }
-}
+}*/
 
 // Convert the pnSeeds array into usable address objects.
 static void convertSeeds(std::vector<CAddress> &vSeedsOut, const unsigned int *data, unsigned int count, int port)
