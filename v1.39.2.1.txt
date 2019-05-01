@@ -1,7 +1,32 @@
 
+================================ RELEASE NOTES ============ v1.39.2.1 LR2
+v1.39.2.1 LR2 is a follow up update for v1.39.2 RC
+
+IMPORTANT:
+It is MANDATORY to update to this latest release.
+There are 3 important FORKS in this release set from Block# 649000 (~ in 2 months).
+*Coinbase Maturity Fork
+*Min Stake Age Fork
+*Min TxFee Fork
+
+
+It is RECOMMENDED to all Wallet users and node owners running Older versions to update to 
+this latest release.
+
+-FORK1 #649000: Coinbase maturity will change from 50 to 220 confirmations
+-FORK2 #649001: Min Stake Age will change from 6hrs ---> 2hrs
+-FORK3 #649002: Min TxFee will change from 0.0001 ---> 0.001
+-Renamed "nStakeMinConfirmations" to "nStakeMinConfirmationsOld"
+(Note: Planning ahead for PoSv3)
+-Renamed "procnode" directory to "turbinenode"
+-FIXED: Some Compiler "Warnings"
+-Cleanup: Unused code
+-BUMP: Network Protocol Version to 75540
+
 ================================ RELEASE NOTES ============ v1.39.2 RC
 v1.39.2 RC is a quick bug fix to the staking notification and balance update in the GUI wallet and
 plus some few new additions and changes.
+
 
 -Renamed "state" to "procstate"
 -Changed "eckey" to "eckeywrapper"
@@ -11,7 +36,6 @@ plus some few new additions and changes.
 -Corrections in chainparams to prepare for our POS upgrade ahead
 -Wallet Signals Bug fix (Fix staking notification and balance update)
 -Made changes in "key"
--Planned ahead for PoSv3 Fork
 -Hardcoded new Checkpoint block #602487
 -Created "mnbase" (Masternodes Base) to hold Collateral and other MN Information
 -Created a New directory "hashcore" for our next POS Algo - Planning to switch from SHA256
