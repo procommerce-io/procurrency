@@ -57,7 +57,7 @@ CFLAGS = -arch x86_64 -stdlib=libc++ -g -msse2
 endif
 
 # proc doesn't work because we don't support big-endian
-CFLAGS += -Wall -Wextra -Wformat -Wno-ignored-qualifiers -Wformat-security -Wno-unused-parameter -Wunused-function -Wunused-variable -fpermissive -Wconversion-null -Wno-deprecated-declarations\
+CFLAGS += -Wall -Wextra -Wformat -Wno-ignored-qualifiers -Wformat-security -Wno-unused-parameter -Wunused-function -Wno-unused-variable -fpermissive -Wconversion-null -Wno-deprecated-declarations\
     $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
 
 OBJS= \
