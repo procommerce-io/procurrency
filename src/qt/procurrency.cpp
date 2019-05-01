@@ -90,10 +90,10 @@ static void InitMessage(const std::string &message)
     }
 }
 
-static void QueueShutdown()
+/*static void QueueShutdown()	//cleanup
 {
     QMetaObject::invokeMethod(QCoreApplication::instance(), "quit", Qt::QueuedConnection);
-}
+}*/
 
 /*
    Translate string to current locale using Qt.

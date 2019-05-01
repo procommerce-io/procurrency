@@ -6,11 +6,6 @@
 #include "main.h"
 #include "rpcserver.h"
 #include "wallet.h"
-//#ifndef OTP_ENABLED
-    //#include "wallet.h"	
-//#else
-    //#include "wallet_otp.h"
-//#endif
 #include "key.h"
 #include "extkey.h"
 #include "chainparams.h"
@@ -47,7 +42,7 @@ Value mnemonic(const Array &params, bool fHelp)
     
     std::string mode = "";
     
-    uint32_t nParamOffset = 0;
+    //uint32_t nParamOffset = 0; //cleanup
     if (params.size() > 0)
     {
         std::string s = params[0].get_str();
@@ -59,7 +54,7 @@ Value mnemonic(const Array &params, bool fHelp)
             st.erase(std::remove(st.begin(), st.end(), ' '), st.end());
             mode = st;
             
-            nParamOffset = 1;
+            //nParamOffset = 1; //cleanup
         } else
         {
             throw std::runtime_error("Unknown mode.");

@@ -1944,7 +1944,7 @@ Value validateaddress(const Array& params, bool fHelp)
         return false;
         };
 
-        CKeyID ckidTo = cpkTo.GetID();
+        //CKeyID ckidTo = cpkTo.GetID(); //cleanup
 
         if (SecretToPublicKey(ephem_secret, ephem_pubkey) != 0)
         {
