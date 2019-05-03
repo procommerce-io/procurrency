@@ -44,12 +44,12 @@ std::set<std::pair<COutPoint, unsigned int> > setStakeSeen;
 
 
 //unsigned int nStakeMinAge       = 6 * 60 * 60;      // 6 hours //cleanup
-unsigned int nStakeMinAge = 0;					//Initialization see Main chain forks
+unsigned int nStakeMinAge = 0;					//Initialization - see CTransaction::GetCoinAge
 unsigned int nStakeMaxAge       = -1; 			// Unlimited
 unsigned int nModifierInterval  = 30 * 60;      // time to elapse before new modifier is computed
 
 //int nCoinbaseMaturity = 50; // 50 //cleanup
-int nCoinbaseMaturity = 0;						//Initialization see Main chain forks
+int nCoinbaseMaturity = 100;		//Initialization - see MerkleTx::GetBlocksToMaturity
 int nStakeMinConfirmationsOld = 60;
 //TODO: PoSv3 Fork - to be moved to "Chainparams"
 /* int nStakeMinConfirmations = 220 */ //Planning ahead for PoSv3 Fork
@@ -104,7 +104,7 @@ std::set<uint256> setValidatedTx;
 //
 
 /** Min Coinbase Maturity Fork **/
-unsigned int GetCoinbaseMaturity(const CBlockIndex* pindexBest)
+/*unsigned int GetCoinbaseMaturity(const CBlockIndex* pindexBest)
 {
 	if (pindexBest->nHeight > COINBASE_MATURITY_FORK_BLOCK+1) {
 		nCoinbaseMaturity = 219;		// 220 Confirmations
@@ -112,10 +112,10 @@ unsigned int GetCoinbaseMaturity(const CBlockIndex* pindexBest)
 		nCoinbaseMaturity = 49;			// 50 Confirmations
 	}
 	return nCoinbaseMaturity;	
-}
+}*/
 
 /** Min Stake Age Fork **/
-unsigned int GetMinStakeAge(const CBlockIndex* pindexBest)
+/*unsigned int GetMinStakeAge(const CBlockIndex* pindexBest)
 {
 	if (pindexBest->nHeight > MIN_STAKE_AGE_FORK_BLOCK+1){
 		nStakeMinAge = 2 * 60 * 60;      // 2 hours
@@ -123,10 +123,10 @@ unsigned int GetMinStakeAge(const CBlockIndex* pindexBest)
 		nStakeMinAge = 6 * 60 * 60;      // 6 hours
 	}
 	return nStakeMinAge;
-}
+}*/
 
 /** Min TxFee Fork **/
-unsigned int GetMinTxFee(const CBlockIndex* pindexBest)
+/*unsigned int GetMinTxFee(const CBlockIndex* pindexBest)
 {
 	if (pindexBest->nHeight > MIN_TX_FEE_FORK_BLOCK+1){
 		int64_t MIN_TX_FEE = MIN_TX_FEE_BASE * 10; 			//	0.001
@@ -134,7 +134,7 @@ unsigned int GetMinTxFee(const CBlockIndex* pindexBest)
 		int64_t MIN_TX_FEE = MIN_TX_FEE_BASE; 				//	0.0001
 	}
 	return MIN_TX_FEE;
-}
+}*/
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -1040,6 +1040,13 @@ bool CTransaction::CheckTransaction() const
 int64_t CTransaction::GetMinFee(unsigned int nBlockSize, enum GetMinFee_mode mode, unsigned int nBytes) const
 {
     // Base fee is either MIN_TX_FEE or MIN_RELAY_TX_FEE for standard txns, and MIN_TX_FEE_ANON for anon txns
+	/** Min TxFee Fork **/
+	if (pindexBest->nHeight > MIN_TX_FEE_FORK_BLOCK+1){
+		int64_t MIN_TX_FEE = MIN_TX_FEE_BASE * 10; 			//	0.001
+	}else{
+		int64_t MIN_TX_FEE = MIN_TX_FEE_BASE; 				//	0.0001
+	}
+	return MIN_TX_FEE;
 
     // -- force GMF_ANON if anon txn
     if (nVersion == ANON_TXN_VERSION)
@@ -3420,11 +3427,19 @@ int CMerkleTx::GetDepthInMainChain(CBlockThinIndex* &pindexRet) const
 }
 
 int CMerkleTx::GetBlocksToMaturity() const
+//int CMerkleTx::GetBlocksToMaturity(const CBlockIndex* pindexBest) const
 {
     if (!(IsCoinBase() || IsCoinStake()))
         return 0;
+	
+	//return max(0, (nCoinbaseMaturity + 1) - GetDepthInMainChain());
+	/** Min Coinbase Maturity Fork **/
+    if (pindexBest->nHeight > COINBASE_MATURITY_FORK_BLOCK+1){
+		return max(0, (nCoinbaseMaturity + 120) - GetDepthInMainChain());	
+	}else{
+		return max(0, (nCoinbaseMaturity - 50) - GetDepthInMainChain());
+	}
     
-    return max(0, (nCoinbaseMaturity + 1) - GetDepthInMainChain());
 }
 
 
@@ -3614,6 +3629,14 @@ bool CTransaction::GetCoinAge(CTxDB& txdb, const CBlockIndex* pindexPrev, uint64
 
     if (IsCoinBase())
         return true;
+	
+	/** Min Stake Age Fork **/
+	if (pindexPrev->nHeight > MIN_STAKE_AGE_FORK_BLOCK+1){
+		nStakeMinAge = 2 * 60 * 60;      // 2 hours
+	}else{
+		nStakeMinAge = 6 * 60 * 60;      // 6 hours
+	}
+	return nStakeMinAge;
 
     BOOST_FOREACH(const CTxIn& txin, vin)
     {

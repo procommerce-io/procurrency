@@ -52,7 +52,7 @@ static const unsigned int MAX_MULTI_BLOCK_ELEMENTS = 64;     // processing large
 static const unsigned int MAX_MULTI_BLOCK_THIN_ELEMENTS = 128;
 
 /** No amount larger than this (in satoshi) is valid */
-//static const int64_t MAX_MONEY = std::numeric_limits<int64_t>::max();
+//static const int64_t MAX_MONEY = std::numeric_limits<int64_t>::max(); //cleanup
 static const int64_t MAX_MONEY = 75000000000 * COIN;
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
@@ -63,7 +63,7 @@ static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20
 
 /** REMOVE MBLK **/ // All Forks Moved to prostate.h
 //static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
-/** New Blocktime Correction **/
+/** New Blocktime Correction **/									//cleanup
 //static const signed int NEW_TARGET_SPACING_FORK_BLOCK = 390000;
 /** MN Enforcement **/
 //static const signed int MN_ENFORCEMENT_FORK_BLOCK = xxxxxxxxx;
@@ -105,8 +105,8 @@ extern int64_t nLastCoinStakeSearchInterval;
 extern const std::string strMessageMagic;
 extern int64_t nTimeBestReceived;
 extern bool fImporting;
-//extern CCriticalSection cs_setpwalletRegistered;
-//extern std::set<CWallet*> setpwalletRegistered;
+//extern CCriticalSection cs_setpwalletRegistered;	//cleanup
+//extern std::set<CWallet*> setpwalletRegistered;	//cleanup
 struct COrphanBlock {
     uint256 hashBlock;
     uint256 hashPrev;
@@ -158,7 +158,7 @@ void PrintBlockTree();
 CBlockIndex* FindBlockByHeight(int nHeight);
 CBlockThinIndex* FindBlockThinByHeight(int nHeight);
 bool ProcessMessages(CNode* pfrom);
-//bool SendMessages(CNode* pto, std::vector<CNode*> &vNodesCopy, bool fSendTrickle);
+//bool SendMessages(CNode* pto, std::vector<CNode*> &vNodesCopy, bool fSendTrickle); //cleanup
 bool SendMessages(CNode* pto, bool fSendTrickle);
 
 bool LoadExternalBlockFile(int nFile, FILE* fileIn);
@@ -168,11 +168,11 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits);
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake);
 unsigned int GetNextTargetRequiredThin(const CBlockThinIndex* pindexLast, bool fProofOfStake);
 /** Min Coinbase Maturity Fork **/
-unsigned int GetCoinbaseMaturity(const CBlockIndex* pindexBest);
-/** Min Stake Age Fork **/
-unsigned int GetMinStakeAge(const CBlockIndex* pindexBest);
-/** Min TxFee Fork **/
-unsigned int GetMinTxFee(const CBlockIndex* pindexBest);
+//unsigned int GetCoinbaseMaturity(const CBlockIndex* pindexBest);
+/** Min Stake Age Fork **/											//cleanup
+//unsigned int GetMinStakeAge(const CBlockIndex* pindexBest);
+/** Min TxFee Fork **/											//cleanup
+//unsigned int GetMinTxFee(const CBlockIndex* pindexBest);
 
 int GetNumBlocksOfPeers();
 bool IsInitialBlockDownload();
@@ -633,6 +633,7 @@ public:
     }
 
     int GetBlocksToMaturity() const;
+	//int GetBlocksToMaturity(const CBlockIndex* pindexBest) const; //cleanup
     bool AcceptToMemoryPool(CTxDB& txdb);
     bool AcceptToMemoryPool();
 };
