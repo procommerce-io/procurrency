@@ -1,4 +1,16 @@
 
+================================ RELEASE NOTES ============ v1.39.2.2 LR3
+This update is a "Quick" Fix for v1.39.2.1 - Please check the release notes for more
+details
+
+It is RECOMMENDED to all Wallet users and node owners running Older versions to update to 
+this latest release.
+The Forks have been brought down from block# 629000 instead of 649000
+
+-Set all Forks from block# 629000 and plus
+-FIX: Moved Coinbase Maturity Fork to MerkleTx::GetBlocksToMaturity
+-FIX: Moved Min Stake Age Fork to CTransaction::GetCoinAge
+-FIX: Moved Min TxFee Fork to CTransaction::GetMinFee
 
 ================================ RELEASE NOTES ============ v1.39.2.1 LR2
 v1.39.2.1 LR2 is a follow up update for v1.39.2 RC
@@ -9,10 +21,6 @@ There are 3 important FORKS in this release set from Block# 649000 (~ in 2 month
 *Coinbase Maturity Fork
 *Min Stake Age Fork
 *Min TxFee Fork
-
-
-It is RECOMMENDED to all Wallet users and node owners running Older versions to update to 
-this latest release.
 
 -FORK1 #649000: Coinbase maturity will change from 50 to 220 confirmations
 -FORK2 #649001: Min Stake Age will change from 6hrs ---> 2hrs
