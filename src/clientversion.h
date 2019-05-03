@@ -17,7 +17,7 @@
 #define CLIENT_VERSION_MINOR       39
 #define CLIENT_VERSION_REVISION    2
 #define CLIENT_VERSION_BUILD       2
-
+//Mandatory
 // Converts the parameter X to a string after macro replacement on X has been performed.
 // Don't merge these into one macro!
 #define STRINGIZE(X) DO_STRINGIZE(X)
