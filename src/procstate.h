@@ -54,7 +54,7 @@ static const int64_t CENT = 1000000;
 
 /** Fees smaller than this (in satoshi) are considered zero fee (for transaction creation) **/
 static const int64_t MIN_TX_FEE_BASE = 10000; //0.0001
-static const int64_t MIN_TX_FEE = MIN_TX_FEE_BASE; //0.0001
+static const int64_t MIN_TX_FEE = MIN_TX_FEE_BASE; //Initialization - see CTransaction::GetMinFee
 /** Anon Stake Booster (ASB) Chain Tx Fees **/
 static const int64_t MIN_TX_FEE_ANON = 1000000; //0.01
 /** Fees smaller than this (in satoshi) are considered zero fee (for relaying) */
@@ -75,13 +75,13 @@ static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
 /** New Blocktime Correction **/
 static const signed int NEW_TARGET_SPACING_FORK_BLOCK = 390000;
 /** Coinbase Maturity Fork **/
-static const signed int COINBASE_MATURITY_FORK_BLOCK = 649000;
+static const signed int COINBASE_MATURITY_FORK_BLOCK = 629000;
 /** Min Stake Age Fork **/
-static const signed int MIN_STAKE_AGE_FORK_BLOCK = 649001;
+static const signed int MIN_STAKE_AGE_FORK_BLOCK = 629001;
 /** Min TxFee Fork **/
-static const signed int MIN_TX_FEE_FORK_BLOCK = 649002;
+static const signed int MIN_TX_FEE_FORK_BLOCK = 629002;
 /** PoSv3 Blocktime Enforcement **/
-//static const signed int TARGET_SPACING_V3_FORK_BLOCK = xxxxx;
+//static const signed int TARGET_SPACING_V3_FORK_BLOCK = 649000;
 /** MN Enforcement **/
 //static const signed int MN_ENFORCEMENT_FORK_BLOCK = xxxxxxxxx;
 
