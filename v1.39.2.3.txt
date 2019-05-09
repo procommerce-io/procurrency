@@ -1,4 +1,19 @@
 
+================================ RELEASE NOTES ============ v1.39.2.3 LR4 MANDATORY
+This Quick update (v1.39.2.3) is to fix a Minor Issue in v1.3.9.2.2 LR3
+that cause the Blockchain to be stuck when doing a Sync from scratch or Clean Sync.
+
+IMPORTANT: The Forks are still active and we have an additional Fork at Block# 639000
+to Enforce the Blocktime. It is MANDATORY that everybody be on this Latest Release.
+-FORK1 #649000: New Coinbase maturity set to 220 confirmations
+-FORK2 #649001: New Min Stake Age set to 2hrs
+-FORK3 #649002: New Min TxFee set to 0.001
+-FORK4: #639000: New Blocktime set to 240s
+
+-Fixed some Minor issues to allow the Blockchain to Sync from scratch
+-Added new Blocktime fork - Activation block# 639000
+-Added "PrivateSend" tab to the Navigation Panel
+
 ================================ RELEASE NOTES ============ v1.39.2.2 LR3
 This update is a "Quick" Fix for v1.39.2.1 - Please check the release notes for more
 details
@@ -16,7 +31,6 @@ The Forks have been brought down from block# 629000 instead of 649000
 v1.39.2.1 LR2 is a follow up update for v1.39.2 RC
 
 IMPORTANT:
-It is MANDATORY to update to this latest release.
 There are 3 important FORKS in this release set from Block# 649000 (~ in 2 months).
 *Coinbase Maturity Fork
 *Min Stake Age Fork
