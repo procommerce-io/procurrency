@@ -81,7 +81,7 @@ static const signed int MIN_STAKE_AGE_FORK_BLOCK = 629001;
 /** Min TxFee Fork **/
 static const signed int MIN_TX_FEE_FORK_BLOCK = 629002;
 /** PoSv3 Blocktime Enforcement **/
-//static const signed int TARGET_SPACING_V3_FORK_BLOCK = 649000;
+static const signed int TARGET_SPACING_V3_FORK_BLOCK = 639000;
 /** MN Enforcement **/
 //static const signed int MN_ENFORCEMENT_FORK_BLOCK = xxxxxxxxx;
 

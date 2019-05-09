@@ -58,8 +58,8 @@ inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MO
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 
-//TODO: Block-Spacing
-/*static const int64_t BLOCK_SPACINGv3 = 180;*/
+//Block-Spacing V3
+static const int64_t BLOCK_SPACINGv3 = 240;
 
 /** REMOVE MBLK **/ // All Forks Moved to prostate.h
 //static const signed int MBLK_REMOVE_FORK_BLOCK = 180000;
@@ -76,6 +76,8 @@ inline int64_t FutureDrift(int64_t nTime, int nHeight) { return Params().IsProto
 
 inline unsigned int GetTargetSpacing(int nHeight) { return Params().IsProtocolV1(nHeight) ? 60 : 69; }
 inline unsigned int GetTargetSpacingVFork2(int nHeight) { return Params().IsProtocolVFork2(nHeight) ? 120 : 60; } // ProtocolVFork2
+//TODO: v1393
+//inline unsigned int GetTargetSpacingVFork3(int nHeight) { return Params().IsProtocolVFork3(nHeight) ? 240 : 120; } // ProtocolVFork3
 
 extern CScript COINBASE_FLAGS;
 extern CCriticalSection cs_main;
