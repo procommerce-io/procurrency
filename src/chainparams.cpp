@@ -46,7 +46,7 @@ static const int YEARLY_BLOCKCOUNT =  899790; //
 /*int64_t CChainParams::GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64_t nFees) const*/
 int64_t CChainParams::GetProofOfStakeReward(const CBlockIndex* pindexPrev, int64_t nCoinAge, int64_t nFees) const
 {
-    int64_t nSubsidy = 5 * COIN;
+    int64_t nSubsidy = 10 * COIN;
 	
 	//if(nHeight < 100)
 	//if(nHeight < (YEARLY_BLOCKCOUNT))
@@ -164,8 +164,10 @@ public:
         nLastPOWBlock = 5000;
         
         nStartPosv2Block = 920; // POSv2 Start
-        nStartPosvFork1Block = 30000; // POSvFork1 Start
-		nStartPosvFork2Block = 440000; // POSvFork2 start
+        nStartPosvFork1Block = 30000; // POSv2Fork1 Start
+		nStartPosvFork2Block = 440000; // POSv2Fork2 start
+		//TODO: v1393
+		/*nStartPosv2Fork3Block = 670000;*/ // POSv2Fork3 start
 
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20); // PoW starting difficulty = 0.0002441
         bnProofOfStakeLimit = CBigNum(~uint256(0) >> 20); // PoS starting difficulty = 0.0002441
