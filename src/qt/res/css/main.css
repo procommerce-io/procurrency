@@ -600,6 +600,7 @@ article {
 /*#navpanel [href='#messages']:before,*/
 #navpanel [href='#blockdata']:before,
 #navpanel [href='#masternode']:before
+#navpanel [href='#privatesend']:before
 /*#navpanel [href='#chaindata']:before,*/
 /*#navpanel [href='#bittrex']:before,*/
 /*#navpanel [href='#news']:before*/ 
@@ -625,6 +626,7 @@ article {
 /*#navpanel .selected [href='#messages']:before,*/
 #navpanel .selected [href='#blockdata']:before,
 #navpanel .selected [href='#masternode']:before
+#navpanel .selected [href='#privatesend']:before
 /*#navpanel .selected [href='#chaindata']:before*/
 /*#navpanel .selected [href='#news']:before*/ 
 {
@@ -660,6 +662,10 @@ article {
 }
 
 #navpanel [href='#masternode']:before {
+    -webkit-mask-position-y: -254px;
+}
+
+#navpanel [href='#privatesend']:before {
     -webkit-mask-position-y: -254px;
 }
 
