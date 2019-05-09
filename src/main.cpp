@@ -49,7 +49,7 @@ unsigned int nStakeMaxAge       = -1; 			// Unlimited
 unsigned int nModifierInterval  = 30 * 60;      // time to elapse before new modifier is computed
 
 //int nCoinbaseMaturity = 50; // 50 //cleanup
-int nCoinbaseMaturity = 100;		//Initialization - see MerkleTx::GetBlocksToMaturity
+int nCoinbaseMaturity = 50;		//Initialization - see MerkleTx::GetBlocksToMaturity
 int nStakeMinConfirmationsOld = 60;
 //TODO: PoSv3 Fork - to be moved to "Chainparams"
 /* int nStakeMinConfirmations = 220 */ //Planning ahead for PoSv3 Fork
@@ -2088,29 +2088,29 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
         return bnTargetLimit.GetCompact(); // second block
     
     //int64_t nTargetSpacing = GetTargetSpacing(pindexLast->nHeight); //cleanup
-	int64_t nTargetSpacing = 0; //
-	//int64_t nTargetSpacing = BLOCK_SPACINGv3; //
+	//int64_t nTargetSpacing = 0; //
+	int64_t nTargetSpacing = BLOCK_SPACINGv3; //240s
 	
-	//TODO: Blocktime Enforcement
+	//Blocktime Enforcement
 	if(pindexLast->nHeight < NEW_TARGET_SPACING_FORK_BLOCK){
-		nTargetSpacing = 90; //90s
-		//int64_t nTargetSpacing = BLOCK_SPACINGv3 - 90;
-	}else{ // if (pindexLast->nHeight < TARGET_SPACING_V3_FORK_BLOCK + 1){
-		nTargetSpacing = 120; //120s
-		//nTargetSpacing = BLOCK_SPACINGv3 - 60;
-	}//else{
-		//nTargetSpacing = BLOCK_SPACINGv3;
-	//}
-	//return nTargetSpacing;
+		//nTargetSpacing = 90; //90s
+		nTargetSpacing = BLOCK_SPACINGv3 - 150; //90s
+	}else if (pindexLast->nHeight < TARGET_SPACING_V3_FORK_BLOCK){
+		//nTargetSpacing = 120; //120s
+		nTargetSpacing = BLOCK_SPACINGv3 - 120; //120s
+	}else{
+		nTargetSpacing = BLOCK_SPACINGv3;
+	}
+	
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
     if (nActualSpacing < 0)
 		nActualSpacing = nTargetSpacing;
 	
-	//TODO: PoSv3 Fork
-	/*if (Params().IsProtocolVFork1(pindexLast->nHeight)) {
+	//Blocktime Enforcement
+	if (pindexLast->nHeight > TARGET_SPACING_V3_FORK_BLOCK+1) {
         if (nActualSpacing < 0)
 			nActualSpacing = nTargetSpacing;
-	}*/
+	}
 
 	if (Params().IsProtocolVFork1(pindexLast->nHeight)) {	///
         if (nActualSpacing > nTargetSpacing * 10)			///
@@ -2161,13 +2161,13 @@ unsigned int GetNextTargetRequiredThin(const CBlockThinIndex* pindexLast, bool f
     
     //int64_t nTargetSpacing = GetTargetSpacing(pindexLast->nHeight);
 	int64_t nTargetSpacing = 0; //Initiation
+	
 	if(pindexLast->nHeight < NEW_TARGET_SPACING_FORK_BLOCK){
 		nTargetSpacing = 90; //90s
-	}else{ // if (pindexLast->nHeight < TARGET_SPACING_ENFORCEMENT_FORK_BLOCK{
+	}else{
 		nTargetSpacing = 120; //120s
-	}//else{
-		//nTargetSpacing = GetTargetSpacing(pindexLast->nHeight);
-	//}
+	}
+	
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
     if (nActualSpacing < 0)
 		nActualSpacing = nTargetSpacing;
@@ -3427,7 +3427,7 @@ int CMerkleTx::GetDepthInMainChain(CBlockThinIndex* &pindexRet) const
 }
 
 int CMerkleTx::GetBlocksToMaturity() const
-//int CMerkleTx::GetBlocksToMaturity(const CBlockIndex* pindexBest) const
+//int CMerkleTx::GetBlocksToMaturity(const CBlockIndex* pindexBest) const //cleanup
 {
     if (!(IsCoinBase() || IsCoinStake()))
         return 0;
@@ -3435,9 +3435,9 @@ int CMerkleTx::GetBlocksToMaturity() const
 	//return max(0, (nCoinbaseMaturity + 1) - GetDepthInMainChain());
 	/** Min Coinbase Maturity Fork **/
     if (pindexBest->nHeight > COINBASE_MATURITY_FORK_BLOCK+1){
-		return max(0, (nCoinbaseMaturity + 120) - GetDepthInMainChain());	
+		return max(0, (nCoinbaseMaturity + 170) - GetDepthInMainChain());	//220 Confirmations
 	}else{
-		return max(0, (nCoinbaseMaturity - 50) - GetDepthInMainChain());
+		return max(0, (nCoinbaseMaturity) - GetDepthInMainChain());	//50 Confirmations
 	}
     
 }
@@ -3624,12 +3624,6 @@ CMerkleBlock::CMerkleBlock(const CBlock& block, CBlockIndex *pBlockIndex, CBloom
 // age (trust score) of competing branches.
 bool CTransaction::GetCoinAge(CTxDB& txdb, const CBlockIndex* pindexPrev, uint64_t& nCoinAge) const
 {
-    CBigNum bnCentSecond = 0;  // coin age in the unit of cent-seconds
-    nCoinAge = 0;
-
-    if (IsCoinBase())
-        return true;
-	
 	/** Min Stake Age Fork **/
 	if (pindexPrev->nHeight > MIN_STAKE_AGE_FORK_BLOCK+1){
 		nStakeMinAge = 2 * 60 * 60;      // 2 hours
@@ -3637,6 +3631,12 @@ bool CTransaction::GetCoinAge(CTxDB& txdb, const CBlockIndex* pindexPrev, uint64
 		nStakeMinAge = 6 * 60 * 60;      // 6 hours
 	}
 	return nStakeMinAge;
+	
+    CBigNum bnCentSecond = 0;  // coin age in the unit of cent-seconds
+    nCoinAge = 0;
+
+    if (IsCoinBase())
+        return true;
 
     BOOST_FOREACH(const CTxIn& txin, vin)
     {
